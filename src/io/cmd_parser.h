@@ -4,6 +4,9 @@
 #include <algorithm>
 #include <tclap/CmdLine.h>
 
+#ifndef _CMD_PARSER_H_
+#define _CMD_PARSER_H_
+
 namespace dd{
 
   class CmdParser{
@@ -36,3 +39,6 @@ namespace dd{
   };
 
 }
+
+
+#endif
