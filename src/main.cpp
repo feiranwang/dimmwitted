@@ -2,6 +2,9 @@
 #include <iostream>
 
 #include "io/cmd_parser.h"
+#include "io/pb_parser.h"
+
+#include "dstruct/factor_graph.h"
 
 int main(int argv, char** argc){
 
@@ -10,5 +13,7 @@ int main(int argv, char** argc){
 
   std::cout << cmd_parser.input_folder->getValue() << std::endl;
 
+  dd::FactorGraph fg;
+  fg.load(cmd_parser);
 
 }
