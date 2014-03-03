@@ -110,6 +110,14 @@ namespace dd{
 
     void load(const CmdParser & cmd);
 
+    void finalize_loading();
+
+    void safety_check();
+
+    bool is_usable(){
+      return this->loading_finalized && this->safety_check_passed;
+    }
+
   };
 
 }
