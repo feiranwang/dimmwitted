@@ -26,6 +26,8 @@ public:
 
   void execute(){
     numa_run_on_node(this->nodeid);
+    //numa_set_localalloc();
+
     this->threads.clear();
     for(int i=0;i<this->nthread;i++){
       this->threads.push_back(std::thread(worker, this->p_workarea, i, this->nthread));

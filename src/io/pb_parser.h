@@ -25,7 +25,7 @@ namespace dd{
     while(coded_input->ReadVarint32(&bytes)){      
       msgLimit = coded_input->PushLimit(bytes);
 
-      coded_input->Skip(3);
+      //coded_input->Skip(3);
       
       if(tmp.MergePartialFromCodedStream(coded_input)){
         handler(tmp, fg);
