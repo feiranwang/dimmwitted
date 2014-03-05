@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <assert.h>
 #include <tclap/CmdLine.h>
 
 #ifndef _CMD_PARSER_H_
@@ -12,24 +13,51 @@ namespace dd{
   class CmdParser{
   public:
 
+    std::string app_name;
+
     TCLAP::ValueArg<std::string> * input_folder;
     TCLAP::ValueArg<std::string> * output_folder;
-    TCLAP::ValueArg<int> * n_epochs;
-    
+
+    TCLAP::ValueArg<int> * n_learning_epoch;
+    TCLAP::ValueArg<int> * n_samples_per_learning_epoch;
+    TCLAP::ValueArg<int> * n_inference_epoch;
+
+    TCLAP::ValueArg<double> * stepsize;
+    TCLAP::ValueArg<double> * decay;
+
     TCLAP::CmdLine * cmd;
 
-    CmdParser(){
+    CmdParser(std::string _app_name){
 
-      cmd = new TCLAP::CmdLine("DimmWitted", ' ', "0.01");
+      app_name = _app_name;
 
-      input_folder = new TCLAP::ValueArg<std::string>("i","input","Input Folder",true,"","string");
-      output_folder = new TCLAP::ValueArg<std::string>("o","output","Output Folder",true,"","string");
-      n_epochs = new TCLAP::ValueArg<int>("n","nepochs","Number of Epochs to Execute",true,-1,"int");
+      if(app_name == "gibbs"){
+        cmd = new TCLAP::CmdLine("DimmWitted GIBBS", ' ', "0.01");
 
-      cmd->add(*input_folder);
-      cmd->add(*output_folder);
-      cmd->add(*n_epochs);
+        input_folder = new TCLAP::ValueArg<std::string>("e","input","Input Folder",true,"","string");
+        output_folder = new TCLAP::ValueArg<std::string>("o","output","Output Folder",true,"","string");
+        
+        n_learning_epoch = new TCLAP::ValueArg<int>("l","n_learning_epoch","Number of Learning Epochs",true,-1,"int");
+        n_samples_per_learning_epoch = new TCLAP::ValueArg<int>("s","n_samples_per_learning_epoch","Number of Samples per Leraning Epoch",true,-1,"int");
+        n_inference_epoch = new TCLAP::ValueArg<int>("i","n_inference_epoch","Number of Samples for Inference",true,-1,"int");
 
+        stepsize = new TCLAP::ValueArg<double>("a","alpha","Stepsize",false,0.01,"double");
+        decay = new TCLAP::ValueArg<double>("d","decay","Decay of stepsize per epoch",false,0.95,"double");
+
+        cmd->add(*input_folder);
+        cmd->add(*output_folder);
+
+        cmd->add(*n_learning_epoch);
+        cmd->add(*n_samples_per_learning_epoch);
+        cmd->add(*n_inference_epoch);
+
+        cmd->add(*stepsize);
+        cmd->add(*decay);
+      }else{
+        std::cout << "ERROR: UNKNOWN APP NAME " << app_name << std::endl;
+        std::cout << "AVAILABLE APP {gibbs}" << app_name << std::endl;
+        assert(false);
+      }
     }
 
     void parse(int argv, char** argc){
