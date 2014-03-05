@@ -66,10 +66,12 @@ void protobuf_AssignDesc_factor_5fgraph_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Weight));
   Variable_descriptor_ = file->message_type(1);
-  static const int Variable_offsets_[3] = {
+  static const int Variable_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Variable, id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Variable, initialvalue_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Variable, datatype_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Variable, isevidence_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Variable, cardinality_),
   };
   Variable_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -185,23 +187,24 @@ void protobuf_AddDesc_factor_5fgraph_2eproto() {
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\022factor_graph.proto\022\010deepdive\"S\n\006Weight"
     "\022\n\n\002id\030\001 \002(\004\022\027\n\014initialValue\030\002 \001(\001:\0010\022\017\n"
-    "\007isFixed\030\003 \002(\010\022\023\n\013description\030\004 \001(\t\"\204\001\n\010"
+    "\007isFixed\030\003 \002(\010\022\023\n\013description\030\004 \001(\t\"\310\001\n\010"
     "Variable\022\n\n\002id\030\001 \002(\004\022\024\n\014initialValue\030\002 \001"
     "(\001\0225\n\010dataType\030\003 \002(\0162#.deepdive.Variable"
-    ".VariableDataType\"\037\n\020VariableDataType\022\013\n"
-    "\007BOOLEAN\020\000\"\254\001\n\006Factor\022\n\n\002id\030\001 \002(\004\022\020\n\010wei"
-    "ghtId\030\002 \002(\004\022;\n\016factorFunction\030\003 \002(\0162#.de"
-    "epdive.Factor.FactorFunctionType\"G\n\022Fact"
-    "orFunctionType\022\t\n\005IMPLY\020\000\022\006\n\002OR\020\001\022\007\n\003AND"
-    "\020\002\022\t\n\005EQUAL\020\003\022\n\n\006ISTRUE\020\004\"]\n\tGraphEdge\022\022"
-    "\n\nvariableId\030\001 \002(\004\022\020\n\010factorId\030\002 \002(\004\022\020\n\010"
-    "position\030\003 \002(\004\022\030\n\nisPositive\030\004 \001(\010:\004true"
-    "\"\232\001\n\013FactorGraph\022 \n\006weight\030\001 \003(\0132\020.deepd"
-    "ive.Weight\022$\n\010variable\030\002 \003(\0132\022.deepdive."
-    "Variable\022 \n\006factor\030\003 \003(\0132\020.deepdive.Fact"
-    "or\022!\n\004edge\030\004 \003(\0132\023.deepdive.GraphEdgeB/\n"
-    "\032org.deepdive.serializationB\021FactorGraph"
-    "Protos", 726);
+    ".VariableDataType\022\022\n\nisEvidence\030\004 \001(\010\022\023\n"
+    "\013cardinality\030\005 \001(\004\":\n\020VariableDataType\022\013"
+    "\n\007BOOLEAN\020\000\022\017\n\013MULTINOMIAL\020\001\022\010\n\004REAL\020\002\"\254"
+    "\001\n\006Factor\022\n\n\002id\030\001 \002(\004\022\020\n\010weightId\030\002 \002(\004\022"
+    ";\n\016factorFunction\030\003 \002(\0162#.deepdive.Facto"
+    "r.FactorFunctionType\"G\n\022FactorFunctionTy"
+    "pe\022\t\n\005IMPLY\020\000\022\006\n\002OR\020\001\022\007\n\003AND\020\002\022\t\n\005EQUAL\020"
+    "\003\022\n\n\006ISTRUE\020\004\"]\n\tGraphEdge\022\022\n\nvariableId"
+    "\030\001 \002(\004\022\020\n\010factorId\030\002 \002(\004\022\020\n\010position\030\003 \002"
+    "(\004\022\030\n\nisPositive\030\004 \001(\010:\004true\"\232\001\n\013FactorG"
+    "raph\022 \n\006weight\030\001 \003(\0132\020.deepdive.Weight\022$"
+    "\n\010variable\030\002 \003(\0132\022.deepdive.Variable\022 \n\006"
+    "factor\030\003 \003(\0132\020.deepdive.Factor\022!\n\004edge\030\004"
+    " \003(\0132\023.deepdive.GraphEdgeB/\n\032org.deepdiv"
+    "e.serializationB\021FactorGraphProtos", 794);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "factor_graph.proto", &protobuf_RegisterTypes);
   Weight::default_instance_ = new Weight();
@@ -575,6 +578,8 @@ const ::google::protobuf::EnumDescriptor* Variable_VariableDataType_descriptor()
 bool Variable_VariableDataType_IsValid(int value) {
   switch(value) {
     case 0:
+    case 1:
+    case 2:
       return true;
     default:
       return false;
@@ -583,6 +588,8 @@ bool Variable_VariableDataType_IsValid(int value) {
 
 #ifndef _MSC_VER
 const Variable_VariableDataType Variable::BOOLEAN;
+const Variable_VariableDataType Variable::MULTINOMIAL;
+const Variable_VariableDataType Variable::REAL;
 const Variable_VariableDataType Variable::VariableDataType_MIN;
 const Variable_VariableDataType Variable::VariableDataType_MAX;
 const int Variable::VariableDataType_ARRAYSIZE;
@@ -591,6 +598,8 @@ const int Variable::VariableDataType_ARRAYSIZE;
 const int Variable::kIdFieldNumber;
 const int Variable::kInitialValueFieldNumber;
 const int Variable::kDataTypeFieldNumber;
+const int Variable::kIsEvidenceFieldNumber;
+const int Variable::kCardinalityFieldNumber;
 #endif  // !_MSC_VER
 
 Variable::Variable()
@@ -612,6 +621,8 @@ void Variable::SharedCtor() {
   id_ = GOOGLE_ULONGLONG(0);
   initialvalue_ = 0;
   datatype_ = 0;
+  isevidence_ = false;
+  cardinality_ = GOOGLE_ULONGLONG(0);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -650,6 +661,8 @@ void Variable::Clear() {
     id_ = GOOGLE_ULONGLONG(0);
     initialvalue_ = 0;
     datatype_ = 0;
+    isevidence_ = false;
+    cardinality_ = GOOGLE_ULONGLONG(0);
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -709,6 +722,38 @@ bool Variable::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(32)) goto parse_isEvidence;
+        break;
+      }
+
+      // optional bool isEvidence = 4;
+      case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_isEvidence:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &isevidence_)));
+          set_has_isevidence();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(40)) goto parse_cardinality;
+        break;
+      }
+
+      // optional uint64 cardinality = 5;
+      case 5: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_cardinality:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
+                 input, &cardinality_)));
+          set_has_cardinality();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -747,6 +792,16 @@ void Variable::SerializeWithCachedSizes(
       3, this->datatype(), output);
   }
 
+  // optional bool isEvidence = 4;
+  if (has_isevidence()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(4, this->isevidence(), output);
+  }
+
+  // optional uint64 cardinality = 5;
+  if (has_cardinality()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(5, this->cardinality(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -769,6 +824,16 @@ void Variable::SerializeWithCachedSizes(
   if (has_datatype()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
       3, this->datatype(), target);
+  }
+
+  // optional bool isEvidence = 4;
+  if (has_isevidence()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(4, this->isevidence(), target);
+  }
+
+  // optional uint64 cardinality = 5;
+  if (has_cardinality()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(5, this->cardinality(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -798,6 +863,18 @@ int Variable::ByteSize() const {
     if (has_datatype()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::EnumSize(this->datatype());
+    }
+
+    // optional bool isEvidence = 4;
+    if (has_isevidence()) {
+      total_size += 1 + 1;
+    }
+
+    // optional uint64 cardinality = 5;
+    if (has_cardinality()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt64Size(
+          this->cardinality());
     }
 
   }
@@ -836,6 +913,12 @@ void Variable::MergeFrom(const Variable& from) {
     if (from.has_datatype()) {
       set_datatype(from.datatype());
     }
+    if (from.has_isevidence()) {
+      set_isevidence(from.isevidence());
+    }
+    if (from.has_cardinality()) {
+      set_cardinality(from.cardinality());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -863,6 +946,8 @@ void Variable::Swap(Variable* other) {
     std::swap(id_, other->id_);
     std::swap(initialvalue_, other->initialvalue_);
     std::swap(datatype_, other->datatype_);
+    std::swap(isevidence_, other->isevidence_);
+    std::swap(cardinality_, other->cardinality_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

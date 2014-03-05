@@ -41,11 +41,13 @@ class GraphEdge;
 class FactorGraph;
 
 enum Variable_VariableDataType {
-  Variable_VariableDataType_BOOLEAN = 0
+  Variable_VariableDataType_BOOLEAN = 0,
+  Variable_VariableDataType_MULTINOMIAL = 1,
+  Variable_VariableDataType_REAL = 2
 };
 bool Variable_VariableDataType_IsValid(int value);
 const Variable_VariableDataType Variable_VariableDataType_VariableDataType_MIN = Variable_VariableDataType_BOOLEAN;
-const Variable_VariableDataType Variable_VariableDataType_VariableDataType_MAX = Variable_VariableDataType_BOOLEAN;
+const Variable_VariableDataType Variable_VariableDataType_VariableDataType_MAX = Variable_VariableDataType_REAL;
 const int Variable_VariableDataType_VariableDataType_ARRAYSIZE = Variable_VariableDataType_VariableDataType_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* Variable_VariableDataType_descriptor();
@@ -253,6 +255,8 @@ class Variable : public ::google::protobuf::Message {
 
   typedef Variable_VariableDataType VariableDataType;
   static const VariableDataType BOOLEAN = Variable_VariableDataType_BOOLEAN;
+  static const VariableDataType MULTINOMIAL = Variable_VariableDataType_MULTINOMIAL;
+  static const VariableDataType REAL = Variable_VariableDataType_REAL;
   static inline bool VariableDataType_IsValid(int value) {
     return Variable_VariableDataType_IsValid(value);
   }
@@ -297,6 +301,20 @@ class Variable : public ::google::protobuf::Message {
   inline ::deepdive::Variable_VariableDataType datatype() const;
   inline void set_datatype(::deepdive::Variable_VariableDataType value);
 
+  // optional bool isEvidence = 4;
+  inline bool has_isevidence() const;
+  inline void clear_isevidence();
+  static const int kIsEvidenceFieldNumber = 4;
+  inline bool isevidence() const;
+  inline void set_isevidence(bool value);
+
+  // optional uint64 cardinality = 5;
+  inline bool has_cardinality() const;
+  inline void clear_cardinality();
+  static const int kCardinalityFieldNumber = 5;
+  inline ::google::protobuf::uint64 cardinality() const;
+  inline void set_cardinality(::google::protobuf::uint64 value);
+
   // @@protoc_insertion_point(class_scope:deepdive.Variable)
  private:
   inline void set_has_id();
@@ -305,15 +323,21 @@ class Variable : public ::google::protobuf::Message {
   inline void clear_has_initialvalue();
   inline void set_has_datatype();
   inline void clear_has_datatype();
+  inline void set_has_isevidence();
+  inline void clear_has_isevidence();
+  inline void set_has_cardinality();
+  inline void clear_has_cardinality();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::uint64 id_;
   double initialvalue_;
   int datatype_;
+  bool isevidence_;
+  ::google::protobuf::uint64 cardinality_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
 
   friend void  protobuf_AddDesc_factor_5fgraph_2eproto();
   friend void protobuf_AssignDesc_factor_5fgraph_2eproto();
@@ -899,6 +923,50 @@ inline void Variable::set_datatype(::deepdive::Variable_VariableDataType value) 
   assert(::deepdive::Variable_VariableDataType_IsValid(value));
   set_has_datatype();
   datatype_ = value;
+}
+
+// optional bool isEvidence = 4;
+inline bool Variable::has_isevidence() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void Variable::set_has_isevidence() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void Variable::clear_has_isevidence() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void Variable::clear_isevidence() {
+  isevidence_ = false;
+  clear_has_isevidence();
+}
+inline bool Variable::isevidence() const {
+  return isevidence_;
+}
+inline void Variable::set_isevidence(bool value) {
+  set_has_isevidence();
+  isevidence_ = value;
+}
+
+// optional uint64 cardinality = 5;
+inline bool Variable::has_cardinality() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void Variable::set_has_cardinality() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void Variable::clear_has_cardinality() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void Variable::clear_cardinality() {
+  cardinality_ = GOOGLE_ULONGLONG(0);
+  clear_has_cardinality();
+}
+inline ::google::protobuf::uint64 Variable::cardinality() const {
+  return cardinality_;
+}
+inline void Variable::set_cardinality(::google::protobuf::uint64 value) {
+  set_has_cardinality();
+  cardinality_ = value;
 }
 
 // -------------------------------------------------------------------
