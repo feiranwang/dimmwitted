@@ -22,8 +22,11 @@ namespace dd{
     google::protobuf::uint32 bytes;
     google::protobuf::io::CodedInputStream::Limit msgLimit;
     coded_input->SetTotalBytesLimit(1e9, 9e8);
-    while(coded_input->ReadVarint32(&bytes)){
+    while(coded_input->ReadVarint32(&bytes)){      
       msgLimit = coded_input->PushLimit(bytes);
+
+      coded_input->Skip(3);
+      
       if(tmp.MergePartialFromCodedStream(coded_input)){
         handler(tmp, fg);
         ct ++;
@@ -33,6 +36,7 @@ namespace dd{
         std::cout << "[ERROR] Send the file to czhang@cs.wisc.edu..." << std::endl; 
         assert(false);
       }
+      
       coded_input->PopLimit(msgLimit);
     }
     google::protobuf::ShutdownProtobufLibrary();
