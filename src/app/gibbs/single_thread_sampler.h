@@ -45,7 +45,7 @@ namespace dd{
       size_t nvar = p_fg->n_variables;
       size_t start = (nvar/n_sharding) * i_sharding;
       size_t end = (nvar/n_sharding) * (i_sharding+1);
-      end = end > nvar ? nvar : end;
+      end = end > nvar ? end : nvar;
       for(size_t i=start; i<end; i++){
         this->sample_sgd_single_variable(i);
       }
