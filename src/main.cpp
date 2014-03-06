@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <iostream>
 #include <numa.h>
+#include <unistd.h>
 
 #include "io/cmd_parser.h"
 #include "io/pb_parser.h"
@@ -36,6 +37,7 @@ dd::CmdParser parse_input(int argv, char** argc){
 void gibbs(dd::CmdParser & cmd_parser){
 
   int n_numa_node = numa_max_node() + 1;
+  int n_thread_per_numa = (sysconf(_SC_NPROCESSORS_CONF))/(n_numa_node);
 
   std::string input_folder = cmd_parser.input_folder->getValue();
   std::string output_folder = cmd_parser.output_folder->getValue();
@@ -47,6 +49,12 @@ void gibbs(dd::CmdParser & cmd_parser){
   double stepsize = cmd_parser.stepsize->getValue();
   double decay = cmd_parser.decay->getValue();
 
+  std::cout << std::endl;
+  std::cout << "#################MACHINE CONFIG#################" << std::endl;
+  std::cout << "# # NUMA Node        : " << n_numa_node << std::endl;
+  std::cout << "# # Thread/NUMA Node : " << n_thread_per_numa << std::endl;
+  std::cout << "################################################" << std::endl;
+  std::cout << std::endl;
   std::cout << "#################GIBBS SAMPLING#################" << std::endl;
   std::cout << "# input_folder       : " << input_folder << std::endl;
   std::cout << "# output_folder      : " << output_folder << std::endl;
