@@ -284,6 +284,7 @@ void dd::GibbsSampling::dump(){
     if(bin >= 0 && bin <=10){
       abc[bin] ++;
     }else{
+      std::cout << variable.id << "   " << variable.agg_mean << "   " << variable.n_sample << std::endl;
       bad ++;
     }
   }
