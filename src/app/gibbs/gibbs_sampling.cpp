@@ -249,6 +249,9 @@ void dd::GibbsSampling::dump(){
     new google::protobuf::io::CodedOutputStream(_OstreamOutputStream);
   deepdive::VariableInferenceResult msg;
   for(const auto & variable : this->p_fg->variables){
+    if(variable.is_evid == true){
+      continue;
+    }
     if(variable.domain_type != DTYPE_BOOLEAN){
       std::cout << "ERROR: Only support boolean variables for now!" << std::endl;
       assert(false);
