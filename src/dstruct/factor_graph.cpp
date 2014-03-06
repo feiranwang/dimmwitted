@@ -5,15 +5,17 @@
 
 void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
   if(variable.datatype() == deepdive::Variable_VariableDataType_BOOLEAN){
-    if(variable.isevidence()==true){
+    if(variable.has_initialvalue()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
       fg.variables.push_back(
         dd::Variable(variable.id(), DTYPE_BOOLEAN, true, 0, 1, 
           variable.initialvalue(), variable.initialvalue())
       );
+      fg.n_var_evid ++;
     }else{
       fg.variables.push_back(
         dd::Variable(variable.id(), DTYPE_BOOLEAN, false, 0, 1, 0, 0)
       );
+      fg.n_var_query ++;
     }
     //std::cout << "~~~~" << variable.id() << std::endl;
   }else{
@@ -65,6 +67,8 @@ void dd::FactorGraph::load(const CmdParser & cmd){
   long n_loaded = dd::stream_load_pb<deepdive::Variable, dd::FactorGraph, handle_variable>(filename_variables, *this);
   assert(n_loaded == this->variables.size());
   std::cout << "LOADED VARIABLES: #" << this->variables.size() << std::endl;
+  std::cout << "          QUERY : #" << this->n_var_query << std::endl;
+  std::cout << "          EVID  : #" << this->n_var_evid << std::endl;
 
   n_loaded = dd::stream_load_pb<deepdive::Factor, dd::FactorGraph, handle_factor>(filename_factors, *this);
   assert(n_loaded == this->factors.size());

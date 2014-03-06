@@ -39,15 +39,15 @@ class Variable;
 class Factor;
 class GraphEdge;
 class FactorGraph;
+class WeightInferenceResult;
+class VariableInferenceResult;
 
 enum Variable_VariableDataType {
-  Variable_VariableDataType_BOOLEAN = 0,
-  Variable_VariableDataType_MULTINOMIAL = 1,
-  Variable_VariableDataType_REAL = 2
+  Variable_VariableDataType_BOOLEAN = 0
 };
 bool Variable_VariableDataType_IsValid(int value);
 const Variable_VariableDataType Variable_VariableDataType_VariableDataType_MIN = Variable_VariableDataType_BOOLEAN;
-const Variable_VariableDataType Variable_VariableDataType_VariableDataType_MAX = Variable_VariableDataType_REAL;
+const Variable_VariableDataType Variable_VariableDataType_VariableDataType_MAX = Variable_VariableDataType_BOOLEAN;
 const int Variable_VariableDataType_VariableDataType_ARRAYSIZE = Variable_VariableDataType_VariableDataType_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* Variable_VariableDataType_descriptor();
@@ -255,8 +255,6 @@ class Variable : public ::google::protobuf::Message {
 
   typedef Variable_VariableDataType VariableDataType;
   static const VariableDataType BOOLEAN = Variable_VariableDataType_BOOLEAN;
-  static const VariableDataType MULTINOMIAL = Variable_VariableDataType_MULTINOMIAL;
-  static const VariableDataType REAL = Variable_VariableDataType_REAL;
   static inline bool VariableDataType_IsValid(int value) {
     return Variable_VariableDataType_IsValid(value);
   }
@@ -301,20 +299,6 @@ class Variable : public ::google::protobuf::Message {
   inline ::deepdive::Variable_VariableDataType datatype() const;
   inline void set_datatype(::deepdive::Variable_VariableDataType value);
 
-  // optional bool isEvidence = 4;
-  inline bool has_isevidence() const;
-  inline void clear_isevidence();
-  static const int kIsEvidenceFieldNumber = 4;
-  inline bool isevidence() const;
-  inline void set_isevidence(bool value);
-
-  // optional uint64 cardinality = 5;
-  inline bool has_cardinality() const;
-  inline void clear_cardinality();
-  static const int kCardinalityFieldNumber = 5;
-  inline ::google::protobuf::uint64 cardinality() const;
-  inline void set_cardinality(::google::protobuf::uint64 value);
-
   // @@protoc_insertion_point(class_scope:deepdive.Variable)
  private:
   inline void set_has_id();
@@ -323,21 +307,15 @@ class Variable : public ::google::protobuf::Message {
   inline void clear_has_initialvalue();
   inline void set_has_datatype();
   inline void clear_has_datatype();
-  inline void set_has_isevidence();
-  inline void clear_has_isevidence();
-  inline void set_has_cardinality();
-  inline void clear_has_cardinality();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::uint64 id_;
   double initialvalue_;
   int datatype_;
-  bool isevidence_;
-  ::google::protobuf::uint64 cardinality_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
 
   friend void  protobuf_AddDesc_factor_5fgraph_2eproto();
   friend void protobuf_AssignDesc_factor_5fgraph_2eproto();
@@ -711,6 +689,200 @@ class FactorGraph : public ::google::protobuf::Message {
   void InitAsDefaultInstance();
   static FactorGraph* default_instance_;
 };
+// -------------------------------------------------------------------
+
+class WeightInferenceResult : public ::google::protobuf::Message {
+ public:
+  WeightInferenceResult();
+  virtual ~WeightInferenceResult();
+
+  WeightInferenceResult(const WeightInferenceResult& from);
+
+  inline WeightInferenceResult& operator=(const WeightInferenceResult& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const WeightInferenceResult& default_instance();
+
+  void Swap(WeightInferenceResult* other);
+
+  // implements Message ----------------------------------------------
+
+  WeightInferenceResult* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const WeightInferenceResult& from);
+  void MergeFrom(const WeightInferenceResult& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required uint64 id = 1;
+  inline bool has_id() const;
+  inline void clear_id();
+  static const int kIdFieldNumber = 1;
+  inline ::google::protobuf::uint64 id() const;
+  inline void set_id(::google::protobuf::uint64 value);
+
+  // required double value = 2;
+  inline bool has_value() const;
+  inline void clear_value();
+  static const int kValueFieldNumber = 2;
+  inline double value() const;
+  inline void set_value(double value);
+
+  // @@protoc_insertion_point(class_scope:deepdive.WeightInferenceResult)
+ private:
+  inline void set_has_id();
+  inline void clear_has_id();
+  inline void set_has_value();
+  inline void clear_has_value();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint64 id_;
+  double value_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+
+  friend void  protobuf_AddDesc_factor_5fgraph_2eproto();
+  friend void protobuf_AssignDesc_factor_5fgraph_2eproto();
+  friend void protobuf_ShutdownFile_factor_5fgraph_2eproto();
+
+  void InitAsDefaultInstance();
+  static WeightInferenceResult* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class VariableInferenceResult : public ::google::protobuf::Message {
+ public:
+  VariableInferenceResult();
+  virtual ~VariableInferenceResult();
+
+  VariableInferenceResult(const VariableInferenceResult& from);
+
+  inline VariableInferenceResult& operator=(const VariableInferenceResult& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const VariableInferenceResult& default_instance();
+
+  void Swap(VariableInferenceResult* other);
+
+  // implements Message ----------------------------------------------
+
+  VariableInferenceResult* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const VariableInferenceResult& from);
+  void MergeFrom(const VariableInferenceResult& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required uint64 id = 1;
+  inline bool has_id() const;
+  inline void clear_id();
+  static const int kIdFieldNumber = 1;
+  inline ::google::protobuf::uint64 id() const;
+  inline void set_id(::google::protobuf::uint64 value);
+
+  // optional uint64 category = 2;
+  inline bool has_category() const;
+  inline void clear_category();
+  static const int kCategoryFieldNumber = 2;
+  inline ::google::protobuf::uint64 category() const;
+  inline void set_category(::google::protobuf::uint64 value);
+
+  // required double expectation = 3;
+  inline bool has_expectation() const;
+  inline void clear_expectation();
+  static const int kExpectationFieldNumber = 3;
+  inline double expectation() const;
+  inline void set_expectation(double value);
+
+  // @@protoc_insertion_point(class_scope:deepdive.VariableInferenceResult)
+ private:
+  inline void set_has_id();
+  inline void clear_has_id();
+  inline void set_has_category();
+  inline void clear_has_category();
+  inline void set_has_expectation();
+  inline void clear_has_expectation();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint64 id_;
+  ::google::protobuf::uint64 category_;
+  double expectation_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+
+  friend void  protobuf_AddDesc_factor_5fgraph_2eproto();
+  friend void protobuf_AssignDesc_factor_5fgraph_2eproto();
+  friend void protobuf_ShutdownFile_factor_5fgraph_2eproto();
+
+  void InitAsDefaultInstance();
+  static VariableInferenceResult* default_instance_;
+};
 // ===================================================================
 
 
@@ -923,50 +1095,6 @@ inline void Variable::set_datatype(::deepdive::Variable_VariableDataType value) 
   assert(::deepdive::Variable_VariableDataType_IsValid(value));
   set_has_datatype();
   datatype_ = value;
-}
-
-// optional bool isEvidence = 4;
-inline bool Variable::has_isevidence() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
-}
-inline void Variable::set_has_isevidence() {
-  _has_bits_[0] |= 0x00000008u;
-}
-inline void Variable::clear_has_isevidence() {
-  _has_bits_[0] &= ~0x00000008u;
-}
-inline void Variable::clear_isevidence() {
-  isevidence_ = false;
-  clear_has_isevidence();
-}
-inline bool Variable::isevidence() const {
-  return isevidence_;
-}
-inline void Variable::set_isevidence(bool value) {
-  set_has_isevidence();
-  isevidence_ = value;
-}
-
-// optional uint64 cardinality = 5;
-inline bool Variable::has_cardinality() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
-}
-inline void Variable::set_has_cardinality() {
-  _has_bits_[0] |= 0x00000010u;
-}
-inline void Variable::clear_has_cardinality() {
-  _has_bits_[0] &= ~0x00000010u;
-}
-inline void Variable::clear_cardinality() {
-  cardinality_ = GOOGLE_ULONGLONG(0);
-  clear_has_cardinality();
-}
-inline ::google::protobuf::uint64 Variable::cardinality() const {
-  return cardinality_;
-}
-inline void Variable::set_cardinality(::google::protobuf::uint64 value) {
-  set_has_cardinality();
-  cardinality_ = value;
 }
 
 // -------------------------------------------------------------------
@@ -1234,6 +1362,124 @@ FactorGraph::edge() const {
 inline ::google::protobuf::RepeatedPtrField< ::deepdive::GraphEdge >*
 FactorGraph::mutable_edge() {
   return &edge_;
+}
+
+// -------------------------------------------------------------------
+
+// WeightInferenceResult
+
+// required uint64 id = 1;
+inline bool WeightInferenceResult::has_id() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void WeightInferenceResult::set_has_id() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void WeightInferenceResult::clear_has_id() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void WeightInferenceResult::clear_id() {
+  id_ = GOOGLE_ULONGLONG(0);
+  clear_has_id();
+}
+inline ::google::protobuf::uint64 WeightInferenceResult::id() const {
+  return id_;
+}
+inline void WeightInferenceResult::set_id(::google::protobuf::uint64 value) {
+  set_has_id();
+  id_ = value;
+}
+
+// required double value = 2;
+inline bool WeightInferenceResult::has_value() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void WeightInferenceResult::set_has_value() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void WeightInferenceResult::clear_has_value() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void WeightInferenceResult::clear_value() {
+  value_ = 0;
+  clear_has_value();
+}
+inline double WeightInferenceResult::value() const {
+  return value_;
+}
+inline void WeightInferenceResult::set_value(double value) {
+  set_has_value();
+  value_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// VariableInferenceResult
+
+// required uint64 id = 1;
+inline bool VariableInferenceResult::has_id() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void VariableInferenceResult::set_has_id() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void VariableInferenceResult::clear_has_id() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void VariableInferenceResult::clear_id() {
+  id_ = GOOGLE_ULONGLONG(0);
+  clear_has_id();
+}
+inline ::google::protobuf::uint64 VariableInferenceResult::id() const {
+  return id_;
+}
+inline void VariableInferenceResult::set_id(::google::protobuf::uint64 value) {
+  set_has_id();
+  id_ = value;
+}
+
+// optional uint64 category = 2;
+inline bool VariableInferenceResult::has_category() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void VariableInferenceResult::set_has_category() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void VariableInferenceResult::clear_has_category() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void VariableInferenceResult::clear_category() {
+  category_ = GOOGLE_ULONGLONG(0);
+  clear_has_category();
+}
+inline ::google::protobuf::uint64 VariableInferenceResult::category() const {
+  return category_;
+}
+inline void VariableInferenceResult::set_category(::google::protobuf::uint64 value) {
+  set_has_category();
+  category_ = value;
+}
+
+// required double expectation = 3;
+inline bool VariableInferenceResult::has_expectation() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void VariableInferenceResult::set_has_expectation() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void VariableInferenceResult::clear_has_expectation() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void VariableInferenceResult::clear_expectation() {
+  expectation_ = 0;
+  clear_has_expectation();
+}
+inline double VariableInferenceResult::expectation() const {
+  return expectation_;
+}
+inline void VariableInferenceResult::set_expectation(double value) {
+  set_has_expectation();
+  expectation_ = value;
 }
 
 
