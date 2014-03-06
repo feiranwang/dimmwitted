@@ -32,21 +32,21 @@ namespace dd{
     }
 
     void sample(const int & i_sharding, const int & n_sharding){
-      size_t nvar = p_fg->n_variables;
-      size_t start = (nvar/n_sharding) * i_sharding;
-      size_t end = (nvar/n_sharding) * (i_sharding+1);
+      long nvar = p_fg->n_variables;
+      long start = ((long)(nvar/n_sharding)+1) * i_sharding;
+      long end = ((long)(nvar/n_sharding)+1) * (i_sharding+1);
       end = end > nvar ? nvar : end;
-      for(size_t i=start; i<end; i++){
+      for(long i=start; i<end; i++){
         this->sample_single_variable(i);
       }
     }
 
     void sample_sgd(const int & i_sharding, const int & n_sharding){
-      size_t nvar = p_fg->n_variables;
-      size_t start = (nvar/n_sharding) * i_sharding;
-      size_t end = (nvar/n_sharding) * (i_sharding+1);
-      end = end > nvar ? end : nvar;
-      for(size_t i=start; i<end; i++){
+      long nvar = p_fg->n_variables;
+      long start = ((long)(nvar/n_sharding)+1) * i_sharding;
+      long end = ((long)(nvar/n_sharding)+1) * (i_sharding+1);
+      end = end > nvar ? nvar : end;
+      for(long i=start; i<end; i++){
         this->sample_sgd_single_variable(i);
       }
     }

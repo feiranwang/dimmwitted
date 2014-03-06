@@ -485,6 +485,7 @@ namespace dd{
         //_mm_prefetch((void*) &fg_immutable->factor_ids_copies[i_fid+1], _MM_HINT_T1);
         //_mm_prefetch((void*) &weights[fg_immutable->factor_ids_copies[i_fid+1].weight_id], _MM_HINT_T1);
 
+
         const CompactFactor & factor = variable.factors[i_fid];
         const double & weight = weights[factor.weight_id];
 
