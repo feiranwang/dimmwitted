@@ -114,6 +114,9 @@ namespace dd{
 
     long n_var_in_factors;
 
+    long n_var_query;
+    long n_var_evid;
+
     bool loading_finalized;
     bool safety_check_passed;
 
@@ -123,6 +126,8 @@ namespace dd{
       this->loading_finalized = false;
       this->safety_check_passed = false;
       this->n_var_in_factors = 0;
+      this->n_var_query = 0;
+      this->n_var_evid = 0;
     }
 
     double potential(const Variable & variable, const double & proposal){
@@ -179,7 +184,7 @@ namespace dd{
         
         const VariableInFactor & vif = factor.vifs[i_vif];
 
-        if(i_vif == factor.var_in_factor_end - 1){
+        if(vif.n_position == factor.n_vifs - 1){
           if(vif.vid == vid){
             sum += (vif.is_positive == true ? proposal : 1-proposal);
           }else{
@@ -398,18 +403,20 @@ namespace dd{
         const Factor & factor = _p_fg->factors[i];
         factors[i] = CompactFactor(factor.id, factor.weight_id, factor.func_id);
         factors[i].var_in_factor_start = i_factor_ids;
+        factors[i].vifs = &var_in_factors[i_factor_ids];
         for(const VariableInFactor & vif : factor.variables){
           var_in_factors[i_factor_ids] = vif;
           i_factor_ids ++;
         }
         factors[i].var_in_factor_end = i_factor_ids;
+        factors[i].n_vifs = factors[i].var_in_factor_end - factors[i].var_in_factor_start;
       }
 
       for(size_t i=0;i<n_var_in_factors;i++){
         const long & factor_id = factor_ids[i];
         factor_ids_copies[i] = CompactFactor(factors[factor_id].id, factors[factor_id].weight_id, 
-          factors[factor_id].func_id, &var_in_factors[factors[factor_id].var_in_factor_start],
-          factors[factor_id].var_in_factor_end-factors[factor_id].var_in_factor_start);
+        factors[factor_id].func_id, &var_in_factors[factors[factor_id].var_in_factor_start],
+        factors[factor_id].var_in_factor_end-factors[factor_id].var_in_factor_start);
         //factor_ids_copies[i].var_in_factor_start = factors[factor_id].var_in_factor_start;
         //factor_ids_copies[i].var_in_factor_end = factors[factor_id].var_in_factor_end;
         //std::cout << (factor_ids_copies[i].var_in_factor_end-factor_ids_copies[i].var_in_factor_start) << std::endl;
@@ -420,8 +427,6 @@ namespace dd{
 
   class CompactFactorGraph{
   public:
-
-    bool does_change_evid;
 
     long n_weights;
     long n_variables;
@@ -438,12 +443,15 @@ namespace dd{
     const long * const factor_ids;
 
     double * const weights;
+
     double * const variable_assignments_free;
     double * const variable_assignments_evid;
     double * const agg_means;
     double * const agg_nsamples;
     double * const factor_tallies_free;
     double * const factor_tallies_evid;
+
+    double stepsize;
 
     CompactFactorGraph(CompactFactorGraph_Immutable * const _fg_immutable,
       CompactFactorGraph_Mutable * const _fg_mutable):
@@ -468,7 +476,7 @@ namespace dd{
 
       }
 
-    double potential(const CompactVariable & variable, const double & proposal){
+    double potential(const CompactVariable & variable, const double & proposal, const bool & does_change_evid){
       double pot = 0.0;
       //for(size_t i_fid=variable.factor_id_start;i_fid<variable.factor_id_end;i_fid++){
 
@@ -491,7 +499,18 @@ namespace dd{
       return pot;
     }
 
-    double potential(CompactFactor & factor){
+    double update_weight(const CompactVariable & variable){
+      for(size_t i_fid=0;i_fid<variable.n_factors;i_fid++){
+        const CompactFactor & factor = variable.factors[i_fid];
+        if(weights_is_fixed[factor.weight_id] == false){
+          double & weight = weights[factor.weight_id];
+          weight += stepsize * (this->potential(factor, false) - this->potential(factor, true));
+        }
+      }
+    }
+
+
+    double potential(const CompactFactor & factor, const bool & does_change_evid){
       if(does_change_evid){
         return factor.potential(fg_mutable->variable_assignments_free, fg_immutable->var_in_factors, -1, -1);
       }else{
@@ -499,11 +518,13 @@ namespace dd{
       }  
     }
 
-    void update(const CompactVariable & variable, const double & new_value){
+    void update(const CompactVariable & variable, const double & new_value, const bool & does_change_evid){
       if(does_change_evid){
         // it does not make sense to tally varialbes when we can change
         // evidences
         fg_mutable->variable_assignments_free[variable.id] = new_value;
+        //fg_mutable->agg_means[variable.id] += new_value;
+        //fg_mutable->agg_nsamples[variable.id] ++;
       }else{
         fg_mutable->variable_assignments_evid[variable.id] = new_value;
         fg_mutable->agg_means[variable.id] += new_value;
@@ -512,9 +533,6 @@ namespace dd{
     }
 
   };
-
-
-
 
 }
 

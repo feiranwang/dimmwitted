@@ -32,11 +32,10 @@ dd::CmdParser parse_input(int argv, char** argc){
   return cmd_parser;
 }
 
-int main(int argv, char** argc){
+
+void gibbs(dd::CmdParser & cmd_parser){
 
   int n_numa_node = numa_max_node() + 1;
-
-  dd::CmdParser cmd_parser = parse_input(argv, argc);
 
   std::string input_folder = cmd_parser.input_folder->getValue();
   std::string output_folder = cmd_parser.output_folder->getValue();
@@ -48,7 +47,7 @@ int main(int argv, char** argc){
   double stepsize = cmd_parser.stepsize->getValue();
   double decay = cmd_parser.decay->getValue();
 
-  std::cout << "################GIBBS SAMPLING################" << std::endl;
+  std::cout << "#################GIBBS SAMPLING#################" << std::endl;
   std::cout << "# input_folder       : " << input_folder << std::endl;
   std::cout << "# output_folder      : " << output_folder << std::endl;
   std::cout << "# n_learning_epoch   : " << n_learning_epoch << std::endl;
@@ -56,13 +55,18 @@ int main(int argv, char** argc){
   std::cout << "# n_inference_epoch  : " << n_inference_epoch << std::endl;
   std::cout << "# stepsize           : " << stepsize << std::endl;
   std::cout << "# decay              : " << decay << std::endl;
-  std::cout << "##############################################" << std::endl;
+  std::cout << "################################################" << std::endl;
+  std::cout << "# IGNORE -s (n_samples/l. epoch). ALWAYS -s 1. #" << std::endl;
+  std::cout << "################################################" << std::endl;
 
   dd::FactorGraph fg;
   fg.load(cmd_parser);
   dd::GibbsSampling gibbs(&fg, &cmd_parser);
 
-  gibbs.learn(n_learning_epoch, n_samples_per_learning_epoch, stepsize, decay);
+  int numa_aware_n_learning_epoch = (int)(n_learning_epoch/n_numa_node) + 
+                            (n_learning_epoch%n_numa_node==0?0:1);
+
+  gibbs.learn(numa_aware_n_learning_epoch, n_samples_per_learning_epoch, stepsize, decay);
   gibbs.dump_weights();
 
   int numa_aware_n_epoch = (int)(n_inference_epoch/n_numa_node) + 
@@ -72,3 +76,20 @@ int main(int argv, char** argc){
   gibbs.dump();
 
 }
+
+int main(int argv, char** argc){
+
+  dd::CmdParser cmd_parser = parse_input(argv, argc);
+
+  if(cmd_parser.app_name == "gibbs"){
+    gibbs(cmd_parser);
+  }
+
+}
+
+
+
+
+
+
+
