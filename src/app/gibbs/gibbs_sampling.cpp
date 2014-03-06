@@ -293,8 +293,8 @@ void dd::GibbsSampling::dump(){
   for(int i=0;i<10;i++){
     std::cout << "PROB BIN 0." << i << "~0." << (i+1) << "  -->  # " << abc[i] << std::endl;
   }
-  std::cout << std::endl;
-  std::cout << "# BAD PROB " << bad << std::endl;
+  //std::cout << std::endl;
+  //std::cout << "# BAD PROB " << bad << std::endl;
 
 
 }
