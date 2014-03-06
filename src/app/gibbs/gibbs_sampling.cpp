@@ -1,8 +1,10 @@
 
 #include "app/gibbs/gibbs_sampling.h"
 #include "app/gibbs/single_node_sampler.h"
+#include "io/pb_parser.h"
 #include <numa.h>
 #include <unistd.h>
+#include <fstream>
 #include "timer.h"
 
 /*!
@@ -168,6 +170,8 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
 
 void dd::GibbsSampling::dump_weights(){
 
+  
+
   std::cout << "LEARNING SNIPPETS (QUERY WEIGHTS):" << std::endl;
   CompactFactorGraph const & cfg = this->compact_factors[0];
   int ct = 0;
@@ -179,6 +183,35 @@ void dd::GibbsSampling::dump_weights(){
     }
   }
   std::cout << "   ..." << std::endl; 
+
+  std::string filename_protocol = this->p_cmd_parser->output_folder->getValue() + "/inference_result.out.weights";
+  std::string filename_text = this->p_cmd_parser->output_folder->getValue() + "/inference_result.out.weights.text";
+
+  std::cout << "DUMPING... PROTOCOL: " << filename_protocol << std::endl;
+  std::cout << "DUMPING... TEXT    : " << filename_text << std::endl;
+
+  std::ofstream fout_text(filename_text.c_str());
+  std::ofstream mFs(filename_protocol.c_str(),std::ios::out | std::ios::binary);
+  google::protobuf::io::OstreamOutputStream *_OstreamOutputStream = 
+    new google::protobuf::io::OstreamOutputStream(&mFs);
+  google::protobuf::io::CodedOutputStream *_CodedOutputStream = 
+    new google::protobuf::io::CodedOutputStream(_OstreamOutputStream);
+  deepdive::WeightInferenceResult msg;
+  for(size_t i=0;i<cfg.n_weights;i++){
+    fout_text << i << " " << cfg.fg_mutable->weights[i] << std::endl;
+    msg.set_id(i);
+    msg.set_value(cfg.fg_mutable->weights[i]);
+    _CodedOutputStream->WriteVarint32(msg.ByteSize());
+    if ( !msg.SerializeToCodedStream(_CodedOutputStream) ){
+      std::cout << "SerializeToCodedStream error " << std::endl;
+      assert(false);
+    } 
+  }
+  delete _CodedOutputStream;
+  delete _OstreamOutputStream;
+  mFs.close();
+  fout_text.close();
+
 }
 
 
@@ -205,6 +238,37 @@ void dd::GibbsSampling::dump(){
     }
   }
   std::cout << "   ..." << std::endl; 
+
+  std::string filename_protocol = this->p_cmd_parser->output_folder->getValue() + "/inference_result.out";
+  std::string filename_text = this->p_cmd_parser->output_folder->getValue() + "/inference_result.out.text";
+  std::cout << "DUMPING... PROTOCOL: " << filename_protocol << std::endl;
+  std::cout << "DUMPING... TEXT    : " << filename_text << std::endl;
+  std::ofstream fout_text(filename_text.c_str());
+  std::ofstream mFs(filename_protocol.c_str(),std::ios::out | std::ios::binary);
+  google::protobuf::io::OstreamOutputStream *_OstreamOutputStream = 
+    new google::protobuf::io::OstreamOutputStream(&mFs);
+  google::protobuf::io::CodedOutputStream *_CodedOutputStream = 
+    new google::protobuf::io::CodedOutputStream(_OstreamOutputStream);
+  deepdive::VariableInferenceResult msg;
+  for(const auto & variable : this->p_fg->variables){
+    if(variable.domain_type != DTYPE_BOOLEAN){
+      std::cout << "ERROR: Only support boolean variables for now!" << std::endl;
+      assert(false);
+    }
+    fout_text << variable.id << " " << (variable.agg_mean/variable.n_sample) << std::endl;
+    msg.set_id(variable.id);
+    msg.set_category(1.0);
+    msg.set_expectation(variable.agg_mean/variable.n_sample);
+    _CodedOutputStream->WriteVarint32(msg.ByteSize());
+    if ( !msg.SerializeToCodedStream(_CodedOutputStream) ){
+      std::cout << "SerializeToCodedStream error " << std::endl;
+      assert(false);
+    } 
+  }
+  delete _CodedOutputStream;
+  delete _OstreamOutputStream;
+  mFs.close();
+  fout_text.close();
 
   std::cout << "INFERENCE CALIBRATION (QUERY BINS):" << std::endl;
   std::vector<int> abc;
