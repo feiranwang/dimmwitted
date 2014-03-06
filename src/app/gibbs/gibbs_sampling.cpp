@@ -18,7 +18,7 @@
 void dd::GibbsSampling::prepare(){
 
   n_numa_nodes = numa_max_node();
-  n_thread_per_numa = 20;
+  n_thread_per_numa = (sysconf(_SC_NPROCESSORS_CONF))/(n_numa_nodes+1);
 
   for(int i=0;i<=n_numa_nodes;i++){
 
@@ -169,8 +169,6 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
 }
 
 void dd::GibbsSampling::dump_weights(){
-
-  
 
   std::cout << "LEARNING SNIPPETS (QUERY WEIGHTS):" << std::endl;
   CompactFactorGraph const & cfg = this->compact_factors[0];

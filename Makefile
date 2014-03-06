@@ -27,14 +27,13 @@ clean:
 	rm -rf factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o
 	rm -rf dw
 
-
 gibbs:
-	./dw gibbs -e data2/ -o data2/ -i 1000 -l 100 -s 10 --alpha 0.01 --decay 0.95
+	./dw gibbs -e data/ -o data/ -i 1000 -l 100 -s 10 --alpha 0.01 --decay 0.95
 
 test:
 	./dw gibbs -e ./test/factor_graph/lr_inf/ 		\
 			   -o ./test/factor_graph/lr_inf/ 		\
-			   -i 100 -l 0 -s 10
+			   -i 100 -l 100 -s 10
 
 test_learn:
 	./dw gibbs -e ./test/factor_graph/lr_learn/ 	\
