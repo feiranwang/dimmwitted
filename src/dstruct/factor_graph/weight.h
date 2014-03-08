@@ -17,6 +17,13 @@ namespace dd{
       this->weight = _weight;
       this->isfixed = _isfixed;
     }
+
+    Weight(){
+      id = -1;
+      weight = 0.0;
+      isfixed = false;
+    }
+
   }; 
 
 }

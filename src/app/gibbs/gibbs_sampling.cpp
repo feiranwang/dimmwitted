@@ -81,24 +81,21 @@ void dd::GibbsSampling::inference(const int & n_epoch){
 void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoch, 
                               const double & stepsize, const double & decay){
 
-  /*
   Timer t_total;
 
   double current_stepsize = stepsize;
 
   Timer t;
-  int nvar = this->compact_factors[0].n_variables;
+  int nvar = this->factorgraphs[0].variables.size();
   int nnode = n_numa_nodes + 1;
-  int nweight = this->compact_factors[0].n_weights;
-
-  //n_thread_per_numa = 1;
+  int nweight = this->factorgraphs[0].weights.size();
 
   std::vector<SingleNodeSampler> single_node_samplers;
   for(int i=0;i<=n_numa_nodes;i++){
-    single_node_samplers.push_back(SingleNodeSampler(&this->compact_factors[i], n_thread_per_numa, i));
+    single_node_samplers.push_back(SingleNodeSampler(&this->factorgraphs[i], n_thread_per_numa, i));
   }
 
-  double * ori_weights = new double[nweight];
+  Weight * ori_weights = new Weight[nweight];
 
   for(int i_epoch=0;i_epoch<n_epoch;i_epoch++){
 
@@ -107,7 +104,7 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
 
     t.restart();
     
-    memcpy(ori_weights, this->compact_factors[0].weights, sizeof(double)*nweight);
+    memcpy(ori_weights, &this->factorgraphs[0].weights[0], sizeof(Weight)*nweight);
 
     for(int i=0;i<nnode;i++){
       single_node_samplers[i].p_fg->stepsize = current_stepsize;
@@ -121,24 +118,24 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
       single_node_samplers[i].wait_sgd();
     }
 
-    CompactFactorGraph const & cfg = this->compact_factors[0];
+    FactorGraph & cfg = this->factorgraphs[0];
     for(int i=1;i<=n_numa_nodes;i++){
-      CompactFactorGraph const & cfg_other = this->compact_factors[i];
-      for(int j=0;j<cfg.n_weights;j++){
-        cfg.fg_mutable->weights[j] += cfg_other.fg_mutable->weights[j];
+      FactorGraph & cfg_other = this->factorgraphs[i];
+      for(int j=0;j<nweight;j++){
+        cfg.weights[j].weight += cfg_other.weights[j].weight;
       }
     }
 
-    for(int j=0;j<cfg.n_weights;j++){
-      cfg.fg_mutable->weights[j] /= nnode;
-      cfg.fg_mutable->weights[j] *= (1.0/(1.0+0.01*current_stepsize));
+    for(int j=0;j<nweight;j++){
+      cfg.weights[j].weight /= nnode;
+      cfg.weights[j].weight *= (1.0/(1.0+0.01*current_stepsize));
     }
 
     for(int i=1;i<=n_numa_nodes;i++){
-      CompactFactorGraph const & cfg_other = this->compact_factors[i];
-      for(int j=0;j<cfg_other.n_weights;j++){
-        if(cfg_other.fg_immutable->weights_is_fixed[j] == false){
-          cfg_other.fg_mutable->weights[j] = this->compact_factors[0].fg_mutable->weights[j];
+      FactorGraph &cfg_other = this->factorgraphs[i];
+      for(int j=0;j<nweight;j++){
+        if(cfg.weights[j].isfixed == false){
+          cfg_other.weights[j].weight = cfg.weights[j].weight;
         }
       }
     }
@@ -146,7 +143,7 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
     double lmax = -1000000;
     double l2=0.0;
     for(int i=0;i<nweight;i++){
-      double diff = fabs(ori_weights[i] - cfg.fg_mutable->weights[i]);
+      double diff = fabs(ori_weights[i].weight - cfg.weights[i].weight);
       l2 += diff*diff;
       if(lmax < diff){
         lmax = diff;
@@ -165,23 +162,24 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
 
   double elapsed = t_total.elapsed();
   std::cout << "TOTAL LEARNING TIME: " << elapsed << " sec." << std::endl;
-  */
+
 }
 
 void dd::GibbsSampling::dump_weights(){
 
-  /*
   std::cout << "LEARNING SNIPPETS (QUERY WEIGHTS):" << std::endl;
-  CompactFactorGraph const & cfg = this->compact_factors[0];
+  FactorGraph const & cfg = this->factorgraphs[0];
   int ct = 0;
-  for(int i=0;i<cfg.n_weights;i++){
+  for(int i=0;i<cfg.weights.size();i++){
     ct ++;
-    std::cout << "   " << i << " " << cfg.fg_mutable->weights[i] << std::endl;
+    std::cout << "   " << i << " " << cfg.weights[i].weight << std::endl;
     if(ct % 10 == 0){
       break;
     }
   }
   std::cout << "   ..." << std::endl; 
+
+  /*
 
   std::string filename_protocol = this->p_cmd_parser->output_folder->getValue() + "/inference_result.out.weights";
   std::string filename_text = this->p_cmd_parser->output_folder->getValue() + "/inference_result.out.weights.text";
