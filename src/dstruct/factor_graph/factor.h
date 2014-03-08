@@ -24,7 +24,6 @@ namespace dd{
     long weight_id;
     std::vector<VariableInFactor> variables;
     int func_id; 
-
     Factor(const long & _id,
            const int & _weight_id,
            const int & _func_id){
@@ -32,9 +31,29 @@ namespace dd{
       this->weight_id = _weight_id;
       this->func_id = _func_id;
     }
+    template<bool does_change_evid>
+    inline double _potential_imply(const std::vector<Variable> &, 
+                                   const long &, const double &) const;
 
     template<bool does_change_evid>
-    inline double _potential_imply(const std::vector<Variable> & _variables, 
+    inline double potential(const std::vector<Variable> & _variables,
+      const long & vid, const double & proposal) const{ 
+      
+      if(func_id == 0){
+        return this->template _potential_imply<does_change_evid>(_variables, vid, proposal);
+      }else if(func_id == 4){
+        return this->template _potential_imply<does_change_evid>(_variables, vid, proposal);
+      }else{
+        std::cout << "Unsupported Factor Function ID= " << func_id << std::endl;
+        assert(false);
+      }
+      return 0.0;
+    }
+ 
+  };
+
+  template<bool does_change_evid>
+  inline double dd::Factor::_potential_imply(const std::vector<Variable> & _variables, 
       const long & vid, const double & proposal) const{
 
       double sum = 0.0;
@@ -56,34 +75,12 @@ namespace dd{
           }
         }
       }
-
       if(sum != 0){
         return 1.0;
       }else{
         return 0.0;
       }
-
-    }
-
-
-    template<bool does_change_evid>
-    inline double potential(const std::vector<Variable> & _variables,
-      const long & vid, const double & proposal) const{ 
-      
-      if(func_id == 0){
-        return this->template _potential_imply<does_change_evid>(_variables, vid, proposal);
-      }else if(func_id == 4){
-        return this->template _potential_imply<does_change_evid>(_variables, vid, proposal);
-      }else{
-        std::cout << "Unsupported Factor Function ID= " << func_id << std::endl;
-        assert(false);
-      }
-      return 0.0;
-    }
- 
-
-  };
-
+  }
 }
 
 #endif

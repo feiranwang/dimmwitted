@@ -15,7 +15,7 @@ namespace dd{
 
     std::string app_name;
 
-    TCLAP::ValueArg<std::string> * fg_file;
+    //TCLAP::ValueArg<std::string> * fg_file;
 
     TCLAP::ValueArg<std::string> * edge_file;
     TCLAP::ValueArg<std::string> * weight_file;
@@ -41,7 +41,7 @@ namespace dd{
       if(app_name == "gibbs"){
         cmd = new TCLAP::CmdLine("DimmWitted GIBBS", ' ', "0.01");
 
-        fg_file = new TCLAP::ValueArg<std::string>("m","fg_meta","factor graph metadata file in protocol buffer format",true,"","string"); 
+        //fg_file = new TCLAP::ValueArg<std::string>("m","fg_meta","factor graph metadata file in protocol buffer format",true,"","string"); 
 
         edge_file = new TCLAP::ValueArg<std::string>("e","edges","edges file in protocol buffer format",true,"","string"); 
         weight_file = new TCLAP::ValueArg<std::string>("w","weights","weights file in protocol buffer format",true,"","string"); 
@@ -58,7 +58,7 @@ namespace dd{
 
         n_thread = new TCLAP::ValueArg<int>("t","threads","This setting is no longer supported and will be ignored.",false,-1,"int");
 
-        cmd->add(*fg_file);
+        //cmd->add(*fg_file);
         
         cmd->add(*edge_file);
         cmd->add(*weight_file);
