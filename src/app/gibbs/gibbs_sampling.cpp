@@ -2,7 +2,7 @@
 #include "app/gibbs/gibbs_sampling.h"
 #include "app/gibbs/single_node_sampler.h"
 #include "io/pb_parser.h"
-#include <numa.h>
+#include "common.h"
 #include <unistd.h>
 #include <fstream>
 #include "timer.h"

@@ -1,10 +1,22 @@
 
 
-GCC = /net/rulk/lfs/rulk/0/czhang/software/gcc/bin/g++
-OPT_FLAG = -Ofast 
+UNAME := $(shell uname)
+
+ifeq ($(UNAME), Linux)
+GCC = g++
+OPT_FLAG = -Ofast
 GCC_INCLUDE = -I./lib/tclap/include/ -I./lib/protobuf/include/ -I./src
 GCC_LIB = -L./lib/protobuf/lib/
 CPP_FLAG = -std=c++0x -lnuma -lrt -lprotobuf
+endif
+
+ifeq ($(UNAME), Darwin)
+GCC = clang++
+OPT_FLAG = -O3 -stdlib=libc++
+GCC_INCLUDE = -I./lib/tclap/include/ -I./lib/protobuf/include/ -I./src
+GCC_LIB = -L./lib/protobuf/lib/
+CPP_FLAG = -std=c++0x  -lprotobuf
+endif
 
 COMPILE_CMD = $(GCC) $(OPT_FLAG) $(GCC_INCLUDE) $(GCC_LIB) $(CPP_FLAG)
 
@@ -22,6 +34,41 @@ factor_graph.pb.o: src/dstruct/factor_graph.pb.cc
 
 gibbs_sampling.o: src/app/gibbs/gibbs_sampling.cpp
 	$(COMPILE_CMD) -c src/app/gibbs/gibbs_sampling.cpp
+
+
+dep:
+	ifeq ($(UNAME), Darwin)
+	cd lib;\
+	tar xf protobuf-2.5.0.tar.bz2;\
+	cd protobuf-2.5.0;\
+	./configure --prefix=`pwd`/../protobuf CC=clang CXX=clang++ CXXFLAGS='-std=c++11 -stdlib=libc++ -O3 -g' LDFLAGS='-stdlib=libc++' LIBS="-lc++ -lc++abi";\
+	make -j8;\
+	make install
+
+	cd lib;\
+	tar xf tclap-1.2.1.tar.gz;\
+	cd tclap-1.2.1;\
+	./configure --prefix=`pwd`/../tclap;\
+	make;\
+	make install
+	endif
+
+	ifeq ($(UNAME), Darwin)
+	cd lib;\
+	tar xf protobuf-2.5.0.tar.bz2;\
+	cd protobuf-2.5.0;\
+	./configure --prefix=`pwd`/../protobuf ;\
+	make -j8;\
+	make install
+
+	cd lib;\
+	tar xf tclap-1.2.1.tar.gz;\
+	cd tclap-1.2.1;\
+	./configure --prefix=`pwd`/../tclap;\
+	make;\
+	make install
+	endif
+
 
 clean:
 	rm -rf factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o

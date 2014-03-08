@@ -1,7 +1,8 @@
 
 #include "factor_graph.pb.h"
 #include "io/cmd_parser.h"
-#include <numa.h>
+#include "common.h"
+
 #include <xmmintrin.h>
 
 #ifndef _FACTOR_GRAPH_H_
@@ -10,6 +11,11 @@
 #define DTYPE_BOOLEAN     0x00
 #define DTYPE_REAL        0x01
 #define DTYPE_MULTINOMIAL 0x04
+
+
+
+
+
 
 /*
 enum _mm_hint

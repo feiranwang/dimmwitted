@@ -2,7 +2,7 @@
 #include "worker/single_node_worker.h"
 #include "app/gibbs/single_thread_sampler.h"
 #include <stdlib.h>
-#include <numa.h>
+#include "common.h"
 
 #ifndef _SINGLE_NODE_SAMPLER_H
 #define _SINGLE_NODE_SAMPLER_H

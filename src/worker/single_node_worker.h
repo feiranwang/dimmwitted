@@ -1,8 +1,8 @@
 
 #include <vector>
 #include <thread>
-#include <numa.h>
-#include <numaif.h>
+#include "common.h"
+
 
 #ifndef _SINGLE_NODE_WORKER_H
 #define _SINGLE_NODE_WORKER_H
