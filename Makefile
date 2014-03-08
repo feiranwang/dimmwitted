@@ -75,7 +75,7 @@ clean:
 	rm -rf dw
 
 gibbs:
-	./dw gibbs -e data/ -o data/ -i 1000 -l 100 -s 10 --alpha 0.01 --decay 0.95
+	./dw gibbs -e data/ -o data/ -i 100 -l 100 -s 10 --alpha 0.01 --decay 0.95
 
 test:
 	./dw gibbs -e ./test/factor_graph/lr_inf/ 		\
