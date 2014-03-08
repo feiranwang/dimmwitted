@@ -2,6 +2,7 @@
 #ifndef _FACTOR_H_
 #define _FACTOR_H_
 
+
 namespace dd{
 
   template<bool does_change_evid>
@@ -33,13 +34,51 @@ namespace dd{
     }
 
     template<bool does_change_evid>
-    inline double potential(const std::vector<Variable> & variables, 
+    inline double _potential_imply(const std::vector<Variable> & _variables, 
       const long & vid, const double & proposal) const{
-      if(vid == -1){
-        return get_vassign<does_change_evid>(variables[0]) == 1.0;
-      }else{
-        return get_vassign<does_change_evid>(variables[vid]) == 1.0;
+
+      double sum = 0.0;
+      int nvar = variables.size();
+      for(const VariableInFactor & vif : variables){
+        if(vif.n_position == nvar - 1){
+          if(vif.vid == vid){
+            sum += (vif.is_positive == true ? proposal : 1-proposal);
+          }else{
+            sum += (vif.is_positive == true ? get_vassign<does_change_evid>(_variables[vif.vid]) 
+              : 1-get_vassign<does_change_evid>(_variables[vif.vid]));
+          }
+        }else{
+          if(vif.vid == vid){
+            sum += (vif.is_positive == false ? proposal : 1-proposal);
+          }else{
+            sum += (vif.is_positive == false ? get_vassign<does_change_evid>(_variables[vif.vid]) 
+              : 1-get_vassign<does_change_evid>(_variables[vif.vid]));
+          }
+        }
       }
+
+      if(sum != 0){
+        return 1.0;
+      }else{
+        return 0.0;
+      }
+
+    }
+
+
+    template<bool does_change_evid>
+    inline double potential(const std::vector<Variable> & _variables,
+      const long & vid, const double & proposal) const{ 
+      
+      if(func_id == 0){
+        return this->template _potential_imply<does_change_evid>(_variables, vid, proposal);
+      }else if(func_id == 4){
+        return this->template _potential_imply<does_change_evid>(_variables, vid, proposal);
+      }else{
+        std::cout << "Unsupported Factor Function ID= " << func_id << std::endl;
+        assert(false);
+      }
+      return 0.0;
     }
  
 
@@ -48,3 +87,7 @@ namespace dd{
 }
 
 #endif
+
+
+
+
