@@ -10,7 +10,7 @@
 
 void load_fg(dd::FactorGraph * const _p_fg, const dd::CmdParser & cmd, const int & nodeid){
   std::cout << "LOADING FACTOR GRAPH ON NODE " << nodeid << std::endl;
-  numa_run_on_node(1);
+  numa_run_on_node(nodeid);
   numa_set_localalloc();
   _p_fg->load(cmd);
 }
@@ -96,6 +96,8 @@ void dd::GibbsSampling::inference(const int & n_epoch){
 
 void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoch, 
                               const double & stepsize, const double & decay){
+
+  numa_set_localalloc();
 
   Timer t_total;
 
