@@ -22,7 +22,7 @@ GCC_LIB = -L./lib/protobuf/lib/
 CPP_FLAG = -std=c++0x  -lprotobuf
 endif
 
-COMPILE_CMD = $(GCC) $(OPT_FLAG) $(GCC_INCLUDE) $(GCC_LIB) $(CPP_FLAG)
+COMPILE_CMD = $(CXX) $(OPT_FLAG) $(GCC_INCLUDE) $(GCC_LIB) $(CPP_FLAG)
 
 dw: factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o
 	$(COMPILE_CMD) -o dw factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o    
