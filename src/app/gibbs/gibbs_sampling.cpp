@@ -10,7 +10,7 @@
 
 void load_fg(dd::FactorGraph * const _p_fg, const dd::CmdParser & cmd, const int & nodeid){
   std::cout << "LOADING FACTOR GRAPH ON NODE " << nodeid << std::endl;
-  numa_run_on_node(nodeid);
+  numa_run_on_node(1);
   numa_set_localalloc();
   _p_fg->load(cmd);
 }
