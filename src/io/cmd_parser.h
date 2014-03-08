@@ -15,12 +15,17 @@ namespace dd{
 
     std::string app_name;
 
-    TCLAP::ValueArg<std::string> * input_folder;
+    TCLAP::ValueArg<std::string> * edge_file;
+    TCLAP::ValueArg<std::string> * weight_file;
+    TCLAP::ValueArg<std::string> * variable_file;
+    TCLAP::ValueArg<std::string> * factor_file;
     TCLAP::ValueArg<std::string> * output_folder;
 
     TCLAP::ValueArg<int> * n_learning_epoch;
     TCLAP::ValueArg<int> * n_samples_per_learning_epoch;
     TCLAP::ValueArg<int> * n_inference_epoch;
+
+    TCLAP::ValueArg<int> * n_thread;
 
     TCLAP::ValueArg<double> * stepsize;
     TCLAP::ValueArg<double> * decay;
@@ -34,17 +39,25 @@ namespace dd{
       if(app_name == "gibbs"){
         cmd = new TCLAP::CmdLine("DimmWitted GIBBS", ' ', "0.01");
 
-        input_folder = new TCLAP::ValueArg<std::string>("e","input","Input Folder",true,"","string");
-        output_folder = new TCLAP::ValueArg<std::string>("o","output","Output Folder",true,"","string");
+        edge_file = new TCLAP::ValueArg<std::string>("e","edges","edges file in protocol buffer format",true,"","string"); 
+        weight_file = new TCLAP::ValueArg<std::string>("w","weights","weights file in protocol buffer format",true,"","string"); 
+        variable_file = new TCLAP::ValueArg<std::string>("v","variables","variables file in protocol buffer format",true,"","string"); 
+        factor_file = new TCLAP::ValueArg<std::string>("f","factors","factors file in protocol buffer format",true,"","string"); 
+        output_folder = new TCLAP::ValueArg<std::string>("o","outputFile","Output Folder",true,"","string");
         
         n_learning_epoch = new TCLAP::ValueArg<int>("l","n_learning_epoch","Number of Learning Epochs",true,-1,"int");
         n_samples_per_learning_epoch = new TCLAP::ValueArg<int>("s","n_samples_per_learning_epoch","Number of Samples per Leraning Epoch",true,-1,"int");
         n_inference_epoch = new TCLAP::ValueArg<int>("i","n_inference_epoch","Number of Samples for Inference",true,-1,"int");
 
         stepsize = new TCLAP::ValueArg<double>("a","alpha","Stepsize",false,0.01,"double");
-        decay = new TCLAP::ValueArg<double>("d","decay","Decay of stepsize per epoch",false,0.95,"double");
+        decay = new TCLAP::ValueArg<double>("d","diminish","Decay of stepsize per epoch",false,0.95,"double");
 
-        cmd->add(*input_folder);
+        n_thread = new TCLAP::ValueArg<int>("t","threads","This setting is no longer supported and will be ignored.",false,-1,"int");
+
+        cmd->add(*edge_file);
+        cmd->add(*weight_file);
+        cmd->add(*variable_file);
+        cmd->add(*factor_file);
         cmd->add(*output_folder);
 
         cmd->add(*n_learning_epoch);
@@ -53,6 +66,7 @@ namespace dd{
 
         cmd->add(*stepsize);
         cmd->add(*decay);
+        cmd->add(*n_thread);
       }else{
         std::cout << "ERROR: UNKNOWN APP NAME " << app_name << std::endl;
         std::cout << "AVAILABLE APP {gibbs}" << app_name << std::endl;

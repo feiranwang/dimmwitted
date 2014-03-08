@@ -10,7 +10,8 @@
 
 // The author knows that this is really ugly...
 // But what can we do? Lets hope our Macbook
-// supporting NUMA soon!
+// supporting NUMA soon! A 2lbs laptop with
+// 4 NUMA nodes, how cool is that!
 #ifdef __MACH__
 #include <math.h>
 #include <stdlib.h>

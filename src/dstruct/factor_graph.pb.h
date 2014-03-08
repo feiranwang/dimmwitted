@@ -43,11 +43,13 @@ class WeightInferenceResult;
 class VariableInferenceResult;
 
 enum Variable_VariableDataType {
-  Variable_VariableDataType_BOOLEAN = 0
+  Variable_VariableDataType_BOOLEAN = 0,
+  Variable_VariableDataType_MULTINOMIAL = 1,
+  Variable_VariableDataType_REAL = 2
 };
 bool Variable_VariableDataType_IsValid(int value);
 const Variable_VariableDataType Variable_VariableDataType_VariableDataType_MIN = Variable_VariableDataType_BOOLEAN;
-const Variable_VariableDataType Variable_VariableDataType_VariableDataType_MAX = Variable_VariableDataType_BOOLEAN;
+const Variable_VariableDataType Variable_VariableDataType_VariableDataType_MAX = Variable_VariableDataType_REAL;
 const int Variable_VariableDataType_VariableDataType_ARRAYSIZE = Variable_VariableDataType_VariableDataType_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* Variable_VariableDataType_descriptor();
@@ -255,6 +257,8 @@ class Variable : public ::google::protobuf::Message {
 
   typedef Variable_VariableDataType VariableDataType;
   static const VariableDataType BOOLEAN = Variable_VariableDataType_BOOLEAN;
+  static const VariableDataType MULTINOMIAL = Variable_VariableDataType_MULTINOMIAL;
+  static const VariableDataType REAL = Variable_VariableDataType_REAL;
   static inline bool VariableDataType_IsValid(int value) {
     return Variable_VariableDataType_IsValid(value);
   }
@@ -299,6 +303,27 @@ class Variable : public ::google::protobuf::Message {
   inline ::deepdive::Variable_VariableDataType datatype() const;
   inline void set_datatype(::deepdive::Variable_VariableDataType value);
 
+  // optional bool isEvidence = 4;
+  inline bool has_isevidence() const;
+  inline void clear_isevidence();
+  static const int kIsEvidenceFieldNumber = 4;
+  inline bool isevidence() const;
+  inline void set_isevidence(bool value);
+
+  // optional uint64 cardinality = 5;
+  inline bool has_cardinality() const;
+  inline void clear_cardinality();
+  static const int kCardinalityFieldNumber = 5;
+  inline ::google::protobuf::uint64 cardinality() const;
+  inline void set_cardinality(::google::protobuf::uint64 value);
+
+  // optional uint64 edgeCount = 6;
+  inline bool has_edgecount() const;
+  inline void clear_edgecount();
+  static const int kEdgeCountFieldNumber = 6;
+  inline ::google::protobuf::uint64 edgecount() const;
+  inline void set_edgecount(::google::protobuf::uint64 value);
+
   // @@protoc_insertion_point(class_scope:deepdive.Variable)
  private:
   inline void set_has_id();
@@ -307,15 +332,24 @@ class Variable : public ::google::protobuf::Message {
   inline void clear_has_initialvalue();
   inline void set_has_datatype();
   inline void clear_has_datatype();
+  inline void set_has_isevidence();
+  inline void clear_has_isevidence();
+  inline void set_has_cardinality();
+  inline void clear_has_cardinality();
+  inline void set_has_edgecount();
+  inline void clear_has_edgecount();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::uint64 id_;
   double initialvalue_;
   int datatype_;
+  bool isevidence_;
+  ::google::protobuf::uint64 cardinality_;
+  ::google::protobuf::uint64 edgecount_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
 
   friend void  protobuf_AddDesc_factor_5fgraph_2eproto();
   friend void protobuf_AssignDesc_factor_5fgraph_2eproto();
@@ -428,6 +462,13 @@ class Factor : public ::google::protobuf::Message {
   inline ::deepdive::Factor_FactorFunctionType factorfunction() const;
   inline void set_factorfunction(::deepdive::Factor_FactorFunctionType value);
 
+  // optional uint64 edgeCount = 4;
+  inline bool has_edgecount() const;
+  inline void clear_edgecount();
+  static const int kEdgeCountFieldNumber = 4;
+  inline ::google::protobuf::uint64 edgecount() const;
+  inline void set_edgecount(::google::protobuf::uint64 value);
+
   // @@protoc_insertion_point(class_scope:deepdive.Factor)
  private:
   inline void set_has_id();
@@ -436,15 +477,18 @@ class Factor : public ::google::protobuf::Message {
   inline void clear_has_weightid();
   inline void set_has_factorfunction();
   inline void clear_has_factorfunction();
+  inline void set_has_edgecount();
+  inline void clear_has_edgecount();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::uint64 id_;
   ::google::protobuf::uint64 weightid_;
+  ::google::protobuf::uint64 edgecount_;
   int factorfunction_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
 
   friend void  protobuf_AddDesc_factor_5fgraph_2eproto();
   friend void protobuf_AssignDesc_factor_5fgraph_2eproto();
@@ -621,66 +665,114 @@ class FactorGraph : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // repeated .deepdive.Weight weight = 1;
-  inline int weight_size() const;
-  inline void clear_weight();
-  static const int kWeightFieldNumber = 1;
-  inline const ::deepdive::Weight& weight(int index) const;
-  inline ::deepdive::Weight* mutable_weight(int index);
-  inline ::deepdive::Weight* add_weight();
-  inline const ::google::protobuf::RepeatedPtrField< ::deepdive::Weight >&
-      weight() const;
-  inline ::google::protobuf::RepeatedPtrField< ::deepdive::Weight >*
-      mutable_weight();
+  // required uint64 numWeights = 1;
+  inline bool has_numweights() const;
+  inline void clear_numweights();
+  static const int kNumWeightsFieldNumber = 1;
+  inline ::google::protobuf::uint64 numweights() const;
+  inline void set_numweights(::google::protobuf::uint64 value);
 
-  // repeated .deepdive.Variable variable = 2;
-  inline int variable_size() const;
-  inline void clear_variable();
-  static const int kVariableFieldNumber = 2;
-  inline const ::deepdive::Variable& variable(int index) const;
-  inline ::deepdive::Variable* mutable_variable(int index);
-  inline ::deepdive::Variable* add_variable();
-  inline const ::google::protobuf::RepeatedPtrField< ::deepdive::Variable >&
-      variable() const;
-  inline ::google::protobuf::RepeatedPtrField< ::deepdive::Variable >*
-      mutable_variable();
+  // required uint64 numVariables = 2;
+  inline bool has_numvariables() const;
+  inline void clear_numvariables();
+  static const int kNumVariablesFieldNumber = 2;
+  inline ::google::protobuf::uint64 numvariables() const;
+  inline void set_numvariables(::google::protobuf::uint64 value);
 
-  // repeated .deepdive.Factor factor = 3;
-  inline int factor_size() const;
-  inline void clear_factor();
-  static const int kFactorFieldNumber = 3;
-  inline const ::deepdive::Factor& factor(int index) const;
-  inline ::deepdive::Factor* mutable_factor(int index);
-  inline ::deepdive::Factor* add_factor();
-  inline const ::google::protobuf::RepeatedPtrField< ::deepdive::Factor >&
-      factor() const;
-  inline ::google::protobuf::RepeatedPtrField< ::deepdive::Factor >*
-      mutable_factor();
+  // required uint64 numFactors = 3;
+  inline bool has_numfactors() const;
+  inline void clear_numfactors();
+  static const int kNumFactorsFieldNumber = 3;
+  inline ::google::protobuf::uint64 numfactors() const;
+  inline void set_numfactors(::google::protobuf::uint64 value);
 
-  // repeated .deepdive.GraphEdge edge = 4;
-  inline int edge_size() const;
-  inline void clear_edge();
-  static const int kEdgeFieldNumber = 4;
-  inline const ::deepdive::GraphEdge& edge(int index) const;
-  inline ::deepdive::GraphEdge* mutable_edge(int index);
-  inline ::deepdive::GraphEdge* add_edge();
-  inline const ::google::protobuf::RepeatedPtrField< ::deepdive::GraphEdge >&
-      edge() const;
-  inline ::google::protobuf::RepeatedPtrField< ::deepdive::GraphEdge >*
-      mutable_edge();
+  // required uint64 numEdges = 4;
+  inline bool has_numedges() const;
+  inline void clear_numedges();
+  static const int kNumEdgesFieldNumber = 4;
+  inline ::google::protobuf::uint64 numedges() const;
+  inline void set_numedges(::google::protobuf::uint64 value);
+
+  // required string weightsFile = 5;
+  inline bool has_weightsfile() const;
+  inline void clear_weightsfile();
+  static const int kWeightsFileFieldNumber = 5;
+  inline const ::std::string& weightsfile() const;
+  inline void set_weightsfile(const ::std::string& value);
+  inline void set_weightsfile(const char* value);
+  inline void set_weightsfile(const char* value, size_t size);
+  inline ::std::string* mutable_weightsfile();
+  inline ::std::string* release_weightsfile();
+  inline void set_allocated_weightsfile(::std::string* weightsfile);
+
+  // required string variablesFile = 6;
+  inline bool has_variablesfile() const;
+  inline void clear_variablesfile();
+  static const int kVariablesFileFieldNumber = 6;
+  inline const ::std::string& variablesfile() const;
+  inline void set_variablesfile(const ::std::string& value);
+  inline void set_variablesfile(const char* value);
+  inline void set_variablesfile(const char* value, size_t size);
+  inline ::std::string* mutable_variablesfile();
+  inline ::std::string* release_variablesfile();
+  inline void set_allocated_variablesfile(::std::string* variablesfile);
+
+  // required string factorsFile = 7;
+  inline bool has_factorsfile() const;
+  inline void clear_factorsfile();
+  static const int kFactorsFileFieldNumber = 7;
+  inline const ::std::string& factorsfile() const;
+  inline void set_factorsfile(const ::std::string& value);
+  inline void set_factorsfile(const char* value);
+  inline void set_factorsfile(const char* value, size_t size);
+  inline ::std::string* mutable_factorsfile();
+  inline ::std::string* release_factorsfile();
+  inline void set_allocated_factorsfile(::std::string* factorsfile);
+
+  // required string edgesFile = 8;
+  inline bool has_edgesfile() const;
+  inline void clear_edgesfile();
+  static const int kEdgesFileFieldNumber = 8;
+  inline const ::std::string& edgesfile() const;
+  inline void set_edgesfile(const ::std::string& value);
+  inline void set_edgesfile(const char* value);
+  inline void set_edgesfile(const char* value, size_t size);
+  inline ::std::string* mutable_edgesfile();
+  inline ::std::string* release_edgesfile();
+  inline void set_allocated_edgesfile(::std::string* edgesfile);
 
   // @@protoc_insertion_point(class_scope:deepdive.FactorGraph)
  private:
+  inline void set_has_numweights();
+  inline void clear_has_numweights();
+  inline void set_has_numvariables();
+  inline void clear_has_numvariables();
+  inline void set_has_numfactors();
+  inline void clear_has_numfactors();
+  inline void set_has_numedges();
+  inline void clear_has_numedges();
+  inline void set_has_weightsfile();
+  inline void clear_has_weightsfile();
+  inline void set_has_variablesfile();
+  inline void clear_has_variablesfile();
+  inline void set_has_factorsfile();
+  inline void clear_has_factorsfile();
+  inline void set_has_edgesfile();
+  inline void clear_has_edgesfile();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
-  ::google::protobuf::RepeatedPtrField< ::deepdive::Weight > weight_;
-  ::google::protobuf::RepeatedPtrField< ::deepdive::Variable > variable_;
-  ::google::protobuf::RepeatedPtrField< ::deepdive::Factor > factor_;
-  ::google::protobuf::RepeatedPtrField< ::deepdive::GraphEdge > edge_;
+  ::google::protobuf::uint64 numweights_;
+  ::google::protobuf::uint64 numvariables_;
+  ::google::protobuf::uint64 numfactors_;
+  ::google::protobuf::uint64 numedges_;
+  ::std::string* weightsfile_;
+  ::std::string* variablesfile_;
+  ::std::string* factorsfile_;
+  ::std::string* edgesfile_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(8 + 31) / 32];
 
   friend void  protobuf_AddDesc_factor_5fgraph_2eproto();
   friend void protobuf_AssignDesc_factor_5fgraph_2eproto();
@@ -1097,6 +1189,72 @@ inline void Variable::set_datatype(::deepdive::Variable_VariableDataType value) 
   datatype_ = value;
 }
 
+// optional bool isEvidence = 4;
+inline bool Variable::has_isevidence() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void Variable::set_has_isevidence() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void Variable::clear_has_isevidence() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void Variable::clear_isevidence() {
+  isevidence_ = false;
+  clear_has_isevidence();
+}
+inline bool Variable::isevidence() const {
+  return isevidence_;
+}
+inline void Variable::set_isevidence(bool value) {
+  set_has_isevidence();
+  isevidence_ = value;
+}
+
+// optional uint64 cardinality = 5;
+inline bool Variable::has_cardinality() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void Variable::set_has_cardinality() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void Variable::clear_has_cardinality() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void Variable::clear_cardinality() {
+  cardinality_ = GOOGLE_ULONGLONG(0);
+  clear_has_cardinality();
+}
+inline ::google::protobuf::uint64 Variable::cardinality() const {
+  return cardinality_;
+}
+inline void Variable::set_cardinality(::google::protobuf::uint64 value) {
+  set_has_cardinality();
+  cardinality_ = value;
+}
+
+// optional uint64 edgeCount = 6;
+inline bool Variable::has_edgecount() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void Variable::set_has_edgecount() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void Variable::clear_has_edgecount() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void Variable::clear_edgecount() {
+  edgecount_ = GOOGLE_ULONGLONG(0);
+  clear_has_edgecount();
+}
+inline ::google::protobuf::uint64 Variable::edgecount() const {
+  return edgecount_;
+}
+inline void Variable::set_edgecount(::google::protobuf::uint64 value) {
+  set_has_edgecount();
+  edgecount_ = value;
+}
+
 // -------------------------------------------------------------------
 
 // Factor
@@ -1166,6 +1324,28 @@ inline void Factor::set_factorfunction(::deepdive::Factor_FactorFunctionType val
   assert(::deepdive::Factor_FactorFunctionType_IsValid(value));
   set_has_factorfunction();
   factorfunction_ = value;
+}
+
+// optional uint64 edgeCount = 4;
+inline bool Factor::has_edgecount() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void Factor::set_has_edgecount() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void Factor::clear_has_edgecount() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void Factor::clear_edgecount() {
+  edgecount_ = GOOGLE_ULONGLONG(0);
+  clear_has_edgecount();
+}
+inline ::google::protobuf::uint64 Factor::edgecount() const {
+  return edgecount_;
+}
+inline void Factor::set_edgecount(::google::protobuf::uint64 value) {
+  set_has_edgecount();
+  edgecount_ = value;
 }
 
 // -------------------------------------------------------------------
@@ -1264,104 +1444,372 @@ inline void GraphEdge::set_ispositive(bool value) {
 
 // FactorGraph
 
-// repeated .deepdive.Weight weight = 1;
-inline int FactorGraph::weight_size() const {
-  return weight_.size();
+// required uint64 numWeights = 1;
+inline bool FactorGraph::has_numweights() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void FactorGraph::clear_weight() {
-  weight_.Clear();
+inline void FactorGraph::set_has_numweights() {
+  _has_bits_[0] |= 0x00000001u;
 }
-inline const ::deepdive::Weight& FactorGraph::weight(int index) const {
-  return weight_.Get(index);
+inline void FactorGraph::clear_has_numweights() {
+  _has_bits_[0] &= ~0x00000001u;
 }
-inline ::deepdive::Weight* FactorGraph::mutable_weight(int index) {
-  return weight_.Mutable(index);
+inline void FactorGraph::clear_numweights() {
+  numweights_ = GOOGLE_ULONGLONG(0);
+  clear_has_numweights();
 }
-inline ::deepdive::Weight* FactorGraph::add_weight() {
-  return weight_.Add();
+inline ::google::protobuf::uint64 FactorGraph::numweights() const {
+  return numweights_;
 }
-inline const ::google::protobuf::RepeatedPtrField< ::deepdive::Weight >&
-FactorGraph::weight() const {
-  return weight_;
-}
-inline ::google::protobuf::RepeatedPtrField< ::deepdive::Weight >*
-FactorGraph::mutable_weight() {
-  return &weight_;
+inline void FactorGraph::set_numweights(::google::protobuf::uint64 value) {
+  set_has_numweights();
+  numweights_ = value;
 }
 
-// repeated .deepdive.Variable variable = 2;
-inline int FactorGraph::variable_size() const {
-  return variable_.size();
+// required uint64 numVariables = 2;
+inline bool FactorGraph::has_numvariables() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void FactorGraph::clear_variable() {
-  variable_.Clear();
+inline void FactorGraph::set_has_numvariables() {
+  _has_bits_[0] |= 0x00000002u;
 }
-inline const ::deepdive::Variable& FactorGraph::variable(int index) const {
-  return variable_.Get(index);
+inline void FactorGraph::clear_has_numvariables() {
+  _has_bits_[0] &= ~0x00000002u;
 }
-inline ::deepdive::Variable* FactorGraph::mutable_variable(int index) {
-  return variable_.Mutable(index);
+inline void FactorGraph::clear_numvariables() {
+  numvariables_ = GOOGLE_ULONGLONG(0);
+  clear_has_numvariables();
 }
-inline ::deepdive::Variable* FactorGraph::add_variable() {
-  return variable_.Add();
+inline ::google::protobuf::uint64 FactorGraph::numvariables() const {
+  return numvariables_;
 }
-inline const ::google::protobuf::RepeatedPtrField< ::deepdive::Variable >&
-FactorGraph::variable() const {
-  return variable_;
-}
-inline ::google::protobuf::RepeatedPtrField< ::deepdive::Variable >*
-FactorGraph::mutable_variable() {
-  return &variable_;
+inline void FactorGraph::set_numvariables(::google::protobuf::uint64 value) {
+  set_has_numvariables();
+  numvariables_ = value;
 }
 
-// repeated .deepdive.Factor factor = 3;
-inline int FactorGraph::factor_size() const {
-  return factor_.size();
+// required uint64 numFactors = 3;
+inline bool FactorGraph::has_numfactors() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void FactorGraph::clear_factor() {
-  factor_.Clear();
+inline void FactorGraph::set_has_numfactors() {
+  _has_bits_[0] |= 0x00000004u;
 }
-inline const ::deepdive::Factor& FactorGraph::factor(int index) const {
-  return factor_.Get(index);
+inline void FactorGraph::clear_has_numfactors() {
+  _has_bits_[0] &= ~0x00000004u;
 }
-inline ::deepdive::Factor* FactorGraph::mutable_factor(int index) {
-  return factor_.Mutable(index);
+inline void FactorGraph::clear_numfactors() {
+  numfactors_ = GOOGLE_ULONGLONG(0);
+  clear_has_numfactors();
 }
-inline ::deepdive::Factor* FactorGraph::add_factor() {
-  return factor_.Add();
+inline ::google::protobuf::uint64 FactorGraph::numfactors() const {
+  return numfactors_;
 }
-inline const ::google::protobuf::RepeatedPtrField< ::deepdive::Factor >&
-FactorGraph::factor() const {
-  return factor_;
-}
-inline ::google::protobuf::RepeatedPtrField< ::deepdive::Factor >*
-FactorGraph::mutable_factor() {
-  return &factor_;
+inline void FactorGraph::set_numfactors(::google::protobuf::uint64 value) {
+  set_has_numfactors();
+  numfactors_ = value;
 }
 
-// repeated .deepdive.GraphEdge edge = 4;
-inline int FactorGraph::edge_size() const {
-  return edge_.size();
+// required uint64 numEdges = 4;
+inline bool FactorGraph::has_numedges() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
 }
-inline void FactorGraph::clear_edge() {
-  edge_.Clear();
+inline void FactorGraph::set_has_numedges() {
+  _has_bits_[0] |= 0x00000008u;
 }
-inline const ::deepdive::GraphEdge& FactorGraph::edge(int index) const {
-  return edge_.Get(index);
+inline void FactorGraph::clear_has_numedges() {
+  _has_bits_[0] &= ~0x00000008u;
 }
-inline ::deepdive::GraphEdge* FactorGraph::mutable_edge(int index) {
-  return edge_.Mutable(index);
+inline void FactorGraph::clear_numedges() {
+  numedges_ = GOOGLE_ULONGLONG(0);
+  clear_has_numedges();
 }
-inline ::deepdive::GraphEdge* FactorGraph::add_edge() {
-  return edge_.Add();
+inline ::google::protobuf::uint64 FactorGraph::numedges() const {
+  return numedges_;
 }
-inline const ::google::protobuf::RepeatedPtrField< ::deepdive::GraphEdge >&
-FactorGraph::edge() const {
-  return edge_;
+inline void FactorGraph::set_numedges(::google::protobuf::uint64 value) {
+  set_has_numedges();
+  numedges_ = value;
 }
-inline ::google::protobuf::RepeatedPtrField< ::deepdive::GraphEdge >*
-FactorGraph::mutable_edge() {
-  return &edge_;
+
+// required string weightsFile = 5;
+inline bool FactorGraph::has_weightsfile() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void FactorGraph::set_has_weightsfile() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void FactorGraph::clear_has_weightsfile() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void FactorGraph::clear_weightsfile() {
+  if (weightsfile_ != &::google::protobuf::internal::kEmptyString) {
+    weightsfile_->clear();
+  }
+  clear_has_weightsfile();
+}
+inline const ::std::string& FactorGraph::weightsfile() const {
+  return *weightsfile_;
+}
+inline void FactorGraph::set_weightsfile(const ::std::string& value) {
+  set_has_weightsfile();
+  if (weightsfile_ == &::google::protobuf::internal::kEmptyString) {
+    weightsfile_ = new ::std::string;
+  }
+  weightsfile_->assign(value);
+}
+inline void FactorGraph::set_weightsfile(const char* value) {
+  set_has_weightsfile();
+  if (weightsfile_ == &::google::protobuf::internal::kEmptyString) {
+    weightsfile_ = new ::std::string;
+  }
+  weightsfile_->assign(value);
+}
+inline void FactorGraph::set_weightsfile(const char* value, size_t size) {
+  set_has_weightsfile();
+  if (weightsfile_ == &::google::protobuf::internal::kEmptyString) {
+    weightsfile_ = new ::std::string;
+  }
+  weightsfile_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* FactorGraph::mutable_weightsfile() {
+  set_has_weightsfile();
+  if (weightsfile_ == &::google::protobuf::internal::kEmptyString) {
+    weightsfile_ = new ::std::string;
+  }
+  return weightsfile_;
+}
+inline ::std::string* FactorGraph::release_weightsfile() {
+  clear_has_weightsfile();
+  if (weightsfile_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = weightsfile_;
+    weightsfile_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void FactorGraph::set_allocated_weightsfile(::std::string* weightsfile) {
+  if (weightsfile_ != &::google::protobuf::internal::kEmptyString) {
+    delete weightsfile_;
+  }
+  if (weightsfile) {
+    set_has_weightsfile();
+    weightsfile_ = weightsfile;
+  } else {
+    clear_has_weightsfile();
+    weightsfile_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
+}
+
+// required string variablesFile = 6;
+inline bool FactorGraph::has_variablesfile() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void FactorGraph::set_has_variablesfile() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void FactorGraph::clear_has_variablesfile() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void FactorGraph::clear_variablesfile() {
+  if (variablesfile_ != &::google::protobuf::internal::kEmptyString) {
+    variablesfile_->clear();
+  }
+  clear_has_variablesfile();
+}
+inline const ::std::string& FactorGraph::variablesfile() const {
+  return *variablesfile_;
+}
+inline void FactorGraph::set_variablesfile(const ::std::string& value) {
+  set_has_variablesfile();
+  if (variablesfile_ == &::google::protobuf::internal::kEmptyString) {
+    variablesfile_ = new ::std::string;
+  }
+  variablesfile_->assign(value);
+}
+inline void FactorGraph::set_variablesfile(const char* value) {
+  set_has_variablesfile();
+  if (variablesfile_ == &::google::protobuf::internal::kEmptyString) {
+    variablesfile_ = new ::std::string;
+  }
+  variablesfile_->assign(value);
+}
+inline void FactorGraph::set_variablesfile(const char* value, size_t size) {
+  set_has_variablesfile();
+  if (variablesfile_ == &::google::protobuf::internal::kEmptyString) {
+    variablesfile_ = new ::std::string;
+  }
+  variablesfile_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* FactorGraph::mutable_variablesfile() {
+  set_has_variablesfile();
+  if (variablesfile_ == &::google::protobuf::internal::kEmptyString) {
+    variablesfile_ = new ::std::string;
+  }
+  return variablesfile_;
+}
+inline ::std::string* FactorGraph::release_variablesfile() {
+  clear_has_variablesfile();
+  if (variablesfile_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = variablesfile_;
+    variablesfile_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void FactorGraph::set_allocated_variablesfile(::std::string* variablesfile) {
+  if (variablesfile_ != &::google::protobuf::internal::kEmptyString) {
+    delete variablesfile_;
+  }
+  if (variablesfile) {
+    set_has_variablesfile();
+    variablesfile_ = variablesfile;
+  } else {
+    clear_has_variablesfile();
+    variablesfile_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
+}
+
+// required string factorsFile = 7;
+inline bool FactorGraph::has_factorsfile() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void FactorGraph::set_has_factorsfile() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void FactorGraph::clear_has_factorsfile() {
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline void FactorGraph::clear_factorsfile() {
+  if (factorsfile_ != &::google::protobuf::internal::kEmptyString) {
+    factorsfile_->clear();
+  }
+  clear_has_factorsfile();
+}
+inline const ::std::string& FactorGraph::factorsfile() const {
+  return *factorsfile_;
+}
+inline void FactorGraph::set_factorsfile(const ::std::string& value) {
+  set_has_factorsfile();
+  if (factorsfile_ == &::google::protobuf::internal::kEmptyString) {
+    factorsfile_ = new ::std::string;
+  }
+  factorsfile_->assign(value);
+}
+inline void FactorGraph::set_factorsfile(const char* value) {
+  set_has_factorsfile();
+  if (factorsfile_ == &::google::protobuf::internal::kEmptyString) {
+    factorsfile_ = new ::std::string;
+  }
+  factorsfile_->assign(value);
+}
+inline void FactorGraph::set_factorsfile(const char* value, size_t size) {
+  set_has_factorsfile();
+  if (factorsfile_ == &::google::protobuf::internal::kEmptyString) {
+    factorsfile_ = new ::std::string;
+  }
+  factorsfile_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* FactorGraph::mutable_factorsfile() {
+  set_has_factorsfile();
+  if (factorsfile_ == &::google::protobuf::internal::kEmptyString) {
+    factorsfile_ = new ::std::string;
+  }
+  return factorsfile_;
+}
+inline ::std::string* FactorGraph::release_factorsfile() {
+  clear_has_factorsfile();
+  if (factorsfile_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = factorsfile_;
+    factorsfile_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void FactorGraph::set_allocated_factorsfile(::std::string* factorsfile) {
+  if (factorsfile_ != &::google::protobuf::internal::kEmptyString) {
+    delete factorsfile_;
+  }
+  if (factorsfile) {
+    set_has_factorsfile();
+    factorsfile_ = factorsfile;
+  } else {
+    clear_has_factorsfile();
+    factorsfile_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
+}
+
+// required string edgesFile = 8;
+inline bool FactorGraph::has_edgesfile() const {
+  return (_has_bits_[0] & 0x00000080u) != 0;
+}
+inline void FactorGraph::set_has_edgesfile() {
+  _has_bits_[0] |= 0x00000080u;
+}
+inline void FactorGraph::clear_has_edgesfile() {
+  _has_bits_[0] &= ~0x00000080u;
+}
+inline void FactorGraph::clear_edgesfile() {
+  if (edgesfile_ != &::google::protobuf::internal::kEmptyString) {
+    edgesfile_->clear();
+  }
+  clear_has_edgesfile();
+}
+inline const ::std::string& FactorGraph::edgesfile() const {
+  return *edgesfile_;
+}
+inline void FactorGraph::set_edgesfile(const ::std::string& value) {
+  set_has_edgesfile();
+  if (edgesfile_ == &::google::protobuf::internal::kEmptyString) {
+    edgesfile_ = new ::std::string;
+  }
+  edgesfile_->assign(value);
+}
+inline void FactorGraph::set_edgesfile(const char* value) {
+  set_has_edgesfile();
+  if (edgesfile_ == &::google::protobuf::internal::kEmptyString) {
+    edgesfile_ = new ::std::string;
+  }
+  edgesfile_->assign(value);
+}
+inline void FactorGraph::set_edgesfile(const char* value, size_t size) {
+  set_has_edgesfile();
+  if (edgesfile_ == &::google::protobuf::internal::kEmptyString) {
+    edgesfile_ = new ::std::string;
+  }
+  edgesfile_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* FactorGraph::mutable_edgesfile() {
+  set_has_edgesfile();
+  if (edgesfile_ == &::google::protobuf::internal::kEmptyString) {
+    edgesfile_ = new ::std::string;
+  }
+  return edgesfile_;
+}
+inline ::std::string* FactorGraph::release_edgesfile() {
+  clear_has_edgesfile();
+  if (edgesfile_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = edgesfile_;
+    edgesfile_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void FactorGraph::set_allocated_edgesfile(::std::string* edgesfile) {
+  if (edgesfile_ != &::google::protobuf::internal::kEmptyString) {
+    delete edgesfile_;
+  }
+  if (edgesfile) {
+    set_has_edgesfile();
+    edgesfile_ = edgesfile;
+  } else {
+    clear_has_edgesfile();
+    edgesfile_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
 }
 
 // -------------------------------------------------------------------

@@ -72,10 +72,13 @@ void protobuf_AssignDesc_factor_5fgraph_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Weight));
   Variable_descriptor_ = file->message_type(1);
-  static const int Variable_offsets_[3] = {
+  static const int Variable_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Variable, id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Variable, initialvalue_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Variable, datatype_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Variable, isevidence_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Variable, cardinality_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Variable, edgecount_),
   };
   Variable_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -90,10 +93,11 @@ void protobuf_AssignDesc_factor_5fgraph_2eproto() {
       sizeof(Variable));
   Variable_VariableDataType_descriptor_ = Variable_descriptor_->enum_type(0);
   Factor_descriptor_ = file->message_type(2);
-  static const int Factor_offsets_[3] = {
+  static const int Factor_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Factor, id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Factor, weightid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Factor, factorfunction_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Factor, edgecount_),
   };
   Factor_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -126,11 +130,15 @@ void protobuf_AssignDesc_factor_5fgraph_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GraphEdge));
   FactorGraph_descriptor_ = file->message_type(4);
-  static const int FactorGraph_offsets_[4] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FactorGraph, weight_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FactorGraph, variable_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FactorGraph, factor_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FactorGraph, edge_),
+  static const int FactorGraph_offsets_[8] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FactorGraph, numweights_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FactorGraph, numvariables_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FactorGraph, numfactors_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FactorGraph, numedges_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FactorGraph, weightsfile_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FactorGraph, variablesfile_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FactorGraph, factorsfile_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FactorGraph, edgesfile_),
   };
   FactorGraph_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -232,26 +240,29 @@ void protobuf_AddDesc_factor_5fgraph_2eproto() {
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\022factor_graph.proto\022\010deepdive\"S\n\006Weight"
     "\022\n\n\002id\030\001 \002(\004\022\027\n\014initialValue\030\002 \001(\001:\0010\022\017\n"
-    "\007isFixed\030\003 \002(\010\022\023\n\013description\030\004 \001(\t\"\204\001\n\010"
+    "\007isFixed\030\003 \002(\010\022\023\n\013description\030\004 \001(\t\"\333\001\n\010"
     "Variable\022\n\n\002id\030\001 \002(\004\022\024\n\014initialValue\030\002 \001"
     "(\001\0225\n\010dataType\030\003 \002(\0162#.deepdive.Variable"
-    ".VariableDataType\"\037\n\020VariableDataType\022\013\n"
-    "\007BOOLEAN\020\000\"\254\001\n\006Factor\022\n\n\002id\030\001 \002(\004\022\020\n\010wei"
-    "ghtId\030\002 \002(\004\022;\n\016factorFunction\030\003 \002(\0162#.de"
-    "epdive.Factor.FactorFunctionType\"G\n\022Fact"
-    "orFunctionType\022\t\n\005IMPLY\020\000\022\006\n\002OR\020\001\022\007\n\003AND"
-    "\020\002\022\t\n\005EQUAL\020\003\022\n\n\006ISTRUE\020\004\"]\n\tGraphEdge\022\022"
-    "\n\nvariableId\030\001 \002(\004\022\020\n\010factorId\030\002 \002(\004\022\020\n\010"
-    "position\030\003 \002(\004\022\030\n\nisPositive\030\004 \001(\010:\004true"
-    "\"\232\001\n\013FactorGraph\022 \n\006weight\030\001 \003(\0132\020.deepd"
-    "ive.Weight\022$\n\010variable\030\002 \003(\0132\022.deepdive."
-    "Variable\022 \n\006factor\030\003 \003(\0132\020.deepdive.Fact"
-    "or\022!\n\004edge\030\004 \003(\0132\023.deepdive.GraphEdge\"2\n"
-    "\025WeightInferenceResult\022\n\n\002id\030\001 \002(\004\022\r\n\005va"
-    "lue\030\002 \002(\001\"L\n\027VariableInferenceResult\022\n\n\002"
-    "id\030\001 \002(\004\022\020\n\010category\030\002 \001(\004\022\023\n\013expectatio"
-    "n\030\003 \002(\001B/\n\032org.deepdive.serializationB\021F"
-    "actorGraphProtos", 856);
+    ".VariableDataType\022\022\n\nisEvidence\030\004 \001(\010\022\023\n"
+    "\013cardinality\030\005 \001(\004\022\021\n\tedgeCount\030\006 \001(\004\":\n"
+    "\020VariableDataType\022\013\n\007BOOLEAN\020\000\022\017\n\013MULTIN"
+    "OMIAL\020\001\022\010\n\004REAL\020\002\"\277\001\n\006Factor\022\n\n\002id\030\001 \002(\004"
+    "\022\020\n\010weightId\030\002 \002(\004\022;\n\016factorFunction\030\003 \002"
+    "(\0162#.deepdive.Factor.FactorFunctionType\022"
+    "\021\n\tedgeCount\030\004 \001(\004\"G\n\022FactorFunctionType"
+    "\022\t\n\005IMPLY\020\000\022\006\n\002OR\020\001\022\007\n\003AND\020\002\022\t\n\005EQUAL\020\003\022"
+    "\n\n\006ISTRUE\020\004\"]\n\tGraphEdge\022\022\n\nvariableId\030\001"
+    " \002(\004\022\020\n\010factorId\030\002 \002(\004\022\020\n\010position\030\003 \002(\004"
+    "\022\030\n\nisPositive\030\004 \001(\010:\004true\"\261\001\n\013FactorGra"
+    "ph\022\022\n\nnumWeights\030\001 \002(\004\022\024\n\014numVariables\030\002"
+    " \002(\004\022\022\n\nnumFactors\030\003 \002(\004\022\020\n\010numEdges\030\004 \002"
+    "(\004\022\023\n\013weightsFile\030\005 \002(\t\022\025\n\rvariablesFile"
+    "\030\006 \002(\t\022\023\n\013factorsFile\030\007 \002(\t\022\021\n\tedgesFile"
+    "\030\010 \002(\t\"2\n\025WeightInferenceResult\022\n\n\002id\030\001 "
+    "\002(\004\022\r\n\005value\030\002 \002(\001\"L\n\027VariableInferenceR"
+    "esult\022\n\n\002id\030\001 \002(\004\022\020\n\010category\030\002 \001(\004\022\023\n\013e"
+    "xpectation\030\003 \002(\001B/\n\032org.deepdive.seriali"
+    "zationB\021FactorGraphProtos", 985);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "factor_graph.proto", &protobuf_RegisterTypes);
   Weight::default_instance_ = new Weight();
@@ -629,6 +640,8 @@ const ::google::protobuf::EnumDescriptor* Variable_VariableDataType_descriptor()
 bool Variable_VariableDataType_IsValid(int value) {
   switch(value) {
     case 0:
+    case 1:
+    case 2:
       return true;
     default:
       return false;
@@ -637,6 +650,8 @@ bool Variable_VariableDataType_IsValid(int value) {
 
 #ifndef _MSC_VER
 const Variable_VariableDataType Variable::BOOLEAN;
+const Variable_VariableDataType Variable::MULTINOMIAL;
+const Variable_VariableDataType Variable::REAL;
 const Variable_VariableDataType Variable::VariableDataType_MIN;
 const Variable_VariableDataType Variable::VariableDataType_MAX;
 const int Variable::VariableDataType_ARRAYSIZE;
@@ -645,6 +660,9 @@ const int Variable::VariableDataType_ARRAYSIZE;
 const int Variable::kIdFieldNumber;
 const int Variable::kInitialValueFieldNumber;
 const int Variable::kDataTypeFieldNumber;
+const int Variable::kIsEvidenceFieldNumber;
+const int Variable::kCardinalityFieldNumber;
+const int Variable::kEdgeCountFieldNumber;
 #endif  // !_MSC_VER
 
 Variable::Variable()
@@ -666,6 +684,9 @@ void Variable::SharedCtor() {
   id_ = GOOGLE_ULONGLONG(0);
   initialvalue_ = 0;
   datatype_ = 0;
+  isevidence_ = false;
+  cardinality_ = GOOGLE_ULONGLONG(0);
+  edgecount_ = GOOGLE_ULONGLONG(0);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -704,6 +725,9 @@ void Variable::Clear() {
     id_ = GOOGLE_ULONGLONG(0);
     initialvalue_ = 0;
     datatype_ = 0;
+    isevidence_ = false;
+    cardinality_ = GOOGLE_ULONGLONG(0);
+    edgecount_ = GOOGLE_ULONGLONG(0);
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -763,6 +787,54 @@ bool Variable::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(32)) goto parse_isEvidence;
+        break;
+      }
+
+      // optional bool isEvidence = 4;
+      case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_isEvidence:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &isevidence_)));
+          set_has_isevidence();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(40)) goto parse_cardinality;
+        break;
+      }
+
+      // optional uint64 cardinality = 5;
+      case 5: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_cardinality:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
+                 input, &cardinality_)));
+          set_has_cardinality();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(48)) goto parse_edgeCount;
+        break;
+      }
+
+      // optional uint64 edgeCount = 6;
+      case 6: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_edgeCount:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
+                 input, &edgecount_)));
+          set_has_edgecount();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -801,6 +873,21 @@ void Variable::SerializeWithCachedSizes(
       3, this->datatype(), output);
   }
 
+  // optional bool isEvidence = 4;
+  if (has_isevidence()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(4, this->isevidence(), output);
+  }
+
+  // optional uint64 cardinality = 5;
+  if (has_cardinality()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(5, this->cardinality(), output);
+  }
+
+  // optional uint64 edgeCount = 6;
+  if (has_edgecount()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(6, this->edgecount(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -823,6 +910,21 @@ void Variable::SerializeWithCachedSizes(
   if (has_datatype()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
       3, this->datatype(), target);
+  }
+
+  // optional bool isEvidence = 4;
+  if (has_isevidence()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(4, this->isevidence(), target);
+  }
+
+  // optional uint64 cardinality = 5;
+  if (has_cardinality()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(5, this->cardinality(), target);
+  }
+
+  // optional uint64 edgeCount = 6;
+  if (has_edgecount()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(6, this->edgecount(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -852,6 +954,25 @@ int Variable::ByteSize() const {
     if (has_datatype()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::EnumSize(this->datatype());
+    }
+
+    // optional bool isEvidence = 4;
+    if (has_isevidence()) {
+      total_size += 1 + 1;
+    }
+
+    // optional uint64 cardinality = 5;
+    if (has_cardinality()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt64Size(
+          this->cardinality());
+    }
+
+    // optional uint64 edgeCount = 6;
+    if (has_edgecount()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt64Size(
+          this->edgecount());
     }
 
   }
@@ -890,6 +1011,15 @@ void Variable::MergeFrom(const Variable& from) {
     if (from.has_datatype()) {
       set_datatype(from.datatype());
     }
+    if (from.has_isevidence()) {
+      set_isevidence(from.isevidence());
+    }
+    if (from.has_cardinality()) {
+      set_cardinality(from.cardinality());
+    }
+    if (from.has_edgecount()) {
+      set_edgecount(from.edgecount());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -917,6 +1047,9 @@ void Variable::Swap(Variable* other) {
     std::swap(id_, other->id_);
     std::swap(initialvalue_, other->initialvalue_);
     std::swap(datatype_, other->datatype_);
+    std::swap(isevidence_, other->isevidence_);
+    std::swap(cardinality_, other->cardinality_);
+    std::swap(edgecount_, other->edgecount_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
@@ -965,6 +1098,7 @@ const int Factor::FactorFunctionType_ARRAYSIZE;
 const int Factor::kIdFieldNumber;
 const int Factor::kWeightIdFieldNumber;
 const int Factor::kFactorFunctionFieldNumber;
+const int Factor::kEdgeCountFieldNumber;
 #endif  // !_MSC_VER
 
 Factor::Factor()
@@ -986,6 +1120,7 @@ void Factor::SharedCtor() {
   id_ = GOOGLE_ULONGLONG(0);
   weightid_ = GOOGLE_ULONGLONG(0);
   factorfunction_ = 0;
+  edgecount_ = GOOGLE_ULONGLONG(0);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1024,6 +1159,7 @@ void Factor::Clear() {
     id_ = GOOGLE_ULONGLONG(0);
     weightid_ = GOOGLE_ULONGLONG(0);
     factorfunction_ = 0;
+    edgecount_ = GOOGLE_ULONGLONG(0);
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -1083,6 +1219,22 @@ bool Factor::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(32)) goto parse_edgeCount;
+        break;
+      }
+
+      // optional uint64 edgeCount = 4;
+      case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_edgeCount:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
+                 input, &edgecount_)));
+          set_has_edgecount();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -1121,6 +1273,11 @@ void Factor::SerializeWithCachedSizes(
       3, this->factorfunction(), output);
   }
 
+  // optional uint64 edgeCount = 4;
+  if (has_edgecount()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(4, this->edgecount(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -1143,6 +1300,11 @@ void Factor::SerializeWithCachedSizes(
   if (has_factorfunction()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
       3, this->factorfunction(), target);
+  }
+
+  // optional uint64 edgeCount = 4;
+  if (has_edgecount()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(4, this->edgecount(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -1174,6 +1336,13 @@ int Factor::ByteSize() const {
     if (has_factorfunction()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::EnumSize(this->factorfunction());
+    }
+
+    // optional uint64 edgeCount = 4;
+    if (has_edgecount()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt64Size(
+          this->edgecount());
     }
 
   }
@@ -1212,6 +1381,9 @@ void Factor::MergeFrom(const Factor& from) {
     if (from.has_factorfunction()) {
       set_factorfunction(from.factorfunction());
     }
+    if (from.has_edgecount()) {
+      set_edgecount(from.edgecount());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -1239,6 +1411,7 @@ void Factor::Swap(Factor* other) {
     std::swap(id_, other->id_);
     std::swap(weightid_, other->weightid_);
     std::swap(factorfunction_, other->factorfunction_);
+    std::swap(edgecount_, other->edgecount_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
@@ -1584,10 +1757,14 @@ void GraphEdge::Swap(GraphEdge* other) {
 // ===================================================================
 
 #ifndef _MSC_VER
-const int FactorGraph::kWeightFieldNumber;
-const int FactorGraph::kVariableFieldNumber;
-const int FactorGraph::kFactorFieldNumber;
-const int FactorGraph::kEdgeFieldNumber;
+const int FactorGraph::kNumWeightsFieldNumber;
+const int FactorGraph::kNumVariablesFieldNumber;
+const int FactorGraph::kNumFactorsFieldNumber;
+const int FactorGraph::kNumEdgesFieldNumber;
+const int FactorGraph::kWeightsFileFieldNumber;
+const int FactorGraph::kVariablesFileFieldNumber;
+const int FactorGraph::kFactorsFileFieldNumber;
+const int FactorGraph::kEdgesFileFieldNumber;
 #endif  // !_MSC_VER
 
 FactorGraph::FactorGraph()
@@ -1606,6 +1783,14 @@ FactorGraph::FactorGraph(const FactorGraph& from)
 
 void FactorGraph::SharedCtor() {
   _cached_size_ = 0;
+  numweights_ = GOOGLE_ULONGLONG(0);
+  numvariables_ = GOOGLE_ULONGLONG(0);
+  numfactors_ = GOOGLE_ULONGLONG(0);
+  numedges_ = GOOGLE_ULONGLONG(0);
+  weightsfile_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  variablesfile_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  factorsfile_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  edgesfile_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1614,6 +1799,18 @@ FactorGraph::~FactorGraph() {
 }
 
 void FactorGraph::SharedDtor() {
+  if (weightsfile_ != &::google::protobuf::internal::kEmptyString) {
+    delete weightsfile_;
+  }
+  if (variablesfile_ != &::google::protobuf::internal::kEmptyString) {
+    delete variablesfile_;
+  }
+  if (factorsfile_ != &::google::protobuf::internal::kEmptyString) {
+    delete factorsfile_;
+  }
+  if (edgesfile_ != &::google::protobuf::internal::kEmptyString) {
+    delete edgesfile_;
+  }
   if (this != default_instance_) {
   }
 }
@@ -1640,10 +1837,32 @@ FactorGraph* FactorGraph::New() const {
 }
 
 void FactorGraph::Clear() {
-  weight_.Clear();
-  variable_.Clear();
-  factor_.Clear();
-  edge_.Clear();
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    numweights_ = GOOGLE_ULONGLONG(0);
+    numvariables_ = GOOGLE_ULONGLONG(0);
+    numfactors_ = GOOGLE_ULONGLONG(0);
+    numedges_ = GOOGLE_ULONGLONG(0);
+    if (has_weightsfile()) {
+      if (weightsfile_ != &::google::protobuf::internal::kEmptyString) {
+        weightsfile_->clear();
+      }
+    }
+    if (has_variablesfile()) {
+      if (variablesfile_ != &::google::protobuf::internal::kEmptyString) {
+        variablesfile_->clear();
+      }
+    }
+    if (has_factorsfile()) {
+      if (factorsfile_ != &::google::protobuf::internal::kEmptyString) {
+        factorsfile_->clear();
+      }
+    }
+    if (has_edgesfile()) {
+      if (edgesfile_ != &::google::protobuf::internal::kEmptyString) {
+        edgesfile_->clear();
+      }
+    }
+  }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
@@ -1654,62 +1873,133 @@ bool FactorGraph::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // repeated .deepdive.Weight weight = 1;
+      // required uint64 numWeights = 1;
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-         parse_weight:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
-                input, add_weight()));
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
+                 input, &numweights_)));
+          set_has_numweights();
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(10)) goto parse_weight;
-        if (input->ExpectTag(18)) goto parse_variable;
+        if (input->ExpectTag(16)) goto parse_numVariables;
         break;
       }
 
-      // repeated .deepdive.Variable variable = 2;
+      // required uint64 numVariables = 2;
       case 2: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-         parse_variable:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
-                input, add_variable()));
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_numVariables:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
+                 input, &numvariables_)));
+          set_has_numvariables();
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(18)) goto parse_variable;
-        if (input->ExpectTag(26)) goto parse_factor;
+        if (input->ExpectTag(24)) goto parse_numFactors;
         break;
       }
 
-      // repeated .deepdive.Factor factor = 3;
+      // required uint64 numFactors = 3;
       case 3: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-         parse_factor:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
-                input, add_factor()));
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_numFactors:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
+                 input, &numfactors_)));
+          set_has_numfactors();
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(26)) goto parse_factor;
-        if (input->ExpectTag(34)) goto parse_edge;
+        if (input->ExpectTag(32)) goto parse_numEdges;
         break;
       }
 
-      // repeated .deepdive.GraphEdge edge = 4;
+      // required uint64 numEdges = 4;
       case 4: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-         parse_edge:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
-                input, add_edge()));
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_numEdges:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
+                 input, &numedges_)));
+          set_has_numedges();
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(34)) goto parse_edge;
+        if (input->ExpectTag(42)) goto parse_weightsFile;
+        break;
+      }
+
+      // required string weightsFile = 5;
+      case 5: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_weightsFile:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_weightsfile()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->weightsfile().data(), this->weightsfile().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(50)) goto parse_variablesFile;
+        break;
+      }
+
+      // required string variablesFile = 6;
+      case 6: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_variablesFile:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_variablesfile()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->variablesfile().data(), this->variablesfile().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(58)) goto parse_factorsFile;
+        break;
+      }
+
+      // required string factorsFile = 7;
+      case 7: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_factorsFile:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_factorsfile()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->factorsfile().data(), this->factorsfile().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(66)) goto parse_edgesFile;
+        break;
+      }
+
+      // required string edgesFile = 8;
+      case 8: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_edgesFile:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_edgesfile()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->edgesfile().data(), this->edgesfile().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -1732,28 +2022,60 @@ bool FactorGraph::MergePartialFromCodedStream(
 
 void FactorGraph::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // repeated .deepdive.Weight weight = 1;
-  for (int i = 0; i < this->weight_size(); i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      1, this->weight(i), output);
+  // required uint64 numWeights = 1;
+  if (has_numweights()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(1, this->numweights(), output);
   }
 
-  // repeated .deepdive.Variable variable = 2;
-  for (int i = 0; i < this->variable_size(); i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, this->variable(i), output);
+  // required uint64 numVariables = 2;
+  if (has_numvariables()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(2, this->numvariables(), output);
   }
 
-  // repeated .deepdive.Factor factor = 3;
-  for (int i = 0; i < this->factor_size(); i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3, this->factor(i), output);
+  // required uint64 numFactors = 3;
+  if (has_numfactors()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(3, this->numfactors(), output);
   }
 
-  // repeated .deepdive.GraphEdge edge = 4;
-  for (int i = 0; i < this->edge_size(); i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      4, this->edge(i), output);
+  // required uint64 numEdges = 4;
+  if (has_numedges()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(4, this->numedges(), output);
+  }
+
+  // required string weightsFile = 5;
+  if (has_weightsfile()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->weightsfile().data(), this->weightsfile().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      5, this->weightsfile(), output);
+  }
+
+  // required string variablesFile = 6;
+  if (has_variablesfile()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->variablesfile().data(), this->variablesfile().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      6, this->variablesfile(), output);
+  }
+
+  // required string factorsFile = 7;
+  if (has_factorsfile()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->factorsfile().data(), this->factorsfile().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      7, this->factorsfile(), output);
+  }
+
+  // required string edgesFile = 8;
+  if (has_edgesfile()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->edgesfile().data(), this->edgesfile().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      8, this->edgesfile(), output);
   }
 
   if (!unknown_fields().empty()) {
@@ -1764,32 +2086,64 @@ void FactorGraph::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* FactorGraph::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // repeated .deepdive.Weight weight = 1;
-  for (int i = 0; i < this->weight_size(); i++) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteMessageNoVirtualToArray(
-        1, this->weight(i), target);
+  // required uint64 numWeights = 1;
+  if (has_numweights()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(1, this->numweights(), target);
   }
 
-  // repeated .deepdive.Variable variable = 2;
-  for (int i = 0; i < this->variable_size(); i++) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteMessageNoVirtualToArray(
-        2, this->variable(i), target);
+  // required uint64 numVariables = 2;
+  if (has_numvariables()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(2, this->numvariables(), target);
   }
 
-  // repeated .deepdive.Factor factor = 3;
-  for (int i = 0; i < this->factor_size(); i++) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteMessageNoVirtualToArray(
-        3, this->factor(i), target);
+  // required uint64 numFactors = 3;
+  if (has_numfactors()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(3, this->numfactors(), target);
   }
 
-  // repeated .deepdive.GraphEdge edge = 4;
-  for (int i = 0; i < this->edge_size(); i++) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteMessageNoVirtualToArray(
-        4, this->edge(i), target);
+  // required uint64 numEdges = 4;
+  if (has_numedges()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(4, this->numedges(), target);
+  }
+
+  // required string weightsFile = 5;
+  if (has_weightsfile()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->weightsfile().data(), this->weightsfile().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        5, this->weightsfile(), target);
+  }
+
+  // required string variablesFile = 6;
+  if (has_variablesfile()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->variablesfile().data(), this->variablesfile().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        6, this->variablesfile(), target);
+  }
+
+  // required string factorsFile = 7;
+  if (has_factorsfile()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->factorsfile().data(), this->factorsfile().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        7, this->factorsfile(), target);
+  }
+
+  // required string edgesFile = 8;
+  if (has_edgesfile()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->edgesfile().data(), this->edgesfile().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        8, this->edgesfile(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -1802,38 +2156,64 @@ void FactorGraph::SerializeWithCachedSizes(
 int FactorGraph::ByteSize() const {
   int total_size = 0;
 
-  // repeated .deepdive.Weight weight = 1;
-  total_size += 1 * this->weight_size();
-  for (int i = 0; i < this->weight_size(); i++) {
-    total_size +=
-      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-        this->weight(i));
-  }
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required uint64 numWeights = 1;
+    if (has_numweights()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt64Size(
+          this->numweights());
+    }
 
-  // repeated .deepdive.Variable variable = 2;
-  total_size += 1 * this->variable_size();
-  for (int i = 0; i < this->variable_size(); i++) {
-    total_size +=
-      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-        this->variable(i));
-  }
+    // required uint64 numVariables = 2;
+    if (has_numvariables()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt64Size(
+          this->numvariables());
+    }
 
-  // repeated .deepdive.Factor factor = 3;
-  total_size += 1 * this->factor_size();
-  for (int i = 0; i < this->factor_size(); i++) {
-    total_size +=
-      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-        this->factor(i));
-  }
+    // required uint64 numFactors = 3;
+    if (has_numfactors()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt64Size(
+          this->numfactors());
+    }
 
-  // repeated .deepdive.GraphEdge edge = 4;
-  total_size += 1 * this->edge_size();
-  for (int i = 0; i < this->edge_size(); i++) {
-    total_size +=
-      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-        this->edge(i));
-  }
+    // required uint64 numEdges = 4;
+    if (has_numedges()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt64Size(
+          this->numedges());
+    }
 
+    // required string weightsFile = 5;
+    if (has_weightsfile()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->weightsfile());
+    }
+
+    // required string variablesFile = 6;
+    if (has_variablesfile()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->variablesfile());
+    }
+
+    // required string factorsFile = 7;
+    if (has_factorsfile()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->factorsfile());
+    }
+
+    // required string edgesFile = 8;
+    if (has_edgesfile()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->edgesfile());
+    }
+
+  }
   if (!unknown_fields().empty()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
@@ -1859,10 +2239,32 @@ void FactorGraph::MergeFrom(const ::google::protobuf::Message& from) {
 
 void FactorGraph::MergeFrom(const FactorGraph& from) {
   GOOGLE_CHECK_NE(&from, this);
-  weight_.MergeFrom(from.weight_);
-  variable_.MergeFrom(from.variable_);
-  factor_.MergeFrom(from.factor_);
-  edge_.MergeFrom(from.edge_);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_numweights()) {
+      set_numweights(from.numweights());
+    }
+    if (from.has_numvariables()) {
+      set_numvariables(from.numvariables());
+    }
+    if (from.has_numfactors()) {
+      set_numfactors(from.numfactors());
+    }
+    if (from.has_numedges()) {
+      set_numedges(from.numedges());
+    }
+    if (from.has_weightsfile()) {
+      set_weightsfile(from.weightsfile());
+    }
+    if (from.has_variablesfile()) {
+      set_variablesfile(from.variablesfile());
+    }
+    if (from.has_factorsfile()) {
+      set_factorsfile(from.factorsfile());
+    }
+    if (from.has_edgesfile()) {
+      set_edgesfile(from.edgesfile());
+    }
+  }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
@@ -1879,28 +2281,21 @@ void FactorGraph::CopyFrom(const FactorGraph& from) {
 }
 
 bool FactorGraph::IsInitialized() const {
+  if ((_has_bits_[0] & 0x000000ff) != 0x000000ff) return false;
 
-  for (int i = 0; i < weight_size(); i++) {
-    if (!this->weight(i).IsInitialized()) return false;
-  }
-  for (int i = 0; i < variable_size(); i++) {
-    if (!this->variable(i).IsInitialized()) return false;
-  }
-  for (int i = 0; i < factor_size(); i++) {
-    if (!this->factor(i).IsInitialized()) return false;
-  }
-  for (int i = 0; i < edge_size(); i++) {
-    if (!this->edge(i).IsInitialized()) return false;
-  }
   return true;
 }
 
 void FactorGraph::Swap(FactorGraph* other) {
   if (other != this) {
-    weight_.Swap(&other->weight_);
-    variable_.Swap(&other->variable_);
-    factor_.Swap(&other->factor_);
-    edge_.Swap(&other->edge_);
+    std::swap(numweights_, other->numweights_);
+    std::swap(numvariables_, other->numvariables_);
+    std::swap(numfactors_, other->numfactors_);
+    std::swap(numedges_, other->numedges_);
+    std::swap(weightsfile_, other->weightsfile_);
+    std::swap(variablesfile_, other->variablesfile_);
+    std::swap(factorsfile_, other->factorsfile_);
+    std::swap(edgesfile_, other->edgesfile_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

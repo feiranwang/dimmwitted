@@ -39,7 +39,11 @@ void gibbs(dd::CmdParser & cmd_parser){
   int n_numa_node = numa_max_node() + 1;
   int n_thread_per_numa = (sysconf(_SC_NPROCESSORS_CONF))/(n_numa_node);
 
-  std::string input_folder = cmd_parser.input_folder->getValue();
+  std::string weight_file = cmd_parser.weight_file->getValue();
+  std::string variable_file = cmd_parser.variable_file->getValue();
+  std::string factor_file = cmd_parser.factor_file->getValue();
+  std::string edge_file = cmd_parser.edge_file->getValue();
+
   std::string output_folder = cmd_parser.output_folder->getValue();
 
   int n_learning_epoch = cmd_parser.n_learning_epoch->getValue();
@@ -56,7 +60,10 @@ void gibbs(dd::CmdParser & cmd_parser){
   std::cout << "################################################" << std::endl;
   std::cout << std::endl;
   std::cout << "#################GIBBS SAMPLING#################" << std::endl;
-  std::cout << "# input_folder       : " << input_folder << std::endl;
+  std::cout << "# edge_file          : " << edge_file << std::endl;
+  std::cout << "# weight_file        : " << weight_file << std::endl;
+  std::cout << "# variable_file      : " << variable_file << std::endl;
+  std::cout << "# factor_file        : " << factor_file << std::endl;
   std::cout << "# output_folder      : " << output_folder << std::endl;
   std::cout << "# n_learning_epoch   : " << n_learning_epoch << std::endl;
   std::cout << "# n_samples/l. epoch : " << n_samples_per_learning_epoch << std::endl;
@@ -65,6 +72,7 @@ void gibbs(dd::CmdParser & cmd_parser){
   std::cout << "# decay              : " << decay << std::endl;
   std::cout << "################################################" << std::endl;
   std::cout << "# IGNORE -s (n_samples/l. epoch). ALWAYS -s 1. #" << std::endl;
+  std::cout << "# IGNORE -t (threads). ALWAYS USE ALL THREADS. #" << std::endl;
   std::cout << "################################################" << std::endl;
 
   dd::FactorGraph fg;

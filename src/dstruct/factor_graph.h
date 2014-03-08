@@ -213,10 +213,12 @@ namespace dd{
 
     }
 
+
     CompactFactor(const long & _id,
            const int & _weight_id,
            const int & _func_id) :
       p_func(_func_id == 0 ? CompactFactor::_potential_imply :
+             _func_id == 4 ? CompactFactor::_potential_imply :
              NULL)
     {
       this->id = _id;
@@ -234,7 +236,9 @@ namespace dd{
            const int & _func_id,
            VariableInFactor * _vifs,
            const int & _n_vifs) :
-      p_func(_func_id == 0 ? CompactFactor::_potential_imply :NULL),
+      p_func(_func_id == 0 ? CompactFactor::_potential_imply :
+             _func_id == 4 ? CompactFactor::_potential_imply :
+            NULL),
       vifs(_vifs),
       n_vifs(_n_vifs)
     {
