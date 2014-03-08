@@ -79,7 +79,7 @@ void gibbs(dd::CmdParser & cmd_parser){
   std::cout << "################################################" << std::endl;
 
 
-  numa_run_on_node(i);
+  numa_run_on_node(0);
   numa_set_localalloc();
   dd::FactorGraph fg;
   fg.load(cmd_parser);
