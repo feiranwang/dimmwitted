@@ -40,7 +40,9 @@ namespace dd{
       agg_means(new double[_nvars]),
       agg_nsamples(new double[_nvars]),
       weight_values(new double [_nweights]),
-      weights_isfixed(new bool [_nweights]){
+      weights_isfixed(new bool [_nweights]),
+      nweights(_nweights),
+      nvars(_nvars){
 
       for(const Variable & variable : variables){
         assignments_free[variable.id] = variable.assignment_free;
