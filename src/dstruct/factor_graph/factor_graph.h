@@ -24,7 +24,6 @@ namespace dd{
     int nvars;
     int nweights;
 
-
     double * const agg_means;
     double * const agg_nsamples; 
     double * const assignments_free;
