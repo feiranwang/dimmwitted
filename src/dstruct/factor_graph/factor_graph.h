@@ -102,7 +102,9 @@ namespace dd{
     template<bool does_change_evid>
     inline double potential(const Variable & variable, const double & proposal){
       double pot = 0.0;
-      for(const long & factor_id : variable.factor_ids){
+      for(int i=0;i<variable.factor_ids.size();i++){
+        const long & factor_id = variable.factor_ids[i];
+        _mm_prefetch(&factors[variable.factor_ids[i+1]], _MM_HINT_T1);
         const Factor & factor = factors[factor_id];
         const double & weight = infrs->weight_values[factor.weight_id];
         if(does_change_evid == true){
