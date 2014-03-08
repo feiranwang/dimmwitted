@@ -57,12 +57,15 @@ public:
 
 void dd::FactorGraph::load(const CmdParser & cmd){
 
-  std::string input_folder = cmd.input_folder->getValue();
+  std::string weight_file = cmd.weight_file->getValue();
+  std::string variable_file = cmd.variable_file->getValue();
+  std::string factor_file = cmd.factor_file->getValue();
+  std::string edge_file = cmd.edge_file->getValue();
 
-  std::string filename_edges = input_folder + "/graph.edges.pb";
-  std::string filename_factors = input_folder + "/graph.factors.pb";
-  std::string filename_variables = input_folder + "/graph.variables.pb";
-  std::string filename_weights = input_folder + "/graph.weights.pb";
+  std::string filename_edges = edge_file;
+  std::string filename_factors = factor_file;
+  std::string filename_variables = variable_file;
+  std::string filename_weights = weight_file;
 
   long n_loaded = dd::stream_load_pb<deepdive::Variable, dd::FactorGraph, handle_variable>(filename_variables, *this);
   assert(n_loaded == this->variables.size());
@@ -88,6 +91,8 @@ void dd::FactorGraph::load(const CmdParser & cmd){
   assert(this->is_usable() == true);
 
 }
+
+
 
 void dd::FactorGraph::finalize_loading(){
   std::sort(this->variables.begin(), this->variables.end(), idsorter<Variable>());
