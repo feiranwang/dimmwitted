@@ -12,19 +12,13 @@ namespace dd{
 
     Weight(const long & _id,
            const double & _weight,
-           const bool & _isfixed){
-      this->id = _id;
-      this->weight = _weight;
-      this->isfixed = _isfixed;
-    }
-
-    Weight(){
-      id = -1;
-      weight = 0.0;
-      isfixed = false;
-    }
-
+           const bool & _isfixed):
+      id(_id),
+      weight(_weight),
+      isfixed(_isfixed)
+    {}
   }; 
+
 
 }
 

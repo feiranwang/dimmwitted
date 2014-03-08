@@ -95,7 +95,7 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
     single_node_samplers.push_back(SingleNodeSampler(&this->factorgraphs[i], n_thread_per_numa, i));
   }
 
-  Weight * ori_weights = new Weight[nweight];
+  double * ori_weights = new double[nweight];
 
   for(int i_epoch=0;i_epoch<n_epoch;i_epoch++){
 
@@ -104,7 +104,7 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
 
     t.restart();
     
-    memcpy(ori_weights, &this->factorgraphs[0].weights[0], sizeof(Weight)*nweight);
+    memcpy(ori_weights, &this->factorgraphs[0].infrs->weight_values, sizeof(double)*nweight);
 
     for(int i=0;i<nnode;i++){
       single_node_samplers[i].p_fg->stepsize = current_stepsize;
@@ -122,20 +122,20 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
     for(int i=1;i<=n_numa_nodes;i++){
       FactorGraph & cfg_other = this->factorgraphs[i];
       for(int j=0;j<nweight;j++){
-        cfg.weights[j].weight += cfg_other.weights[j].weight;
+        cfg.infrs->weight_values[j] += cfg_other.infrs->weight_values[j];
       }
     }
 
     for(int j=0;j<nweight;j++){
-      cfg.weights[j].weight /= nnode;
-      cfg.weights[j].weight *= (1.0/(1.0+0.01*current_stepsize));
+      cfg.infrs->weight_values[j] /= nnode;
+      cfg.infrs->weight_values[j] *= (1.0/(1.0+0.01*current_stepsize));
     }
 
     for(int i=1;i<=n_numa_nodes;i++){
       FactorGraph &cfg_other = this->factorgraphs[i];
       for(int j=0;j<nweight;j++){
-        if(cfg.weights[j].isfixed == false){
-          cfg_other.weights[j].weight = cfg.weights[j].weight;
+        if(cfg.infrs->weights_isfixed[j] == false){
+          cfg_other.infrs->weight_values[j] = cfg.infrs->weight_values[j];
         }
       }
     }
@@ -143,7 +143,7 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
     double lmax = -1000000;
     double l2=0.0;
     for(int i=0;i<nweight;i++){
-      double diff = fabs(ori_weights[i].weight - cfg.weights[i].weight);
+      double diff = fabs(ori_weights[i] - cfg.infrs->weight_values[i]);
       l2 += diff*diff;
       if(lmax < diff){
         lmax = diff;
@@ -170,9 +170,9 @@ void dd::GibbsSampling::dump_weights(){
   std::cout << "LEARNING SNIPPETS (QUERY WEIGHTS):" << std::endl;
   FactorGraph const & cfg = this->factorgraphs[0];
   int ct = 0;
-  for(size_t i=0;i<cfg.weights.size();i++){
+  for(size_t i=0;i<cfg.infrs->nweights;i++){
     ct ++;
-    std::cout << "   " << i << " " << cfg.weights[i].weight << std::endl;
+    std::cout << "   " << i << " " << cfg.infrs->weight_values[i] << std::endl;
     if(ct % 10 == 0){
       break;
     }
@@ -194,10 +194,10 @@ void dd::GibbsSampling::dump_weights(){
   google::protobuf::io::CodedOutputStream *_CodedOutputStream = 
     new google::protobuf::io::CodedOutputStream(_OstreamOutputStream);
   deepdive::WeightInferenceResult msg;
-  for(size_t i=0;i<cfg.weights.size();i++){
-    fout_text << i << " " << cfg.weights[i].weight << std::endl;
+  for(size_t i=0;i<cfg.infrs->nweights;i++){
+    fout_text << i << " " << cfg.infrs->weight_values[i] << std::endl;
     msg.set_id(i);
-    msg.set_value(cfg.weights[i].weight);
+    msg.set_value(cfg.infrs->weight_values[i]);
     _CodedOutputStream->WriteVarint32(msg.ByteSize());
     if ( !msg.SerializeToCodedStream(_CodedOutputStream) ){
       std::cout << "SerializeToCodedStream error " << std::endl;
@@ -224,8 +224,8 @@ void dd::GibbsSampling::dump(){
   for(int i=0;i<=n_numa_nodes;i++){
     const FactorGraph & cfg = factorgraphs[i];
     for(auto & variable : cfg.variables){
-      agg_means[variable.id] += variable.agg_mean;
-      agg_nsamples[variable.id] += variable.n_sample;
+      agg_means[variable.id] += cfg.infrs->agg_means[variable.id];
+      agg_nsamples[variable.id] += cfg.infrs->agg_nsamples[variable.id];
     }
   }
 
