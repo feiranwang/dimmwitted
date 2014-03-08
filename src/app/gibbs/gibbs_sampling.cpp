@@ -55,9 +55,6 @@ void dd::GibbsSampling::inference(const int & n_epoch){
   Timer t;
   int nvar = this->factorgraphs[0].variables.size();
 
-
-  std::cout << nvar << "!!!!!!!!!!!" << std::endl;
-
   int nnode = n_numa_nodes + 1;
 
   std::vector<SingleNodeSampler> single_node_samplers;
@@ -96,8 +93,6 @@ void dd::GibbsSampling::inference(const int & n_epoch){
 
 void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoch, 
                               const double & stepsize, const double & decay){
-
-  numa_set_localalloc();
 
   Timer t_total;
 
