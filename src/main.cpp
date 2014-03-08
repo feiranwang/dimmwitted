@@ -33,7 +33,6 @@ dd::CmdParser parse_input(int argv, char** argc){
   return cmd_parser;
 }
 
-
 void gibbs(dd::CmdParser & cmd_parser){
 
   int n_numa_node = numa_max_node() + 1;

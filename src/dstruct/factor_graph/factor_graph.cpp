@@ -15,11 +15,11 @@ void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
     if(variable.has_initialvalue()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
       fg.variables.push_back(
         dd::Variable(variable.id(), DTYPE_BOOLEAN, true, 0, 1, 
-          variable.initialvalue(), variable.initialvalue())
+          variable.initialvalue(), variable.initialvalue(), variable.edgecount())
       );
     }else{
       fg.variables.push_back(
-        dd::Variable(variable.id(), DTYPE_BOOLEAN, false, 0, 1, 0, 0)
+        dd::Variable(variable.id(), DTYPE_BOOLEAN, false, 0, 1, 0, 0, variable.edgecount())
       );
     }
   }else{
@@ -30,7 +30,7 @@ void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
 
 void handle_factor(const deepdive::Factor & factor, dd::FactorGraph & fg){
   fg.factors.push_back(
-    dd::Factor(factor.id(), factor.weightid(), factor.factorfunction())
+    dd::Factor(factor.id(), factor.weightid(), factor.factorfunction(), factor.edgecount())
   );
 }
 
