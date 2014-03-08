@@ -10,8 +10,6 @@ namespace dd{
   class GibbsSampling{
   public:
 
-    FactorGraph * const p_fg;
-
     CmdParser * const p_cmd_parser;
 
     int n_numa_nodes;
@@ -20,8 +18,8 @@ namespace dd{
 
     std::vector<FactorGraph> factorgraphs;
 
-    GibbsSampling(FactorGraph * const _p_fg, CmdParser * const _p_cmd_parser) 
-      : p_fg(_p_fg), p_cmd_parser(_p_cmd_parser){
+    GibbsSampling(CmdParser * const _p_cmd_parser) 
+      : p_cmd_parser(_p_cmd_parser){
       prepare();
     }
 

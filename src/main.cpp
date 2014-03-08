@@ -77,12 +77,7 @@ void gibbs(dd::CmdParser & cmd_parser){
   std::cout << "# IGNORE -t (threads). ALWAYS USE ALL THREADS. #" << std::endl;
   std::cout << "################################################" << std::endl;
 
-
-  numa_run_on_node(0);
-  numa_set_localalloc();
-  dd::FactorGraph fg;
-  fg.load(cmd_parser);
-  dd::GibbsSampling gibbs(&fg, &cmd_parser);
+  dd::GibbsSampling gibbs(&cmd_parser);
 
   int numa_aware_n_learning_epoch = (int)(n_learning_epoch/n_numa_node) + 
                             (n_learning_epoch%n_numa_node==0?0:1);

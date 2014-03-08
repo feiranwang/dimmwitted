@@ -56,7 +56,6 @@ namespace dd{
     }
   };
 
-
   class FactorGraph {
   public:
     std::vector<Variable> variables;
