@@ -31,6 +31,8 @@ void dd::GibbsSampling::prepare(){
   std::vector<std::thread> loaders;
 
   for(int i=0;i<=n_numa_nodes;i++){
+    numa_run_on_node(i);
+    numa_set_localalloc();
     dd::FactorGraph * fg = new dd::FactorGraph;
     this->factorgraphs.push_back(*fg);
   }
