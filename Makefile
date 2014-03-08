@@ -3,7 +3,9 @@
 UNAME := $(shell uname)
 
 ifeq ($(UNAME), Linux)
-GCC = g++
+ifndef CXX
+CXX = g++
+endif
 OPT_FLAG = -Ofast
 GCC_INCLUDE = -I./lib/tclap/include/ -I./lib/protobuf/include/ -I./src
 GCC_LIB = -L./lib/protobuf/lib/
@@ -11,7 +13,9 @@ CPP_FLAG = -std=c++0x -lnuma -lrt -lprotobuf
 endif
 
 ifeq ($(UNAME), Darwin)
-GCC = clang++
+ifndef CXX
+CXX = clang++
+endif
 OPT_FLAG = -O3 -stdlib=libc++
 GCC_INCLUDE = -I./lib/tclap/include/ -I./lib/protobuf/include/ -I./src
 GCC_LIB = -L./lib/protobuf/lib/
