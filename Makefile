@@ -2,7 +2,7 @@
 
 UNAME := $(shell uname)
 
-ifeq ("$(UNAME)", "Linux")
+ifeq ($(UNAME), Linux)
 GCC = g++
 OPT_FLAG = -Ofast
 GCC_INCLUDE = -I./lib/tclap/include/ -I./lib/protobuf/include/ -I./src
@@ -10,7 +10,7 @@ GCC_LIB = -L./lib/protobuf/lib/
 CPP_FLAG = -std=c++0x -lnuma -lrt -lprotobuf
 endif
 
-ifeq ("$(UNAME)", "Darwin")
+ifeq ($(UNAME), Darwin)
 GCC = clang++
 OPT_FLAG = -O3 -stdlib=libc++
 GCC_INCLUDE = -I./lib/tclap/include/ -I./lib/protobuf/include/ -I./src
@@ -37,7 +37,7 @@ gibbs_sampling.o: src/app/gibbs/gibbs_sampling.cpp
 
 
 dep:
-	ifeq ("$(UNAME)", "Darwin")
+ifeq ($(UNAME), Darwin)
 	cd lib;\
 	tar xf protobuf-2.5.0.tar.bz2;\
 	cd protobuf-2.5.0;\
@@ -51,9 +51,9 @@ dep:
 	./configure --prefix=`pwd`/../tclap;\
 	make;\
 	make install
-	endif
+endif
 
-	ifeq ("$(UNAME)", "Darwin")
+ifeq ($(UNAME), Darwin)
 	cd lib;\
 	tar xf protobuf-2.5.0.tar.bz2;\
 	cd protobuf-2.5.0;\
@@ -67,7 +67,7 @@ dep:
 	./configure --prefix=`pwd`/../tclap;\
 	make;\
 	make install
-	endif
+endif
 
 
 clean:
