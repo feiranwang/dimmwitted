@@ -20,18 +20,18 @@ void dd::GibbsSampling::prepare(){
   n_numa_nodes = numa_max_node();
   n_thread_per_numa = (sysconf(_SC_NPROCESSORS_CONF))/(n_numa_nodes+1);
 
-  for(int i=0;i<=n_numa_nodes;i++){
+  this->factorgraphs.push_back(*p_fg);
+  for(int i=1;i<=n_numa_nodes;i++){
 
     numa_run_on_node(i);
     numa_set_localalloc();
 
-    dd::CompactFactorGraph_Immutable * p_fg_immutable = 
-      new dd::CompactFactorGraph_Immutable(this->p_fg, i);
+    std::cout << "CREATE FG ON NODE ..." <<  i << std::endl;
+    dd::FactorGraph fg;
+    fg.load(*p_cmd_parser);
 
-    this->compact_factors.push_back(dd::CompactFactorGraph(
-      p_fg_immutable,
-      new dd::CompactFactorGraph_Mutable(this->p_fg, i)
-    ));
+    this->factorgraphs.push_back(fg);
+
   }
 
 }
@@ -41,12 +41,12 @@ void dd::GibbsSampling::inference(const int & n_epoch){
   Timer t_total;
 
   Timer t;
-  int nvar = this->compact_factors[0].n_variables;
+  int nvar = this->factorgraphs[0].variables.size();
   int nnode = n_numa_nodes + 1;
 
   std::vector<SingleNodeSampler> single_node_samplers;
   for(int i=0;i<=n_numa_nodes;i++){
-    single_node_samplers.push_back(SingleNodeSampler(&this->compact_factors[i], 
+    single_node_samplers.push_back(SingleNodeSampler(&this->factorgraphs[i], 
       n_thread_per_numa, i));
   }
 
@@ -56,7 +56,6 @@ void dd::GibbsSampling::inference(const int & n_epoch){
 
   for(int i_epoch=0;i_epoch<n_epoch;i_epoch++){
 
-    
     std::cout << std::setprecision(2) << "INFERENCE EPOCH " << i_epoch * nnode <<  "~" 
       << ((i_epoch+1) * nnode) << "...." << std::flush;
 
@@ -82,6 +81,7 @@ void dd::GibbsSampling::inference(const int & n_epoch){
 void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoch, 
                               const double & stepsize, const double & decay){
 
+  /*
   Timer t_total;
 
   double current_stepsize = stepsize;
@@ -165,11 +165,12 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
 
   double elapsed = t_total.elapsed();
   std::cout << "TOTAL LEARNING TIME: " << elapsed << " sec." << std::endl;
-
+  */
 }
 
 void dd::GibbsSampling::dump_weights(){
 
+  /*
   std::cout << "LEARNING SNIPPETS (QUERY WEIGHTS):" << std::endl;
   CompactFactorGraph const & cfg = this->compact_factors[0];
   int ct = 0;
@@ -209,27 +210,36 @@ void dd::GibbsSampling::dump_weights(){
   delete _OstreamOutputStream;
   mFs.close();
   fout_text.close();
+  */
 
 }
 
 
 void dd::GibbsSampling::dump(){
 
+  double * agg_means = new double[factorgraphs[0].variables.size()];
+  double * agg_nsamples = new double[factorgraphs[0].variables.size()];
+  for(long i=0;i<factorgraphs[0].variables.size();i++){
+    agg_means[i] = 0;
+    agg_nsamples[i] = 0;
+  }
+
   for(int i=0;i<=n_numa_nodes;i++){
-    const CompactFactorGraph & cfg = compact_factors[i];
-    for(auto & variable : this->p_fg->variables){
-      variable.agg_mean += cfg.fg_mutable->agg_means[variable.id];
-      variable.n_sample += cfg.fg_mutable->agg_nsamples[variable.id];
+    const FactorGraph & cfg = factorgraphs[i];
+    for(auto & variable : cfg.variables){
+      agg_means[variable.id] += variable.agg_mean;
+      agg_nsamples[variable.id] += variable.n_sample;
     }
   }
 
   std::cout << "INFERENCE SNIPPETS (QUERY VARIABLES):" << std::endl;
   int ct = 0;
-  for(const auto & variable : this->p_fg->variables){
+  for(const Variable & variable : factorgraphs[0].variables){
     if(variable.is_evid == false){
       ct ++;
       std::cout << "   " << variable.id << " " 
-                << variable.agg_mean/variable.n_sample << "  @  " << variable.n_sample << std::endl;
+                << agg_means[variable.id]/agg_nsamples[variable.id] << "  @  " 
+                << agg_nsamples[variable.id] << std::endl;
       if(ct % 10 == 0){
         break;
       }
@@ -237,6 +247,7 @@ void dd::GibbsSampling::dump(){
   }
   std::cout << "   ..." << std::endl; 
 
+  /*
   std::string filename_protocol = this->p_cmd_parser->output_folder->getValue() + "/inference_result.out";
   std::string filename_text = this->p_cmd_parser->output_folder->getValue() + "/inference_result.out.text";
   std::cout << "DUMPING... PROTOCOL: " << filename_protocol << std::endl;
@@ -293,9 +304,7 @@ void dd::GibbsSampling::dump(){
   for(int i=0;i<10;i++){
     std::cout << "PROB BIN 0." << i << "~0." << (i+1) << "  -->  # " << abc[i] << std::endl;
   }
-  //std::cout << std::endl;
-  //std::cout << "# BAD PROB " << bad << std::endl;
-
+  */
 
 }
 
