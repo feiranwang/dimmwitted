@@ -18,6 +18,46 @@
 
 namespace dd{
 
+  class InferenceResult{
+  public:
+
+    int nvars;
+    int nweights;
+
+
+    double * const agg_means;
+    double * const agg_nsamples; 
+    double * const assignments_free;
+    double * const assignments_evid;
+    double * const weight_values;
+    bool * const weights_isfixed;
+
+    InferenceResult(
+      std::vector<Variable> variables,
+      std::vector<Weight> weights,
+      size_t _nvars, size_t _nweights):
+      assignments_free(new double[_nvars]),
+      assignments_evid(new double[_nvars]),
+      agg_means(new double[_nvars]),
+      agg_nsamples(new double[_nvars]),
+      weight_values(new double [_nweights]),
+      weights_isfixed(new bool [_nweights]){
+
+      for(const Variable & variable : variables){
+        assignments_free[variable.id] = variable.assignment_free;
+        assignments_evid[variable.id] = variable.assignment_evid;
+        agg_means[variable.id] = 0.0;
+        agg_nsamples[variable.id] = 0.0;
+      }
+
+      for(const Weight & weight: weights){
+        weight_values[weight.id] = weight.weight;
+        weights_isfixed[weight.id] = weight.isfixed;
+      }
+    }
+  };
+
+
   class FactorGraph {
   public:
     std::vector<Variable> variables;
@@ -26,6 +66,8 @@ namespace dd{
 
     bool loading_finalized;
     bool safety_check_passed;
+
+    InferenceResult * infrs;
 
     double stepsize;
 
@@ -37,8 +79,8 @@ namespace dd{
     double update_weight(const Variable & variable){
       for(const long & i_fid:variable.factor_ids){
         const Factor & factor = factors[i_fid];
-        if(weights[factor.weight_id].isfixed == false){
-          weights[factor.weight_id].weight += 
+        if(infrs->weights_isfixed[factor.weight_id] == false){
+          infrs->weight_values[factor.weight_id] += 
             stepsize * (this->template potential<false>(factor) 
               - this->template potential<true>(factor));
         }
@@ -47,8 +89,11 @@ namespace dd{
 
     template<bool does_change_evid>
     inline double potential(const Factor & factor){
-      return factor.template potential<does_change_evid>(
-        variables, -1, -1);
+      if(does_change_evid == true){
+        return factor.potential(infrs->assignments_free, -1, -1);
+      }else{
+        return factor.potential(infrs->assignments_evid, -1, -1);
+      }
     }
   
     template<bool does_change_evid>
@@ -57,12 +102,16 @@ namespace dd{
     template<bool does_change_evid>
     inline double potential(const Variable & variable, const double & proposal){
       double pot = 0.0;
-      for(int i=0;i<variable.n_factors;i++){
-        const long & factor_id = variable.factor_ids[i];
+      for(const long & factor_id : variable.factor_ids){
         const Factor & factor = factors[factor_id];
-        const Weight & weight = weights[factor.weight_id];
-        pot += weight.weight*factor.template potential<does_change_evid>(
-              variables, variable.id, proposal);
+        const double & weight = infrs->weight_values[factor.weight_id];
+        if(does_change_evid == true){
+          pot += weight*factor.potential(
+              infrs->assignments_free, variable.id, proposal);
+        }else{
+          pot += weight*factor.potential(
+              infrs->assignments_evid, variable.id, proposal);
+        }
       }
       return pot;
     }
@@ -81,14 +130,14 @@ namespace dd{
 
   template<>
   inline void FactorGraph::update<true>(Variable & variable, const double & new_value){
-    variable.assignment_free = new_value;
+    infrs->assignments_free[variable.id] = new_value;
   }
 
   template<>
   inline void FactorGraph::update<false>(Variable & variable, const double & new_value){
-    variable.assignment_evid = new_value;
-    variable.agg_mean += new_value;
-    variable.n_sample ++ ;
+    infrs->assignments_evid[variable.id] = new_value;
+    infrs->agg_means[variable.id] += new_value;
+    infrs->agg_nsamples[variable.id]  ++ ;
   }
 
 

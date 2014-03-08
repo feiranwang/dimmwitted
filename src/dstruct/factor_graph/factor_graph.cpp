@@ -104,6 +104,7 @@ void dd::FactorGraph::finalize_loading(){
   std::sort(this->factors.begin(), this->factors.end(), idsorter<Factor>());
   std::sort(this->weights.begin(), this->weights.end(), idsorter<Weight>()); 
   this->loading_finalized = true;
+  infrs = new InferenceResult(variables, weights, variables.size(), weights.size());
 }
 
 void dd::FactorGraph::safety_check(){
