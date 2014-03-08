@@ -60,21 +60,21 @@ public:
 
 void dd::FactorGraph::load(const CmdParser & cmd){
 
-  std::string fg_file = cmd.fg_file->getValue();
+  //std::string fg_file = cmd.fg_file->getValue();
   std::string weight_file = cmd.weight_file->getValue();
   std::string variable_file = cmd.variable_file->getValue();
   std::string factor_file = cmd.factor_file->getValue();
   std::string edge_file = cmd.edge_file->getValue();
 
-  std::string filename_fg = fg_file;
+  //std::string filename_fg = fg_file;
   std::string filename_edges = edge_file;
   std::string filename_factors = factor_file;
   std::string filename_variables = variable_file;
   std::string filename_weights = weight_file;
 
-  long n_loaded = dd::single_load_pb<deepdive::FactorGraph, dd::FactorGraph, handle_metadata>(filename_fg, *this);
+  //long n_loaded = dd::single_load_pb<deepdive::FactorGraph, dd::FactorGraph, handle_metadata>(filename_fg, *this);
 
-  n_loaded = dd::stream_load_pb<deepdive::Variable, dd::FactorGraph, handle_variable>(filename_variables, *this);
+  long n_loaded = dd::stream_load_pb<deepdive::Variable, dd::FactorGraph, handle_variable>(filename_variables, *this);
   assert(n_loaded == this->variables.size());
   std::cout << "LOADED VARIABLES: #" << this->variables.size() << std::endl;
   //std::cout << "          QUERY : #" << this->n_var_query << std::endl;

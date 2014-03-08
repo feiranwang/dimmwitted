@@ -87,7 +87,7 @@ clean:
 	rm -rf dw
 
 gibbs:
-	./dw gibbs -m data2/graph.meta.pb       \
+	./dw gibbs 						       \
 			   -e data2/graph.edges.pb 		\
 			   -w data2/graph.weights.pb 	\
 			   -v data2/graph.variables.pb 	\
@@ -95,6 +95,16 @@ gibbs:
 			   -o data2/					\
 			   -i 100 -l 100 -s 10 --alpha 0.01 --diminish 0.95
 	#./dw gibbs -e data/ -o data/ -i 100 -l 100 -s 10 --alpha 0.01 --decay 0.95
+
+gibbs2:
+	./dw gibbs 						       \
+			   -e data/graph.edges.pb 		\
+			   -w data/graph.weights.pb 	\
+			   -v data/graph.variables.pb 	\
+			   -f data/graph.factors.pb    \
+			   -o data/					\
+			   -i 100 -l 100 -s 10 --alpha 0.01 --diminish 0.95
+
 
 test:
 	./dw gibbs -e ./test/factor_graph/lr_inf/ 		\
