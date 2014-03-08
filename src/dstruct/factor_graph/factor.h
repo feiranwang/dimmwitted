@@ -22,14 +22,17 @@ namespace dd{
   public:
     long id;
     long weight_id;
+    int n_variables;
     std::vector<VariableInFactor> variables;
     int func_id; 
     Factor(const long & _id,
            const int & _weight_id,
-           const int & _func_id){
+           const int & _func_id,
+           const int & _n_variables){
       this->id = _id;
       this->weight_id = _weight_id;
       this->func_id = _func_id;
+      this->n_variables = _n_variables;
     }
     template<bool does_change_evid>
     inline double _potential_imply(const std::vector<Variable> &, 
@@ -57,9 +60,9 @@ namespace dd{
       const long & vid, const double & proposal) const{
 
       double sum = 0.0;
-      int nvar = variables.size();
-      for(const VariableInFactor & vif : variables){
-        if(vif.n_position == nvar - 1){
+      for(int i=0;i<n_variables;i++){
+        const VariableInFactor & vif = variables[i];
+        if(vif.n_position == n_variables - 1){
           if(vif.vid == vid){
             sum += (vif.is_positive == true ? proposal : 1-proposal);
           }else{
