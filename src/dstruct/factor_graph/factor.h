@@ -34,18 +34,16 @@ namespace dd{
       this->func_id = _func_id;
       this->n_variables = _n_variables;
     }
-    template<bool does_change_evid>
-    inline double _potential_imply(const std::vector<Variable> &, 
+    inline double _potential_imply(const double * const var_values, 
                                    const long &, const double &) const;
 
-    template<bool does_change_evid>
-    inline double potential(const std::vector<Variable> & _variables,
+    inline double potential(const double * const var_values,
       const long & vid, const double & proposal) const{ 
       
       if(func_id == 0){
-        return this->template _potential_imply<does_change_evid>(_variables, vid, proposal);
+        return _potential_imply(var_values, vid, proposal);
       }else if(func_id == 4){
-        return this->template _potential_imply<does_change_evid>(_variables, vid, proposal);
+        return _potential_imply(var_values, vid, proposal);
       }else{
         std::cout << "Unsupported Factor Function ID= " << func_id << std::endl;
         assert(false);
@@ -55,26 +53,24 @@ namespace dd{
  
   };
 
-  template<bool does_change_evid>
-  inline double dd::Factor::_potential_imply(const std::vector<Variable> & _variables, 
+  inline double dd::Factor::_potential_imply(const double * const var_values, 
       const long & vid, const double & proposal) const{
 
       double sum = 0.0;
-      for(int i=0;i<n_variables;i++){
-        const VariableInFactor & vif = variables[i];
+      for(const VariableInFactor & vif : variables){
         if(vif.n_position == n_variables - 1){
           if(vif.vid == vid){
             sum += (vif.is_positive == true ? proposal : 1-proposal);
           }else{
-            sum += (vif.is_positive == true ? get_vassign<does_change_evid>(_variables[vif.vid]) 
-              : 1-get_vassign<does_change_evid>(_variables[vif.vid]));
+            sum += (vif.is_positive == true ? var_values[vif.vid]
+              : 1-var_values[vif.vid]);
           }
         }else{
           if(vif.vid == vid){
             sum += (vif.is_positive == false ? proposal : 1-proposal);
           }else{
-            sum += (vif.is_positive == false ? get_vassign<does_change_evid>(_variables[vif.vid]) 
-              : 1-get_vassign<does_change_evid>(_variables[vif.vid]));
+            sum += (vif.is_positive == false ? var_values[vif.vid]
+              : var_values[vif.vid]);
           }
         }
       }
