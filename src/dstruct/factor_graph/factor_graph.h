@@ -34,7 +34,16 @@ namespace dd{
       this->safety_check_passed = false;
     }
 
-    double update_weight(const Variable & variable);
+    double update_weight(const Variable & variable){
+      for(const long & i_fid:variable.factor_ids){
+        const Factor & factor = factors[i_fid];
+        if(weights[factor.weight_id].isfixed == false){
+          weights[factor.weight_id].weight += 
+            stepsize * (this->template potential<false>(factor) 
+              - this->template potential<true>(factor));
+        }
+      }
+    }
 
     template<bool does_change_evid>
     inline double potential(const Factor & factor){
