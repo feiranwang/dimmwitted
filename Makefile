@@ -57,7 +57,7 @@ ifeq ($(UNAME), Darwin)
 	make install
 endif
 
-ifeq ($(UNAME), Darwin)
+ifeq ($(UNAME), Linux)
 	cd lib;\
 	tar xf protobuf-2.5.0.tar.bz2;\
 	cd protobuf-2.5.0;\
