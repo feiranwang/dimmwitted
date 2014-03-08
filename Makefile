@@ -38,13 +38,10 @@ gibbs_sampling.o: src/app/gibbs/gibbs_sampling.cpp
 
 dep:
 ifeq ($(UNAME), Darwin)
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "~~          I AM A MAC!          ~~"
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	cd lib;\
 	tar xf protobuf-2.5.0.tar.bz2;\
 	cd protobuf-2.5.0;\
-	./configure --prefix=`pwd`/../protobuf CC=clang CXX=clang++ CXXFLAGS='-std=c++11 -stdlib=libc++ -O3 -g' LDFLAGS='-stdlib=libc++' LIBS="-lc++ -lc++abi"
+	./configure --prefix=`pwd`/../protobuf CC=clang CXX=clang++ CXXFLAGS='-std=c++11 -stdlib=libc++ -O3 -g' LDFLAGS='-stdlib=libc++' LIBS="-lc++ -lc++abi";\
 	make -j8;\
 	make install
 
