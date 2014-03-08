@@ -103,7 +103,7 @@ gibbs2:
 			   -v data/graph.variables.pb 	\
 			   -f data/graph.factors.pb    \
 			   -o data/					\
-			   -i 100 -l 100 -s 10 --alpha 0.01 --diminish 0.95
+			   -i 100 -l 0 -s 10 --alpha 0.01 --diminish 0.95
 
 
 test:
