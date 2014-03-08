@@ -1,7 +1,7 @@
 
 #include <iostream>
 #include "io/cmd_parser.h"
-#include "dstruct/factor_graph.h"
+#include "dstruct/factor_graph/factor_graph.h"
 
 #ifndef _GIBBS_SAMPLING_H_
 #define _GIBBS_SAMPLING_H_
@@ -18,7 +18,7 @@ namespace dd{
 
     int n_thread_per_numa;
 
-    std::vector<CompactFactorGraph> compact_factors;
+    std::vector<FactorGraph> factorgraphs;
 
     GibbsSampling(FactorGraph * const _p_fg, CmdParser * const _p_cmd_parser) 
       : p_fg(_p_fg), p_cmd_parser(_p_cmd_parser){
