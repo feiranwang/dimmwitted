@@ -41,12 +41,15 @@ void dd::GibbsSampling::prepare(){
   for(int i=0;i<=n_numa_nodes;i++){
     dd::FactorGraph * fg = new dd::FactorGraph;
     this->factorgraphs.push_back(*fg);
-    loaders.push_back(std::thread(load_fg, &factorgraphs[i], *p_cmd_parser, i));
+    //loaders.push_back(std::thread(load_fg, &factorgraphs[i], *p_cmd_parser, i));
+    numa_run_on_node(i);
+    numa_set_localalloc();
+    load_fg(&factorgraphs[i], *p_cmd_parser, i);
   }
 
-  for(int i=0;i<=n_numa_nodes;i++){
-    loaders[i].join();
-  }
+  //for(int i=0;i<=n_numa_nodes;i++){
+  //  loaders[i].join();
+  //}
 
 }
 
