@@ -7,14 +7,6 @@
 #include <fstream>
 #include "timer.h"
 
-
-void load_fg(dd::FactorGraph * const _p_fg, const dd::CmdParser & cmd, const int & nodeid){
-  std::cout << "LOADING FACTOR GRAPH ON NODE " << nodeid << std::endl;
-  numa_run_on_node(nodeid);
-  numa_set_localalloc();
-  _p_fg->load(cmd);
-}
-
 /*!
  * \brief In this function, the factor graph is located to each NUMA node.
  * 
@@ -28,28 +20,19 @@ void dd::GibbsSampling::prepare(){
   n_numa_nodes = numa_max_node();
   n_thread_per_numa = (sysconf(_SC_NPROCESSORS_CONF))/(n_numa_nodes+1);
 
-  std::vector<std::thread> loaders;
+  this->factorgraphs.push_back(*p_fg);
+  for(int i=1;i<=n_numa_nodes;i++){
 
-  for(int i=0;i<=n_numa_nodes;i++){
     numa_run_on_node(i);
     numa_set_localalloc();
-    dd::FactorGraph * fg = new dd::FactorGraph;
-    this->factorgraphs.push_back(*fg);
+
+    std::cout << "CREATE FG ON NODE ..." <<  i << std::endl;
+    dd::FactorGraph fg;
+    fg.load(*p_cmd_parser);
+
+    this->factorgraphs.push_back(fg);
+
   }
-
-
-  for(int i=0;i<=n_numa_nodes;i++){
-    dd::FactorGraph * fg = new dd::FactorGraph;
-    this->factorgraphs.push_back(*fg);
-    //loaders.push_back(std::thread(load_fg, &factorgraphs[i], *p_cmd_parser, i));
-    numa_run_on_node(i);
-    numa_set_localalloc();
-    load_fg(&factorgraphs[i], *p_cmd_parser, i);
-  }
-
-  //for(int i=0;i<=n_numa_nodes;i++){
-  //  loaders[i].join();
-  //}
 
 }
 
@@ -59,7 +42,6 @@ void dd::GibbsSampling::inference(const int & n_epoch){
 
   Timer t;
   int nvar = this->factorgraphs[0].variables.size();
-
   int nnode = n_numa_nodes + 1;
 
   std::vector<SingleNodeSampler> single_node_samplers;
