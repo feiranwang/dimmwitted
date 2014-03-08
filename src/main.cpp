@@ -1,7 +1,7 @@
 
 #include <assert.h>
 #include <iostream>
-#include <numa.h>
+#include "common.h"
 #include <unistd.h>
 
 #include "io/cmd_parser.h"

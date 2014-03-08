@@ -23,12 +23,18 @@ namespace dd{
 
     double r;
 
-    drand48_data * const p_rand_seed;
+    //drand48_data * const p_rand_seed;
+
+    unsigned short p_rand_seed[3];
+
     double * const p_rand_obj_buf;
 
     SingleThreadSampler(CompactFactorGraph * _p_fg) :
-      p_fg (_p_fg), p_rand_seed(new drand48_data), p_rand_obj_buf(new double){
-      srand48_r(rand(),this->p_rand_seed);
+      p_fg (_p_fg), p_rand_obj_buf(new double){
+      //srand48_r(rand(),this->p_rand_seed);
+      p_rand_seed[0] = rand();
+      p_rand_seed[1] = rand();
+      p_rand_seed[2] = rand();
     }
 
     void sample(const int & i_sharding, const int & n_sharding){
@@ -69,7 +75,8 @@ namespace dd{
           //std::cout << potential_pos << " " << potential_neg << std::endl;
 
           if(variable.is_evid == false){
-            drand48_r(this->p_rand_seed, this->p_rand_obj_buf);
+            *this->p_rand_obj_buf = erand48(this->p_rand_seed);
+            //drand48_r(this->p_rand_seed, this->p_rand_obj_buf);
             if((*this->p_rand_obj_buf) * (1.0 + exp(potential_neg-potential_pos)) < 1.0){
               this->p_fg->update(variable, 1.0, false);
             }else{
@@ -80,7 +87,8 @@ namespace dd{
           potential_pos_freeevid = p_fg->potential(variable, 1, true);
           potential_neg_freeevid = p_fg->potential(variable, 0, true);
 
-          drand48_r(this->p_rand_seed, this->p_rand_obj_buf);
+          *this->p_rand_obj_buf = erand48(this->p_rand_seed);
+          //drand48_r(this->p_rand_seed, this->p_rand_obj_buf);
           if((*this->p_rand_obj_buf) * (1.0 + exp(potential_neg_freeevid-potential_pos_freeevid)) < 1.0){
             this->p_fg->update(variable, 1.0, true);
           }else{
@@ -109,7 +117,8 @@ namespace dd{
           potential_pos = p_fg->potential(variable, 1, false);
           potential_neg = p_fg->potential(variable, 0, false);
 
-          drand48_r(this->p_rand_seed, this->p_rand_obj_buf);
+          *this->p_rand_obj_buf = erand48(this->p_rand_seed);
+          //drand48_r(this->p_rand_seed, this->p_rand_obj_buf);
           if((*this->p_rand_obj_buf) * (1.0 + exp(potential_neg-potential_pos)) < 1.0){
             this->p_fg->update(variable, 1.0, false);
           }else{
