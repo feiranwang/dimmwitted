@@ -170,7 +170,7 @@ void dd::GibbsSampling::dump_weights(){
   std::cout << "LEARNING SNIPPETS (QUERY WEIGHTS):" << std::endl;
   FactorGraph const & cfg = this->factorgraphs[0];
   int ct = 0;
-  for(int i=0;i<cfg.weights.size();i++){
+  for(size_t i=0;i<cfg.weights.size();i++){
     ct ++;
     std::cout << "   " << i << " " << cfg.weights[i].weight << std::endl;
     if(ct % 10 == 0){
@@ -179,10 +179,10 @@ void dd::GibbsSampling::dump_weights(){
   }
   std::cout << "   ..." << std::endl; 
 
-  /*
-
-  std::string filename_protocol = this->p_cmd_parser->output_folder->getValue() + "/inference_result.out.weights";
-  std::string filename_text = this->p_cmd_parser->output_folder->getValue() + "/inference_result.out.weights.text";
+  std::string filename_protocol = p_cmd_parser->output_folder->getValue() 
+    + "/inference_result.out.weights";
+  std::string filename_text = p_cmd_parser->output_folder->getValue() 
+    + "/inference_result.out.weights.text";
 
   std::cout << "DUMPING... PROTOCOL: " << filename_protocol << std::endl;
   std::cout << "DUMPING... TEXT    : " << filename_text << std::endl;
@@ -194,10 +194,10 @@ void dd::GibbsSampling::dump_weights(){
   google::protobuf::io::CodedOutputStream *_CodedOutputStream = 
     new google::protobuf::io::CodedOutputStream(_OstreamOutputStream);
   deepdive::WeightInferenceResult msg;
-  for(size_t i=0;i<cfg.n_weights;i++){
-    fout_text << i << " " << cfg.fg_mutable->weights[i] << std::endl;
+  for(size_t i=0;i<cfg.weights.size();i++){
+    fout_text << i << " " << cfg.weights[i].weight << std::endl;
     msg.set_id(i);
-    msg.set_value(cfg.fg_mutable->weights[i]);
+    msg.set_value(cfg.weights[i].weight);
     _CodedOutputStream->WriteVarint32(msg.ByteSize());
     if ( !msg.SerializeToCodedStream(_CodedOutputStream) ){
       std::cout << "SerializeToCodedStream error " << std::endl;
@@ -208,7 +208,6 @@ void dd::GibbsSampling::dump_weights(){
   delete _OstreamOutputStream;
   mFs.close();
   fout_text.close();
-  */
 
 }
 
@@ -245,9 +244,10 @@ void dd::GibbsSampling::dump(){
   }
   std::cout << "   ..." << std::endl; 
 
-  /*
-  std::string filename_protocol = this->p_cmd_parser->output_folder->getValue() + "/inference_result.out";
-  std::string filename_text = this->p_cmd_parser->output_folder->getValue() + "/inference_result.out.text";
+  std::string filename_protocol = p_cmd_parser->output_folder->getValue() + 
+    "/inference_result.out";
+  std::string filename_text = p_cmd_parser->output_folder->getValue() + 
+    "/inference_result.out.text";
   std::cout << "DUMPING... PROTOCOL: " << filename_protocol << std::endl;
   std::cout << "DUMPING... TEXT    : " << filename_text << std::endl;
   std::ofstream fout_text(filename_text.c_str());
@@ -257,7 +257,7 @@ void dd::GibbsSampling::dump(){
   google::protobuf::io::CodedOutputStream *_CodedOutputStream = 
     new google::protobuf::io::CodedOutputStream(_OstreamOutputStream);
   deepdive::VariableInferenceResult msg;
-  for(const auto & variable : this->p_fg->variables){
+  for(const Variable & variable : factorgraphs[0].variables){
     if(variable.is_evid == true){
       continue;
     }
@@ -265,10 +265,10 @@ void dd::GibbsSampling::dump(){
       std::cout << "ERROR: Only support boolean variables for now!" << std::endl;
       assert(false);
     }
-    fout_text << variable.id << " " << (variable.agg_mean/variable.n_sample) << std::endl;
+    fout_text << variable.id << " " << (agg_means[variable.id]/agg_nsamples[variable.id]) << std::endl;
     msg.set_id(variable.id);
     msg.set_category(1.0);
-    msg.set_expectation(variable.agg_mean/variable.n_sample);
+    msg.set_expectation(agg_means[variable.id]/agg_nsamples[variable.id]);
     _CodedOutputStream->WriteVarint32(msg.ByteSize());
     if ( !msg.SerializeToCodedStream(_CodedOutputStream) ){
       std::cout << "SerializeToCodedStream error " << std::endl;
@@ -286,15 +286,15 @@ void dd::GibbsSampling::dump(){
     abc.push_back(0);
   }
   int bad = 0;
-  for(const auto & variable : this->p_fg->variables){
+  for(const auto & variable : factorgraphs[0].variables){
     if(variable.is_evid == true){
       continue;
     }
-    int bin = (int)(variable.agg_mean/variable.n_sample*10);
+    int bin = (int)(agg_means[variable.id]/agg_nsamples[variable.id]*10);
     if(bin >= 0 && bin <=10){
       abc[bin] ++;
     }else{
-      std::cout << variable.id << "   " << variable.agg_mean << "   " << variable.n_sample << std::endl;
+      //std::cout << variable.id << "   " << variable.agg_mean << "   " << variable.n_sample << std::endl;
       bad ++;
     }
   }
@@ -302,7 +302,6 @@ void dd::GibbsSampling::dump(){
   for(int i=0;i<10;i++){
     std::cout << "PROB BIN 0." << i << "~0." << (i+1) << "  -->  # " << abc[i] << std::endl;
   }
-  */
 
 }
 
