@@ -57,7 +57,8 @@ namespace dd{
     template<bool does_change_evid>
     inline double potential(const Variable & variable, const double & proposal){
       double pot = 0.0;
-      for(const long & factor_id : variable.factor_ids){
+      for(int i=0;i<variable.n_factors;i++){
+        const long & factor_id = variable.factor_ids[i];
         const Factor & factor = factors[factor_id];
         const Weight & weight = weights[factor.weight_id];
         pot += weight.weight*factor.template potential<does_change_evid>(
