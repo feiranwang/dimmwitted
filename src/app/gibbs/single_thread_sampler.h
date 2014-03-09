@@ -37,11 +37,11 @@ namespace dd{
       long start = ((long)(nvar/n_sharding)+1) * i_sharding;
       long end = ((long)(nvar/n_sharding)+1) * (i_sharding+1);
       end = end > nvar ? nvar : end;
-      //for(int i=0;i<100;i++){
+      for(int i=0;i<100;i++){
       for(long i=start; i<end; i++){
         this->sample_single_variable(i);
       }
-      //}
+      }
     }
 
     void sample_sgd(const int & i_sharding, const int & n_sharding){
@@ -62,10 +62,9 @@ namespace dd{
 
       if(variable.domain_type == DTYPE_BOOLEAN){
 
-          potential_pos = p_fg->template potential<false>(variable, 1);
-          potential_neg = p_fg->template potential<false>(variable, 0);
-
           if(variable.is_evid == false){
+            potential_pos = p_fg->template potential<false>(variable, 1);
+            potential_neg = p_fg->template potential<false>(variable, 0);
             *this->p_rand_obj_buf = erand48(this->p_rand_seed);
             if((*this->p_rand_obj_buf) * (1.0 + exp(potential_neg-potential_pos)) < 1.0){
               p_fg->template update<false>(variable, 1.0);
