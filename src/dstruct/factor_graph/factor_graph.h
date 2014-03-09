@@ -151,12 +151,15 @@ namespace dd{
       double pot = 0.0;
       for(long i=variable.n_start_i_factors;i<variable.n_factors+variable.n_start_i_factors;i++){
         
-        _mm_prefetch(&factors[factor_ids[i]], _MM_HINT_T2);
 
-        const long & factor_id = factor_ids[i];
-        const Factor & factor = factors[factor_id];
-        const double & weight = infrs->weight_values[factor.weight_id];
+        volatile const long & factor_id = factor_ids[i];
+        volatile const Factor & factor = factors[factor_id];
+        //volatile const double & weight = infrs->weight_values[factor.weight_id];
+        volatile const double & weight = infrs->weight_values[factor.weight_id > 0? 0: 0];
 
+        //__builtin_prefetch(factors + factor_ids[i+1], 1 , 3);
+
+        /*
         if(does_change_evid == true){
           pot += weight*factor.potential(
               vifs, infrs->assignments_free, variable.id, proposal);
@@ -164,7 +167,11 @@ namespace dd{
           pot += weight*factor.potential(
               vifs, infrs->assignments_evid, variable.id, proposal);
         }
+        */
         //std::cout << weight << std::endl;
+
+
+
       }
       //std::cout << "~~~" << pot << std::endl;
       return pot;

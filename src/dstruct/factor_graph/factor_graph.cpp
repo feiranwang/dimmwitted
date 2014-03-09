@@ -12,8 +12,8 @@ void handle_metadata(const deepdive::FactorGraph & factorgraph, dd::FactorGraph 
 
 void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
   if(variable.datatype() == deepdive::Variable_VariableDataType_BOOLEAN){
-    //if(variable.has_initialvalue() || variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
-    if(variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
+    if(variable.has_initialvalue() || variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
+    //if(variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
       //fg.variables.push_back(
       //  dd::Variable(variable.id(), DTYPE_BOOLEAN, true, 0, 1, 
       //    variable.initialvalue(), variable.initialvalue(), variable.edgecount())
