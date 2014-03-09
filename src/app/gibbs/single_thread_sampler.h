@@ -33,7 +33,7 @@ namespace dd{
     }
 
     void sample(const int & i_sharding, const int & n_sharding){
-      long nvar = p_fg->variables.size();
+      long nvar = p_fg->n_var;
       long start = ((long)(nvar/n_sharding)+1) * i_sharding;
       long end = ((long)(nvar/n_sharding)+1) * (i_sharding+1);
       end = end > nvar ? nvar : end;
@@ -43,7 +43,7 @@ namespace dd{
     }
 
     void sample_sgd(const int & i_sharding, const int & n_sharding){
-      long nvar = p_fg->variables.size();
+      long nvar = p_fg->n_var;
       long start = ((long)(nvar/n_sharding)+1) * i_sharding;
       long end = ((long)(nvar/n_sharding)+1) * (i_sharding+1);
       end = end > nvar ? nvar : end;

@@ -38,7 +38,7 @@ void gibbs(dd::CmdParser & cmd_parser){
   int n_numa_node = numa_max_node() + 1;
   int n_thread_per_numa = (sysconf(_SC_NPROCESSORS_CONF))/(n_numa_node);
 
-  //std::string fg_file = cmd_parser.fg_file->getValue();
+  std::string fg_file = cmd_parser.fg_file->getValue();
 
   std::string weight_file = cmd_parser.weight_file->getValue();
   std::string variable_file = cmd_parser.variable_file->getValue();
@@ -61,7 +61,7 @@ void gibbs(dd::CmdParser & cmd_parser){
   std::cout << "################################################" << std::endl;
   std::cout << std::endl;
   std::cout << "#################GIBBS SAMPLING#################" << std::endl;
-  //std::cout << "# fg_file            : " << fg_file << std::endl;
+  std::cout << "# fg_file            : " << fg_file << std::endl;
   std::cout << "# edge_file          : " << edge_file << std::endl;
   std::cout << "# weight_file        : " << weight_file << std::endl;
   std::cout << "# variable_file      : " << variable_file << std::endl;
@@ -78,9 +78,16 @@ void gibbs(dd::CmdParser & cmd_parser){
   std::cout << "################################################" << std::endl;
 
 
+  deepdive::FactorGraph meta = dd::read_single_pb<deepdive::FactorGraph>(fg_file);
+  std::cout << "# nvar               : " << meta.numvariables() << std::endl;
+  std::cout << "# nfac               : " << meta.numfactors() << std::endl;
+  std::cout << "# nweight            : " << meta.numweights() << std::endl;
+  std::cout << "################################################" << std::endl;
+
+
   numa_run_on_node(0);
   numa_set_localalloc();
-  dd::FactorGraph fg;
+  dd::FactorGraph fg(meta.numvariables(), meta.numfactors(), meta.numweights());
   fg.load(cmd_parser);
   dd::GibbsSampling gibbs(&fg, &cmd_parser);
 

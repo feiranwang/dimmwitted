@@ -13,14 +13,20 @@ void handle_metadata(const deepdive::FactorGraph & factorgraph, dd::FactorGraph 
 void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
   if(variable.datatype() == deepdive::Variable_VariableDataType_BOOLEAN){
     if(variable.has_initialvalue()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
-      fg.variables.push_back(
-        dd::Variable(variable.id(), DTYPE_BOOLEAN, true, 0, 1, 
-          variable.initialvalue(), variable.initialvalue(), variable.edgecount())
-      );
+      //fg.variables.push_back(
+      //  dd::Variable(variable.id(), DTYPE_BOOLEAN, true, 0, 1, 
+      //    variable.initialvalue(), variable.initialvalue(), variable.edgecount())
+      //);
+      fg.variables[fg.c_nvar] = dd::Variable(variable.id(), DTYPE_BOOLEAN, true, 0, 1, 
+        variable.initialvalue(), variable.initialvalue(), variable.edgecount());
+      fg.c_nvar ++;
     }else{
-      fg.variables.push_back(
-        dd::Variable(variable.id(), DTYPE_BOOLEAN, false, 0, 1, 0, 0, variable.edgecount())
-      );
+      //fg.variables.push_back(
+      //  dd::Variable(variable.id(), DTYPE_BOOLEAN, false, 0, 1, 0, 0, variable.edgecount())
+      //);
+      fg.variables[fg.c_nvar] = dd::Variable(variable.id(), DTYPE_BOOLEAN, false, 0, 1, 0, 0, 
+        variable.edgecount());
+      fg.c_nvar ++;
     }
   }else{
     std::cout << "[ERROR] Only Boolean variables are supported now!" << std::endl;
@@ -29,15 +35,19 @@ void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
 }
 
 void handle_factor(const deepdive::Factor & factor, dd::FactorGraph & fg){
-  fg.factors.push_back(
-    dd::Factor(factor.id(), factor.weightid(), factor.factorfunction(), factor.edgecount())
-  );
+  //fg.factors.push_back(
+  //  dd::Factor(factor.id(), factor.weightid(), factor.factorfunction(), factor.edgecount())
+  //);
+  fg.factors[fg.c_nfactor] = dd::Factor(factor.id(), factor.weightid(), factor.factorfunction(), factor.edgecount());
+  fg.c_nfactor ++;
 }
 
 void handle_weight(const deepdive::Weight & weight, dd::FactorGraph & fg){
-  fg.weights.push_back(
-    dd::Weight(weight.id(), weight.initialvalue(), weight.isfixed())
-  );
+  //fg.weights.push_back(
+  //  dd::Weight(weight.id(), weight.initialvalue(), weight.isfixed())
+  //);
+  fg.weights[fg.c_nweight] = dd::Weight(weight.id(), weight.initialvalue(), weight.isfixed());
+  fg.c_nweight ++;
 }
 
 void handle_edge(const deepdive::GraphEdge & edge, dd::FactorGraph & fg){
@@ -60,33 +70,27 @@ public:
 
 void dd::FactorGraph::load(const CmdParser & cmd){
 
-  //std::string fg_file = cmd.fg_file->getValue();
   std::string weight_file = cmd.weight_file->getValue();
   std::string variable_file = cmd.variable_file->getValue();
   std::string factor_file = cmd.factor_file->getValue();
   std::string edge_file = cmd.edge_file->getValue();
 
-  //std::string filename_fg = fg_file;
   std::string filename_edges = edge_file;
   std::string filename_factors = factor_file;
   std::string filename_variables = variable_file;
   std::string filename_weights = weight_file;
 
-  //long n_loaded = dd::single_load_pb<deepdive::FactorGraph, dd::FactorGraph, handle_metadata>(filename_fg, *this);
-
   long n_loaded = dd::stream_load_pb<deepdive::Variable, dd::FactorGraph, handle_variable>(filename_variables, *this);
-  assert(n_loaded == this->variables.size());
-  std::cout << "LOADED VARIABLES: #" << this->variables.size() << std::endl;
-  //std::cout << "          QUERY : #" << this->n_var_query << std::endl;
-  //std::cout << "          EVID  : #" << this->n_var_evid << std::endl;
+  assert(n_loaded == n_var);
+  std::cout << "LOADED VARIABLES: #" << n_loaded << std::endl;
 
   n_loaded = dd::stream_load_pb<deepdive::Factor, dd::FactorGraph, handle_factor>(filename_factors, *this);
-  assert(n_loaded == this->factors.size());
-  std::cout << "LOADED FACTORS: #" << this->factors.size() << std::endl;
+  assert(n_loaded == n_factor);
+  std::cout << "LOADED FACTORS: #" << n_loaded << std::endl;
 
   n_loaded = dd::stream_load_pb<deepdive::Weight, dd::FactorGraph, handle_weight>(filename_weights, *this);
-  assert(n_loaded == this->weights.size());
-  std::cout << "LOADED WEIGHTS: #" << this->weights.size() << std::endl;
+  assert(n_loaded == n_weight);
+  std::cout << "LOADED WEIGHTS: #" << n_loaded << std::endl;
 
   this->finalize_loading();
 
@@ -100,24 +104,24 @@ void dd::FactorGraph::load(const CmdParser & cmd){
 }
 
 void dd::FactorGraph::finalize_loading(){
-  std::sort(this->variables.begin(), this->variables.end(), idsorter<Variable>());
-  std::sort(this->factors.begin(), this->factors.end(), idsorter<Factor>());
-  std::sort(this->weights.begin(), this->weights.end(), idsorter<Weight>()); 
+  std::sort(&variables[0], &variables[n_var-1], idsorter<Variable>());
+  std::sort(&factors[0], &factors[n_factor-1], idsorter<Factor>());
+  std::sort(&weights[0], &weights[n_weight-1], idsorter<Weight>()); 
   this->loading_finalized = true;
-  infrs = new InferenceResult(variables, weights, variables.size(), weights.size());
+  infrs->init(variables, weights);
 }
 
 void dd::FactorGraph::safety_check(){
-  size_t s = variables.size();
-  for(size_t i=0;i<s;i++){
+  long s = n_var;
+  for(long i=0;i<s;i++){
     assert(this->variables[i].id == i);
   }
-  s = factors.size();
-  for(size_t i=0;i<s;i++){
+  s = n_factor;
+  for(long i=0;i<s;i++){
     assert(this->factors[i].id == i);
   }
-  s = weights.size();
-  for(size_t i=0;i<s;i++){
+  s = n_weight;
+  for(long i=0;i<s;i++){
     assert(this->weights[i].id == i);
   }
   std::cout << "FACTOR GRAPH: Safety Checking Passed..." << std::endl;

@@ -25,6 +25,11 @@ namespace dd{
     int n_variables;
     std::vector<VariableInFactor> variables;
     int func_id; 
+
+    Factor(){
+
+    }
+
     Factor(const long & _id,
            const int & _weight_id,
            const int & _func_id,

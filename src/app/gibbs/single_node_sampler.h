@@ -43,7 +43,7 @@ namespace dd{
     }
 
     void clear_variabletally(){
-      for(size_t i=0;i<p_fg->variables.size();i++){
+      for(size_t i=0;i<p_fg->n_var;i++){
         p_fg->variables[i].agg_mean = 0.0;
         p_fg->variables[i].n_sample = 0.0;
       }
