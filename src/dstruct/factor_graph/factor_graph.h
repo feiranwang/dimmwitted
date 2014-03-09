@@ -61,18 +61,23 @@ namespace dd{
 
   class FactorGraph {
   public:
-    
+
     Variable * const variables;
     Factor * const factors;
     Weight * const weights;
 
+    long * const factor_ids;
+    VariableInFactor * const vifs;
+
     long n_var;
     long n_factor;
     long n_weight;
+    long n_edge;
 
     long c_nvar;
     long c_nfactor;
     long c_nweight;
+    long c_edge;
 
     bool loading_finalized;
     bool safety_check_passed;
@@ -81,12 +86,15 @@ namespace dd{
 
     double stepsize;
 
-    FactorGraph(long _n_var, long _n_factor, long _n_weight) : 
+    FactorGraph(long _n_var, long _n_factor, long _n_weight, long _n_edge) : 
       variables(new Variable[_n_var]),
       factors(new Factor[_n_factor]),
       weights(new Weight[_n_weight]),
       n_var(_n_var), n_factor(_n_factor), n_weight(_n_weight),
-      infrs(new InferenceResult(_n_var, _n_weight))
+      infrs(new InferenceResult(_n_var, _n_weight)),
+      n_edge(_n_edge),
+      factor_ids(new long[_n_edge]),
+      vifs(new VariableInFactor[_n_edge])
     {
       this->loading_finalized = false;
       this->safety_check_passed = false;
@@ -96,8 +104,8 @@ namespace dd{
     }
 
     double update_weight(const Variable & variable){
-      for(const long & i_fid:variable.factor_ids){
-        const Factor & factor = factors[i_fid];
+      for(long i=variable.n_start_i_factors;i<variable.n_factors+variable.n_start_i_factors;i++){
+        const Factor & factor = factors[factor_ids[i]];
         if(infrs->weights_isfixed[factor.weight_id] == false){
           infrs->weight_values[factor.weight_id] += 
             stepsize * (this->template potential<false>(factor) 
@@ -121,8 +129,8 @@ namespace dd{
     template<bool does_change_evid>
     inline double potential(const Variable & variable, const double & proposal){
       double pot = 0.0;
-      for(int i=0;i<variable.factor_ids.size();i++){
-        const long & factor_id = variable.factor_ids[i];
+      for(long i=variable.n_start_i_factors;i<variable.n_factors+variable.n_start_i_factors;i++){
+        const long & factor_id = factor_ids[i];
         const Factor & factor = factors[factor_id];
         const double & weight = infrs->weight_values[factor.weight_id];
 
