@@ -16,14 +16,15 @@ namespace dd{
     double assignment_free;
 
     int n_factors;
+    long n_start_i_factors;
 
-    std::vector<long> factor_ids;
+    std::vector<long> tmp_factor_ids;
 
     double agg_mean;
     long n_sample;
 
     Variable(){
-      
+
     }
 
     Variable(const long & _id, const int & _domain_type, 
@@ -51,6 +52,10 @@ namespace dd{
     long vid;
     int n_position;
     bool is_positive;
+
+    VariableInFactor(){
+
+    }
 
     VariableInFactor(const long & _vid, const int & _n_position, 
                      const bool & _is_positive){

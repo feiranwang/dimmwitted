@@ -82,12 +82,13 @@ void gibbs(dd::CmdParser & cmd_parser){
   std::cout << "# nvar               : " << meta.numvariables() << std::endl;
   std::cout << "# nfac               : " << meta.numfactors() << std::endl;
   std::cout << "# nweight            : " << meta.numweights() << std::endl;
+  std::cout << "# nedge              : " << meta.numedges() << std::endl;
   std::cout << "################################################" << std::endl;
 
 
   numa_run_on_node(0);
   numa_set_localalloc();
-  dd::FactorGraph fg(meta.numvariables(), meta.numfactors(), meta.numweights());
+  dd::FactorGraph fg(meta.numvariables(), meta.numfactors(), meta.numweights(), meta.numedges());
   fg.load(cmd_parser);
   dd::GibbsSampling gibbs(&fg, &cmd_parser);
 
