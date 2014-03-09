@@ -87,7 +87,7 @@ clean:
 	rm -rf dw
 
 gibbs:
-	./dw gibbs 						       \
+	./dw gibbs -m data2/graph.meta.pb		\
 			   -e data2/graph.edges.pb 		\
 			   -w data2/graph.weights.pb 	\
 			   -v data2/graph.variables.pb 	\
