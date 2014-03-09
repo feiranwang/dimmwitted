@@ -37,9 +37,9 @@ for i in range(0,NVAR):
 for i in range(NVAR,2*NVAR):
 	v = factor_graph_pb2.Variable()
 	v.id = i
-	#v.initialValue = None
+	v.initialValue = 0
 	v.dataType = 0
-	v.isEvidence = True
+	v.isEvidence = False
 	v.cardinality = 1
 	v.edgeCount = 1
 	size = v.ByteSize()
