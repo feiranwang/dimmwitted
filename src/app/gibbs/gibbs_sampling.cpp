@@ -100,6 +100,8 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
   }
 
   double * ori_weights = new double[nweight];
+  memcpy(ori_weights, this->factorgraphs[0].infrs->weight_values, sizeof(double)*nweight);
+
 
   for(int i_epoch=0;i_epoch<n_epoch;i_epoch++){
 
@@ -108,8 +110,6 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
 
     t.restart();
     
-    memcpy(ori_weights, this->factorgraphs[0].infrs->weight_values, sizeof(double)*nweight);
-
     for(int i=0;i<nnode;i++){
       single_node_samplers[i].p_fg->stepsize = current_stepsize;
     }
@@ -149,6 +149,7 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
     double l2=0.0;
     for(int i=0;i<nweight;i++){
       double diff = fabs(ori_weights[i] - cfg.infrs->weight_values[i]);
+      ori_weights[i] = cfg.infrs->weight_values[i];
       l2 += diff*diff;
       if(lmax < diff){
         lmax = diff;
