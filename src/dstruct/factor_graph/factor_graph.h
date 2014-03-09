@@ -150,6 +150,9 @@ namespace dd{
     inline double potential(const Variable & variable, const double & proposal){
       double pot = 0.0;
       for(long i=variable.n_start_i_factors;i<variable.n_factors+variable.n_start_i_factors;i++){
+        
+        _mm_prefetch(&factors[factor_ids[i]], _MM_HINT_T2);
+
         const long & factor_id = factor_ids[i];
         const Factor & factor = factors[factor_id];
         const double & weight = infrs->weight_values[factor.weight_id];
