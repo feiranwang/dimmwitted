@@ -94,7 +94,6 @@ gibbs:
 			   -f data2/graph.factors.pb    \
 			   -o data2/					\
 			   -i 100 -l 100 -s 10 --alpha 0.01 --diminish 0.95
-	#./dw gibbs -e data/ -o data/ -i 100 -l 100 -s 10 --alpha 0.01 --decay 0.95
 
 gibbs2:
 	./dw gibbs 						       \
@@ -105,16 +104,19 @@ gibbs2:
 			   -o data/					\
 			   -i 100 -l 0 -s 10 --alpha 0.01 --diminish 0.95
 
-
 test:
 	./dw gibbs -e ./test/factor_graph/lr_inf/ 		\
 			   -o ./test/factor_graph/lr_inf/ 		\
 			   -i 100 -l 100 -s 10
 
 test_learn:
-	./dw gibbs -e ./test/factor_graph/lr_learn/ 	\
-			   -o ./test/factor_graph/lr_learn/ 	\
-			   -i 1000 -l 1000 -s 10 --alpha 0.0001
+	./dw gibbs -m test/generate/lr_learn/graph.meta.pb		\
+			   -e test/generate/lr_learn/graph.edges.pb 		\
+			   -w test/generate/lr_learn/graph.weights.pb 	\
+			   -v test/generate/lr_learn/graph.variables.pb 	\
+			   -f test/generate/lr_learn/graph.factors.pb    \
+			   -o test/generate/lr_learn/					\
+			   -i 100 -l 100 -s 10 --alpha 0.01 --diminish 0.95
 
 test_learn_dep:
 	./dw gibbs -e ./test/factor_graph/lr_learn_dep/ 	\
@@ -130,4 +132,6 @@ gibbs_pb:
 	./lib/protobuf/bin/protoc -I=./src/dstruct/factor_graph/ --cpp_out=./src/dstruct/factor_graph/ ./src/dstruct/factor_graph/factor_graph.proto
 
 gibbs_pb_py:
-	./lib/protobuf/bin/protoc -I=./src/dstruct/ --python_out=./test/factor_graph ./src/dstruct/factor_graph.proto
+	./lib/protobuf/bin/protoc -I=./src/dstruct/factor_graph/ --python_out=./test/generate/ ./src/dstruct/factor_graph/factor_graph.proto
+
+
