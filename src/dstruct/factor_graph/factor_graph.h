@@ -103,6 +103,23 @@ namespace dd{
       c_nweight = 0;
     }
 
+    void copy_from(const FactorGraph * const p_other_fg){
+      memcpy(variables, p_other_fg->variables, sizeof(Variable)*n_var);
+      memcpy(factors, p_other_fg->factors, sizeof(Factor)*n_factor);
+      memcpy(weights, p_other_fg->weights, sizeof(Weight)*n_weight);
+      memcpy(factor_ids, p_other_fg->factor_ids, sizeof(long)*n_edge);
+      memcpy(vifs, p_other_fg->vifs, sizeof(VariableInFactor)*n_edge);
+
+      c_nvar = p_other_fg->c_nvar;
+      c_nfactor = p_other_fg->c_nfactor;
+      c_nweight = p_other_fg->c_nweight;
+      c_edge = p_other_fg->c_edge;
+      loading_finalized = p_other_fg->loading_finalized;
+      safety_check_passed = p_other_fg->safety_check_passed;
+
+      infrs->init(variables, weights);
+    }
+
     double update_weight(const Variable & variable){
       for(long i=variable.n_start_i_factors;i<variable.n_factors+variable.n_start_i_factors;i++){
         const Factor & factor = factors[factor_ids[i]];
