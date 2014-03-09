@@ -122,9 +122,10 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
       single_node_samplers[i].wait_sgd();
     }
 
-    /*
+    
     FactorGraph & cfg = this->factorgraphs[0];
     
+    /*
     for(int i=1;i<=n_numa_nodes;i++){
       FactorGraph & cfg_other = this->factorgraphs[i];
       for(int j=0;j<nweight;j++){
