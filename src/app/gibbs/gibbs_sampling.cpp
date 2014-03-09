@@ -28,7 +28,9 @@ void dd::GibbsSampling::prepare(){
 
     std::cout << "CREATE FG ON NODE ..." <<  i << std::endl;
     dd::FactorGraph fg(p_fg->n_var, p_fg->n_factor, p_fg->n_weight, p_fg->n_edge);
-    fg.load(*p_cmd_parser);
+    
+    fg.copy_from(p_fg);
+    //fg.load(*p_cmd_parser);
 
     this->factorgraphs.push_back(fg);
 
