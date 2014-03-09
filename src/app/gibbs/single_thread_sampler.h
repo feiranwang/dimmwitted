@@ -37,11 +37,11 @@ namespace dd{
       long start = ((long)(nvar/n_sharding)+1) * i_sharding;
       long end = ((long)(nvar/n_sharding)+1) * (i_sharding+1);
       end = end > nvar ? nvar : end;
-      for(int i=0;i<100;i++){
+      //for(int i=0;i<100;i++){
       for(long i=start; i<end; i++){
         this->sample_single_variable(i);
       }
-      }
+      //}
     }
 
     void sample_sgd(const int & i_sharding, const int & n_sharding){

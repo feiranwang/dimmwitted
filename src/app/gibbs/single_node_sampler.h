@@ -10,11 +10,9 @@
 namespace dd{
   void gibbs_single_thread_task(FactorGraph * const _p_fg, int i_worker, int n_worker){
     //numa_set_localalloc();
-    int cpu = sched_getcpu();
-    int node = numa_node_of_cpu(cpu);
-
-    std::cout << node << std::endl;
-
+    //int cpu = sched_getcpu();
+    //int node = numa_node_of_cpu(cpu);
+    //std::cout << node << std::endl;
     SingleThreadSampler sampler = SingleThreadSampler(_p_fg);
     sampler.sample(i_worker,n_worker);
   }
