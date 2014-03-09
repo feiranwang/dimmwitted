@@ -23,7 +23,10 @@ namespace dd{
     long id;
     long weight_id;
     int n_variables;
-    std::vector<VariableInFactor> variables;
+
+    long n_start_i_vif;
+
+    std::vector<VariableInFactor> tmp_variables;
     int func_id; 
 
     Factor(){
@@ -39,16 +42,18 @@ namespace dd{
       this->func_id = _func_id;
       this->n_variables = _n_variables;
     }
-    inline double _potential_imply(const double * const var_values, 
+    inline double _potential_imply(const VariableInFactor * const vifs,
+                                   const double * const var_values, 
                                    const long &, const double &) const;
 
-    inline double potential(const double * const var_values,
+    inline double potential(const VariableInFactor * const vifs,
+      const double * const var_values,
       const long & vid, const double & proposal) const{ 
       
       if(func_id == 0){
-        return _potential_imply(var_values, vid, proposal);
+        return _potential_imply(vifs, var_values, vid, proposal);
       }else if(func_id == 4){
-        return _potential_imply(var_values, vid, proposal);
+        return _potential_imply(vifs, var_values, vid, proposal);
       }else{
         std::cout << "Unsupported Factor Function ID= " << func_id << std::endl;
         assert(false);
@@ -58,11 +63,14 @@ namespace dd{
  
   };
 
-  inline double dd::Factor::_potential_imply(const double * const var_values, 
+  inline double dd::Factor::_potential_imply(
+      const VariableInFactor * const vifs,
+      const double * const var_values, 
       const long & vid, const double & proposal) const{
 
       double sum = 0.0;
-      for(const VariableInFactor & vif : variables){
+      for(long i_vif=n_start_i_vif;i_vif<n_start_i_vif+n_variables;i_vif++){
+        const VariableInFactor & vif = vifs[i_vif];
         if(vif.n_position == n_variables - 1){
           if(vif.vid == vid){
             sum += (vif.is_positive == true ? proposal : 1-proposal);
