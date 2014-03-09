@@ -88,8 +88,8 @@ fo.close()
 fo = open("lr_learn/graph.weights.pb", "wb")
 w = factor_graph_pb2.Weight()
 w.id = 0
-w.initialValue = 1.38
-w.isFixed = True
+w.initialValue = 0.0
+w.isFixed = False
 fo.write(struct.pack("i", w.ByteSize()+3))
 fo.write(w.SerializeToString())
 fo.close()

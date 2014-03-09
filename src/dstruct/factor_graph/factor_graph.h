@@ -124,6 +124,9 @@ namespace dd{
       for(long i=variable.n_start_i_factors;i<variable.n_factors+variable.n_start_i_factors;i++){
         const Factor & factor = factors[factor_ids[i]];
         if(infrs->weights_isfixed[factor.weight_id] == false){
+          //if(variable.is_evid == true){
+          //  std::cout << this->template potential<true>(factor) << "   " << this->template potential<false>(factor)  << std::endl;
+          //}
           infrs->weight_values[factor.weight_id] += 
             stepsize * (this->template potential<false>(factor) 
               - this->template potential<true>(factor));
@@ -158,7 +161,9 @@ namespace dd{
           pot += weight*factor.potential(
               vifs, infrs->assignments_evid, variable.id, proposal);
         }
+        //std::cout << weight << std::endl;
       }
+      //std::cout << "~~~" << pot << std::endl;
       return pot;
     }
 
