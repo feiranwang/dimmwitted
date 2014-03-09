@@ -33,7 +33,6 @@ void dd::GibbsSampling::prepare(){
     //fg.load(*p_cmd_parser);
 
     this->factorgraphs.push_back(fg);
-
   }
 
 }
