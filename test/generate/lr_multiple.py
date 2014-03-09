@@ -3,7 +3,7 @@ import struct
 import factor_graph_pb2
 import random
 
-NVAR = 10000
+NVAR = 100000
 
 fo = open("lr_learn2/graph.meta.pb", "wb")
 w = factor_graph_pb2.FactorGraph()
