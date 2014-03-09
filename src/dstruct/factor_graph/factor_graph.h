@@ -117,9 +117,9 @@ namespace dd{
     template<bool does_change_evid>
     inline double potential(const Factor & factor){
       if(does_change_evid == true){
-        return factor.potential(infrs->assignments_free, -1, -1);
+        return factor.potential(vifs, infrs->assignments_free, -1, -1);
       }else{
-        return factor.potential(infrs->assignments_evid, -1, -1);
+        return factor.potential(vifs, infrs->assignments_evid, -1, -1);
       }
     }
   
@@ -136,10 +136,10 @@ namespace dd{
 
         if(does_change_evid == true){
           pot += weight*factor.potential(
-              infrs->assignments_free, variable.id, proposal);
+              vifs, infrs->assignments_free, variable.id, proposal);
         }else{
           pot += weight*factor.potential(
-              infrs->assignments_evid, variable.id, proposal);
+              vifs, infrs->assignments_evid, variable.id, proposal);
         }
       }
       return pot;

@@ -51,14 +51,13 @@ void handle_weight(const deepdive::Weight & weight, dd::FactorGraph & fg){
 }
 
 void handle_edge(const deepdive::GraphEdge & edge, dd::FactorGraph & fg){
-  fg.factors[edge.factorid()].variables.push_back(
+  fg.factors[edge.factorid()].tmp_variables.push_back(
     dd::VariableInFactor(edge.variableid(), edge.position(), edge.ispositive())
   );
   
   fg.variables[edge.variableid()].tmp_factor_ids.push_back(
     edge.factorid()
   );
-
 }
 
 
@@ -111,6 +110,10 @@ void dd::FactorGraph::finalize_loading(){
   std::sort(&weights[0], &weights[n_weight-1], idsorter<Weight>()); 
   this->loading_finalized = true;
   infrs->init(variables, weights);
+}
+
+void dd::FactorGraph::safety_check(){
+
   c_edge = 0;
   for(long i=0;i<n_var;i++){
     Variable & variable = variables[i];
@@ -121,9 +124,16 @@ void dd::FactorGraph::finalize_loading(){
     }
   }
 
-}
+  c_edge = 0;
+  for(long i=0;i<n_factor;i++){
+    Factor & factor = factors[i];
+    factor.n_start_i_vif = c_edge;
+    for(const VariableInFactor & vif : factor.tmp_variables){
+      vifs[c_edge] = vif;
+      c_edge ++;
+    }
+  }
 
-void dd::FactorGraph::safety_check(){
   long s = n_var;
   for(long i=0;i<s;i++){
     assert(this->variables[i].id == i);
