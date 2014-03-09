@@ -118,6 +118,17 @@ test_learn:
 			   -o test/generate/lr_learn/					\
 			   -i 100 -l 100 -s 10 --alpha 0.01 --diminish 0.95
 
+test_learn2:
+	./dw gibbs -m test/generate/lr_learn2/graph.meta.pb		\
+			   -e test/generate/lr_learn2/graph.edges.pb 		\
+			   -w test/generate/lr_learn2/graph.weights.pb 	\
+			   -v test/generate/lr_learn2/graph.variables.pb 	\
+			   -f test/generate/lr_learn2/graph.factors.pb    \
+			   -o test/generate/lr_learn2/					\
+			   -i 100 -l 100 -s 10 --alpha 0.01 --diminish 0.95
+
+
+
 test_learn_dep:
 	./dw gibbs -e ./test/factor_graph/lr_learn_dep/ 	\
 			   -o ./test/factor_graph/lr_learn_dep/ 	\
