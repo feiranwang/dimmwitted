@@ -18,7 +18,9 @@
 void dd::GibbsSampling::prepare(){
 
   n_numa_nodes = numa_max_node();
-  n_thread_per_numa = (sysconf(_SC_NPROCESSORS_CONF))/(n_numa_nodes+1);
+  //n_thread_per_numa = (sysconf(_SC_NPROCESSORS_CONF))/(n_numa_nodes+1);
+  n_thread_per_numa = 1;
+
 
   this->factorgraphs.push_back(*p_fg);
   for(int i=1;i<=n_numa_nodes;i++){
@@ -119,7 +121,9 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
       single_node_samplers[i].wait_sgd();
     }
 
+    
     FactorGraph & cfg = this->factorgraphs[0];
+    
     for(int i=1;i<=n_numa_nodes;i++){
       FactorGraph & cfg_other = this->factorgraphs[i];
       for(int j=0;j<nweight;j++){
@@ -140,6 +144,7 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
         }
       }
     }
+    
 
     double lmax = -1000000;
     double l2=0.0;
