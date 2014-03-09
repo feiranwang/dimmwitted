@@ -22,6 +22,10 @@ namespace dd{
     double agg_mean;
     long n_sample;
 
+    Variable(){
+      
+    }
+
     Variable(const long & _id, const int & _domain_type, 
              const bool & _is_evid, const double & _lower_bound,
              const double & _upper_bound, const double & _init_value, 

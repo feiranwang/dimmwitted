@@ -27,7 +27,7 @@ void dd::GibbsSampling::prepare(){
     numa_set_localalloc();
 
     std::cout << "CREATE FG ON NODE ..." <<  i << std::endl;
-    dd::FactorGraph fg;
+    dd::FactorGraph fg(p_fg->n_var, p_fg->n_factor, p_fg->n_weight);
     fg.load(*p_cmd_parser);
 
     this->factorgraphs.push_back(fg);
@@ -41,7 +41,7 @@ void dd::GibbsSampling::inference(const int & n_epoch){
   Timer t_total;
 
   Timer t;
-  int nvar = this->factorgraphs[0].variables.size();
+  int nvar = this->factorgraphs[0].n_var;
   int nnode = n_numa_nodes + 1;
 
   std::vector<SingleNodeSampler> single_node_samplers;
@@ -86,9 +86,9 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
   double current_stepsize = stepsize;
 
   Timer t;
-  int nvar = this->factorgraphs[0].variables.size();
+  int nvar = this->factorgraphs[0].n_var;
   int nnode = n_numa_nodes + 1;
-  int nweight = this->factorgraphs[0].weights.size();
+  int nweight = this->factorgraphs[0].n_weight;
 
   std::vector<SingleNodeSampler> single_node_samplers;
   for(int i=0;i<=n_numa_nodes;i++){
@@ -214,16 +214,17 @@ void dd::GibbsSampling::dump_weights(){
 
 void dd::GibbsSampling::dump(){
 
-  double * agg_means = new double[factorgraphs[0].variables.size()];
-  double * agg_nsamples = new double[factorgraphs[0].variables.size()];
-  for(long i=0;i<factorgraphs[0].variables.size();i++){
+  double * agg_means = new double[factorgraphs[0].n_var];
+  double * agg_nsamples = new double[factorgraphs[0].n_var];
+  for(long i=0;i<factorgraphs[0].n_var;i++){
     agg_means[i] = 0;
     agg_nsamples[i] = 0;
   }
 
   for(int i=0;i<=n_numa_nodes;i++){
     const FactorGraph & cfg = factorgraphs[i];
-    for(auto & variable : cfg.variables){
+    for(long i=0;i<factorgraphs[0].n_var;i++){
+      const Variable & variable = factorgraphs[0].variables[i];
       agg_means[variable.id] += cfg.infrs->agg_means[variable.id];
       agg_nsamples[variable.id] += cfg.infrs->agg_nsamples[variable.id];
     }
@@ -231,7 +232,8 @@ void dd::GibbsSampling::dump(){
 
   std::cout << "INFERENCE SNIPPETS (QUERY VARIABLES):" << std::endl;
   int ct = 0;
-  for(const Variable & variable : factorgraphs[0].variables){
+  for(long i=0;i<factorgraphs[0].n_var;i++){
+    const Variable & variable = factorgraphs[0].variables[i];
     if(variable.is_evid == false){
       ct ++;
       std::cout << "   " << variable.id << " " 
@@ -257,7 +259,8 @@ void dd::GibbsSampling::dump(){
   google::protobuf::io::CodedOutputStream *_CodedOutputStream = 
     new google::protobuf::io::CodedOutputStream(_OstreamOutputStream);
   deepdive::VariableInferenceResult msg;
-  for(const Variable & variable : factorgraphs[0].variables){
+  for(long i=0;i<factorgraphs[0].n_var;i++){
+    const Variable & variable = factorgraphs[0].variables[i];
     if(variable.is_evid == true){
       continue;
     }
@@ -286,7 +289,8 @@ void dd::GibbsSampling::dump(){
     abc.push_back(0);
   }
   int bad = 0;
-  for(const auto & variable : factorgraphs[0].variables){
+  for(long i=0;i<factorgraphs[0].n_var;i++){
+    const Variable & variable = factorgraphs[0].variables[i];
     if(variable.is_evid == true){
       continue;
     }

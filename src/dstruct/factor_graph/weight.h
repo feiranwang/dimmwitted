@@ -17,6 +17,10 @@ namespace dd{
       weight(_weight),
       isfixed(_isfixed)
     {}
+
+    Weight(){
+      
+    }
   }; 
 
 

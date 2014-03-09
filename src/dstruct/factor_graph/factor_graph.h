@@ -21,8 +21,8 @@ namespace dd{
   class InferenceResult{
   public:
 
-    int nvars;
-    int nweights;
+    long nvars;
+    long nweights;
 
     double * const agg_means;
     double * const agg_nsamples; 
@@ -31,10 +31,7 @@ namespace dd{
     double * const weight_values;
     bool * const weights_isfixed;
 
-    InferenceResult(
-      std::vector<Variable> variables,
-      std::vector<Weight> weights,
-      size_t _nvars, size_t _nweights):
+    InferenceResult(long _nvars, long _nweights):
       assignments_free(new double[_nvars]),
       assignments_evid(new double[_nvars]),
       agg_means(new double[_nvars]),
@@ -42,16 +39,20 @@ namespace dd{
       weight_values(new double [_nweights]),
       weights_isfixed(new bool [_nweights]),
       nweights(_nweights),
-      nvars(_nvars){
+      nvars(_nvars){}
 
-      for(const Variable & variable : variables){
+    void init(Variable * const variables, Weight * const weights){
+
+      for(long t=0;t<nvars;t++){
+        const Variable & variable = variables[t];
         assignments_free[variable.id] = variable.assignment_free;
         assignments_evid[variable.id] = variable.assignment_evid;
         agg_means[variable.id] = 0.0;
         agg_nsamples[variable.id] = 0.0;
       }
 
-      for(const Weight & weight: weights){
+      for(long t=0;t<nweights;t++){
+        const Weight & weight = weights[t];
         weight_values[weight.id] = weight.weight;
         weights_isfixed[weight.id] = weight.isfixed;
       }
@@ -60,20 +61,38 @@ namespace dd{
 
   class FactorGraph {
   public:
-    std::vector<Variable> variables;
-    std::vector<Factor> factors;
-    std::vector<Weight> weights;
+    
+    Variable * const variables;
+    Factor * const factors;
+    Weight * const weights;
+
+    long n_var;
+    long n_factor;
+    long n_weight;
+
+    long c_nvar;
+    long c_nfactor;
+    long c_nweight;
 
     bool loading_finalized;
     bool safety_check_passed;
 
-    InferenceResult * infrs;
+    InferenceResult * const infrs ;
 
     double stepsize;
 
-    FactorGraph(){
+    FactorGraph(long _n_var, long _n_factor, long _n_weight) : 
+      variables(new Variable[_n_var]),
+      factors(new Factor[_n_factor]),
+      weights(new Weight[_n_weight]),
+      n_var(_n_var), n_factor(_n_factor), n_weight(_n_weight),
+      infrs(new InferenceResult(_n_var, _n_weight))
+    {
       this->loading_finalized = false;
       this->safety_check_passed = false;
+      c_nvar = 0;
+      c_nfactor = 0;
+      c_nweight = 0;
     }
 
     double update_weight(const Variable & variable){
@@ -104,9 +123,9 @@ namespace dd{
       double pot = 0.0;
       for(int i=0;i<variable.factor_ids.size();i++){
         const long & factor_id = variable.factor_ids[i];
-        _mm_prefetch(&factors[variable.factor_ids[i+1]], _MM_HINT_T1);
         const Factor & factor = factors[factor_id];
         const double & weight = infrs->weight_values[factor.weight_id];
+
         if(does_change_evid == true){
           pot += weight*factor.potential(
               infrs->assignments_free, variable.id, proposal);
