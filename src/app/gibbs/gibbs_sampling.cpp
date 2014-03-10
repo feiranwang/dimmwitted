@@ -128,7 +128,6 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
 
     
     FactorGraph & cfg = this->factorgraphs[0];
-    /*
     for(int i=1;i<=n_numa_nodes;i++){
       FactorGraph & cfg_other = this->factorgraphs[i];
       for(int j=0;j<nweight;j++){
@@ -149,11 +148,10 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
         }
       }
     }    
-    */
+
 
     double lmax = -1000000;
     double l2=0.0;
-    /*
     for(int i=0;i<nweight;i++){
       double diff = fabs(ori_weights[i] - cfg.infrs->weight_values[i]);
       ori_weights[i] = cfg.infrs->weight_values[i];
@@ -163,7 +161,6 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
       }
     }
     lmax = lmax/current_stepsize;
-    */
     
     double elapsed = t.elapsed();
     std::cout << "" << elapsed << " sec.";
