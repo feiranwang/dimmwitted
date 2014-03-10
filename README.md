@@ -4,11 +4,12 @@ DimmWitted
 # How fast is DimmWitted?
 
   - On Amazon EC2's FREE MACHINE (512M memory, 1 core). We can at 3.6M varialbes/seconds.
-  - One 
+  - On a 2-node Amazon EC2 machine, sampling 7 billion random variables, each of which has 10 features, takes 3 minutes. This means we can run inference for all living human beings on this planet with $15 (100 samples!)
+  - On Macbook, DimmWitted runs 10x faster than DeepDive's default sampler.
 
 # Pre-built Binary
 
-We include a pre-built binary... Because we reply on lnuma, this is not always possible... But 
+We include a pre-built binary in the folder release... Because we reply on lnuma, this is not always possible... But 
 we successfully deployed this binary to the following configurations. Good luck!
 
   - Local Machine: Linux MACHINENAME 2.6.32-358.23.2.el6.x86_64 #1 SMP Sat Sep 14 05:32:37 EDT 2013 x86_64 x86_64 x86_64 GNU/Linux
@@ -24,7 +25,7 @@ We haven't found machines that cannot work with binaries yet.
 
 If you are lucky, the follow two commands will tell you whether it works or not
 
-    unzip dw.zip
+    tar xf dw.tar.bz2
     sh test.sh
 
 # Installation
