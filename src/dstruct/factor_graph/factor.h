@@ -18,30 +18,19 @@ namespace dd{
     return v.assignment_evid;
   }
 
-  class Factor {
+  class CompactFactor{
   public:
     long id;
-    long weight_id;
+    int func_id; 
     int n_variables;
-
     long n_start_i_vif;
 
-    std::vector<VariableInFactor> tmp_variables;
-    int func_id; 
+    CompactFactor(){}
 
-    Factor(){
-
+    CompactFactor(const long & _id){
+      id = _id;
     }
 
-    Factor(const long & _id,
-           const int & _weight_id,
-           const int & _func_id,
-           const int & _n_variables){
-      this->id = _id;
-      this->weight_id = _weight_id;
-      this->func_id = _func_id;
-      this->n_variables = _n_variables;
-    }
     inline double _potential_imply(const VariableInFactor * const vifs,
                                    const double * const var_values, 
                                    const long &, const double &) const;
@@ -60,10 +49,37 @@ namespace dd{
       }
       return 0.0;
     }
+
+  };
+
+  class Factor {
+  public:
+    long id;
+    long weight_id;
+    int func_id;
+    int n_variables;
+
+    long n_start_i_vif;
+
+    std::vector<VariableInFactor> tmp_variables;
+
+    Factor(){
+
+    }
+
+    Factor(const long & _id,
+           const int & _weight_id,
+           const int & _func_id,
+           const int & _n_variables){
+      this->id = _id;
+      this->weight_id = _weight_id;
+      this->func_id = _func_id;
+      this->n_variables = _n_variables;
+    }
  
   };
 
-  inline double dd::Factor::_potential_imply(
+  inline double dd::CompactFactor::_potential_imply(
       const VariableInFactor * const vifs,
       const double * const var_values, 
       const long & vid, const double & proposal) const{
@@ -72,7 +88,6 @@ namespace dd{
       for(long i_vif=n_start_i_vif;i_vif<n_start_i_vif+n_variables;i_vif++){
         const VariableInFactor & vif = vifs[i_vif];
         if(vif.n_position == n_variables - 1){
-          //std::cout << "~" << std::endl;
           if(vif.vid == vid){
             sum += (vif.is_positive == true ? proposal : 1-proposal);
           }else{
@@ -80,7 +95,6 @@ namespace dd{
               : 1-var_values[vif.vid]);
           }
         }else{
-          //std::cout << "#" << std::endl;
           if(vif.vid == vid){
             sum += (vif.is_positive == false ? proposal : 1-proposal);
           }else{

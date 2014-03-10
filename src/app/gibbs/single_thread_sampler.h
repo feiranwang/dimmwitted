@@ -83,8 +83,7 @@ namespace dd{
             p_fg->template update<true>(variable, 0.0);
           }
 
-          //TODO
-          //this->p_fg->update_weight(variable);
+          this->p_fg->update_weight(variable);
           
       }else{
         std::cout << "[ERROR] Only Boolean variables are supported now!" << std::endl;
