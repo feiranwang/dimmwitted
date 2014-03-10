@@ -47,6 +47,8 @@ factor_graph.pb.o: src/dstruct/factor_graph/factor_graph.pb.cc
 gibbs_sampling.o: src/app/gibbs/gibbs_sampling.cpp
 	$(COMPILE_CMD) -c src/app/gibbs/gibbs_sampling.cpp
 
+assembly:
+	$(COMPILE_CMD) -S src/app/gibbs/gibbs_sampling.cpp
 
 dep:
 ifeq ($(UNAME), Darwin)
@@ -125,7 +127,7 @@ test_learn2:
 			   -v test/generate/lr_learn2/graph.variables.pb 	\
 			   -f test/generate/lr_learn2/graph.factors.pb    \
 			   -o test/generate/lr_learn2/					\
-			   -i 100 -l 100 -s 10 --alpha 0.01 --diminish 0.95
+			   -i 100 -l 100 -s 10 --alpha 0.001 --diminish 0.95
 
 
 
