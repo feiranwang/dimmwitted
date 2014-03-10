@@ -26,7 +26,6 @@ void dd::GibbsSampling::prepare(){
   //}
   //n_thread_per_numa = 1;
 
-
   this->factorgraphs.push_back(*p_fg);
   for(int i=1;i<=n_numa_nodes;i++){
 
@@ -126,7 +125,6 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
       single_node_samplers[i].wait_sgd();
     }
 
-    
     FactorGraph & cfg = this->factorgraphs[0];
     for(int i=1;i<=n_numa_nodes;i++){
       FactorGraph & cfg_other = this->factorgraphs[i];
