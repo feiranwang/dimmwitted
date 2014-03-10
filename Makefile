@@ -9,7 +9,7 @@ endif
 OPT_FLAG = -Ofast
 GCC_INCLUDE = -I./lib/tclap/include/ -I./lib/protobuf/include/ -I./src
 GCC_LIB = -L./lib/protobuf/lib/
-CPP_FLAG = -std=c++0x -lnuma -lrt -lprotobuf
+CPP_FLAG = -std=c++0x -static-libgcc -Wl,-Bstatic -lnuma -lrt -lprotobuf
 endif
 
 ifeq ($(UNAME), Darwin)
@@ -19,7 +19,7 @@ endif
 OPT_FLAG = -O3 -stdlib=libc++
 GCC_INCLUDE = -I./lib/tclap/include/ -I./lib/protobuf/include/ -I./src
 GCC_LIB = -L./lib/protobuf/lib/
-CPP_FLAG = -std=c++0x  -lprotobuf
+CPP_FLAG = -std=c++0x -lprotobuf 
 endif
 
 COMPILE_CMD = $(CXX) $(OPT_FLAG) $(GCC_INCLUDE) $(GCC_LIB) $(CPP_FLAG)
