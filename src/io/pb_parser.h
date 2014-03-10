@@ -29,7 +29,7 @@ namespace dd{
     coded_input->SetTotalBytesLimit(1e9, 9e8);
     while(coded_input->ReadVarint32(&bytes)){      
       msgLimit = coded_input->PushLimit(bytes);
-      coded_input->Skip(3);
+      //coded_input->Skip(3);
       if(tmp.ParseFromCodedStream(coded_input)){
         handler(tmp, fg);
         ct ++;
