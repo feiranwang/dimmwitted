@@ -81,6 +81,9 @@ namespace dd{
     long c_nweight;
     long c_edge;
 
+    long n_evid;
+    long n_query;
+
     bool loading_finalized;
     bool safety_check_passed;
 
@@ -105,6 +108,8 @@ namespace dd{
       c_nvar = 0;
       c_nfactor = 0;
       c_nweight = 0;
+      n_evid = 0;
+      n_query = 0;
     }
 
     void copy_from(const FactorGraph * const p_other_fg){
@@ -128,8 +133,8 @@ namespace dd{
     }
 
     double update_weight(const Variable & variable){
-      const CompactFactor * const fs = &factors_dups[variable.n_start_i_factors];
-      const int * const ws = &factors_dups_weightids[variable.n_start_i_factors];
+      const CompactFactor * const fs = factors_dups + variable.n_start_i_factors;
+      const int * const ws = factors_dups_weightids + variable.n_start_i_factors;
       for(long i=0;i<variable.n_factors;i++){
         //_mm_prefetch(factors_dups_weightids + i + 1, _MM_HINT_T0);
         if(infrs->weights_isfixed[ws[i]] == false){
@@ -159,7 +164,7 @@ namespace dd{
       const CompactFactor * const fs = &factors_dups[variable.n_start_i_factors];
       const int * const ws = &factors_dups_weightids[variable.n_start_i_factors];      
       for(long i=0;i<variable.n_factors;i++){
-        _mm_prefetch(infrs->weight_values + ws[i], _MM_HINT_T0);
+        //_mm_prefetch(infrs->weight_values + ws[i], _MM_HINT_T0);
         if(does_change_evid == true){
           tmp = fs[i].potential(
               vifs, infrs->assignments_free, variable.id, proposal);
