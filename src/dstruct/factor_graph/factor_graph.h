@@ -66,6 +66,8 @@ namespace dd{
     Factor * const factors;
     Weight * const weights;
 
+    CompactFactor * const factors_dups;
+    int * const factors_dups_weightids;
     long * const factor_ids;
     VariableInFactor * const vifs;
 
@@ -94,7 +96,9 @@ namespace dd{
       infrs(new InferenceResult(_n_var, _n_weight)),
       n_edge(_n_edge),
       factor_ids(new long[_n_edge]),
-      vifs(new VariableInFactor[_n_edge])
+      factors_dups(new CompactFactor[_n_edge]),
+      vifs(new VariableInFactor[_n_edge]),
+      factors_dups_weightids(new int[_n_edge])
     {
       this->loading_finalized = false;
       this->safety_check_passed = false;
@@ -110,6 +114,9 @@ namespace dd{
       memcpy(factor_ids, p_other_fg->factor_ids, sizeof(long)*n_edge);
       memcpy(vifs, p_other_fg->vifs, sizeof(VariableInFactor)*n_edge);
 
+      memcpy(factors_dups, p_other_fg->factors_dups, sizeof(CompactFactor)*n_edge);
+      memcpy(factors_dups_weightids, p_other_fg->factors_dups_weightids, sizeof(int)*n_edge);
+
       c_nvar = p_other_fg->c_nvar;
       c_nfactor = p_other_fg->c_nfactor;
       c_nweight = p_other_fg->c_nweight;
@@ -121,21 +128,20 @@ namespace dd{
     }
 
     double update_weight(const Variable & variable){
-      for(long i=variable.n_start_i_factors;i<variable.n_factors+variable.n_start_i_factors;i++){
-        const Factor & factor = factors[factor_ids[i]];
-        if(infrs->weights_isfixed[factor.weight_id] == false){
-          //if(variable.is_evid == true){
-          //  std::cout << this->template potential<true>(factor) << "   " << this->template potential<false>(factor)  << std::endl;
-          //}
-          infrs->weight_values[factor.weight_id] += 
-            stepsize * (this->template potential<false>(factor) 
-              - this->template potential<true>(factor));
+      const CompactFactor * const fs = &factors_dups[variable.n_start_i_factors];
+      const int * const ws = &factors_dups_weightids[variable.n_start_i_factors];
+      for(long i=0;i<variable.n_factors;i++){
+        //_mm_prefetch(factors_dups_weightids + i + 1, _MM_HINT_T0);
+        if(infrs->weights_isfixed[ws[i]] == false){
+          infrs->weight_values[ws[i]] += 
+            stepsize * (this->template potential<false>(fs[i]) 
+              - this->template potential<true>(fs[i]));
         }
       }
     }
 
     template<bool does_change_evid>
-    inline double potential(const Factor & factor){
+    inline double potential(const CompactFactor & factor){
       if(does_change_evid == true){
         return factor.potential(vifs, infrs->assignments_free, -1, -1);
       }else{
@@ -148,32 +154,22 @@ namespace dd{
 
     template<bool does_change_evid>
     inline double potential(const Variable & variable, const double & proposal){
-      double pot = 0.0;
-      for(long i=variable.n_start_i_factors;i<variable.n_factors+variable.n_start_i_factors;i++){
-        
-
-        volatile const long & factor_id = factor_ids[i];
-        volatile const Factor & factor = factors[factor_id];
-        //volatile const double & weight = infrs->weight_values[factor.weight_id];
-        volatile const double & weight = infrs->weight_values[factor.weight_id > 0? 0: 0];
-
-        //__builtin_prefetch(factors + factor_ids[i+1], 1 , 3);
-
-        /*
+      double pot = 0.0;  
+      double tmp;
+      const CompactFactor * const fs = &factors_dups[variable.n_start_i_factors];
+      const int * const ws = &factors_dups_weightids[variable.n_start_i_factors];      
+      for(long i=0;i<variable.n_factors;i++){
+        _mm_prefetch(infrs->weight_values + ws[i], _MM_HINT_T0);
         if(does_change_evid == true){
-          pot += weight*factor.potential(
+          tmp = fs[i].potential(
               vifs, infrs->assignments_free, variable.id, proposal);
         }else{
-          pot += weight*factor.potential(
+          tmp = fs[i].potential(
               vifs, infrs->assignments_evid, variable.id, proposal);
         }
-        */
-        //std::cout << weight << std::endl;
-
-
+        pot += infrs->weight_values[ws[i]] * tmp;
 
       }
-      //std::cout << "~~~" << pot << std::endl;
       return pot;
     }
 
