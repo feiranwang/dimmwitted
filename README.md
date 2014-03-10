@@ -1,4 +1,4 @@
-dimmwitted
+DimmWitted
 ==========
 
 # How fast is DimmWitted?
