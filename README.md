@@ -16,12 +16,12 @@ we successfully deployed this binary to the following configurations. Good luck!
   - Local Machine: Linux MACHINENAME 2.6.32-431.3.1.el6.x86_64 #1 SMP Fri Dec 13 06:58:20 EST 2013 x86_64 x86_64 x86_64 GNU/Linux
   - Local Machine: Linux MACHINENAME 2.6.32-279.el6.x86_64 #1 SMP Fri Jun 22 12:19:21 UTC 2012 x86_64 x86_64 x86_64 GNU/Linux
   - Local Machine: Linux MACHINENAME 2.6.32-358.el6.x86_64 #1 SMP Fri Feb 22 00:31:26 UTC 2013 x86_64 x86_64 x86_64 GNU/Linux
+  - Local Machine: Linux MACHINENAME 2.6.18-308.el5 #1 SMP Tue Feb 21 20:06:06 EST 2012 x86_64 x86_64 x86_64 GNU/Linux
   - EC2 Free Machine: Linux MACHINENAME 3.2.0-58-virtual #88-Ubuntu SMP Tue Dec 3 17:58:13 UTC 2013 x86_64 x86_64 x86_64 GNU/Linux
   
 We failed on:
 
   - Linux d-02.cs.wisc.edu 2.6.18-274.12.1.el5 #1 SMP Tue Nov 8 21:37:35 EST 2011 x86_64 x86_64 x86_64 GNU/Linux
-  - Linux rocky.Stanford.EDU 2.6.18-308.el5 #1 SMP Tue Feb 21 20:06:06 EST 2012 x86_64 x86_64 x86_64 GNU/Linux
 
 If you are lock, the follow two commands will tell you whether it works or not
 
