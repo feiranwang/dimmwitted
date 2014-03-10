@@ -24,8 +24,8 @@ We haven't found machines that cannot work with binaries yet.
 
 If you are lucky, the follow two commands will tell you whether it works or not
 
-  unzip dw.zip
-  sh test.sh
+    unzip dw.zip
+    sh test.sh
 
 # Installation
 
