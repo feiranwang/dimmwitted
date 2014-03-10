@@ -12,8 +12,9 @@ void handle_metadata(const deepdive::FactorGraph & factorgraph, dd::FactorGraph 
 
 void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
   if(variable.datatype() == deepdive::Variable_VariableDataType_BOOLEAN){
-    if(variable.has_initialvalue() || variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
-    //if(variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
+    //if(variable.has_initialvalue() || variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
+    if(variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
+    //if(false){
       //fg.variables.push_back(
       //  dd::Variable(variable.id(), DTYPE_BOOLEAN, true, 0, 1, 
       //    variable.initialvalue(), variable.initialvalue(), variable.edgecount())
@@ -115,15 +116,21 @@ void dd::FactorGraph::finalize_loading(){
 
 void dd::FactorGraph::safety_check(){
 
+  /*
   c_edge = 0;
   for(long i=0;i<n_var;i++){
     Variable & variable = variables[i];
     variable.n_start_i_factors = c_edge;
     for(const long & fid : variable.tmp_factor_ids){
       factor_ids[c_edge] = fid;
+      factors_dups[c_edge].id = factors[fid].id;
+      factors_dups[c_edge].func_id = factors[fid].func_id;
+      factors_dups[c_edge].n_variables = factors[fid].n_variables;
+      factors_dups[c_edge].n_start_i_vif = factors[fid].n_start_i_vif;
+      factors_dups_weightids[c_edge] = factors[fid].weight_id;
       c_edge ++;
     }
-  }
+  }*/
 
   c_edge = 0;
   for(long i=0;i<n_factor;i++){
@@ -131,6 +138,21 @@ void dd::FactorGraph::safety_check(){
     factor.n_start_i_vif = c_edge;
     for(const VariableInFactor & vif : factor.tmp_variables){
       vifs[c_edge] = vif;
+      c_edge ++;
+    }
+  }
+
+  c_edge = 0;
+  for(long i=0;i<n_var;i++){
+    Variable & variable = variables[i];
+    variable.n_start_i_factors = c_edge;
+    for(const long & fid : variable.tmp_factor_ids){
+      factor_ids[c_edge] = fid;
+      factors_dups[c_edge].id = factors[fid].id;
+      factors_dups[c_edge].func_id = factors[fid].func_id;
+      factors_dups[c_edge].n_variables = factors[fid].n_variables;
+      factors_dups[c_edge].n_start_i_vif = factors[fid].n_start_i_vif;
+      factors_dups_weightids[c_edge] = factors[fid].weight_id;
       c_edge ++;
     }
   }
