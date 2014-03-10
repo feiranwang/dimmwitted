@@ -8,7 +8,7 @@ DimmWitted
 
 # Pre-built Binary
 
-We support pre-built binaries... Because we reply on lnuma, this is not always possible... But 
+We include a pre-built binary... Because we reply on lnuma, this is not always possible... But 
 we successfully deployed this binary to the following configurations. Good luck!
 
   - Local Machine: Linux MACHINENAME 2.6.32-358.23.2.el6.x86_64 #1 SMP Sat Sep 14 05:32:37 EDT 2013 x86_64 x86_64 x86_64 GNU/Linux
