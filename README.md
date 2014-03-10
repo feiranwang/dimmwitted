@@ -27,7 +27,7 @@ we successfully deployed this binary to the following configurations. Good luck!
     - Local Machine: Linux MACHINENAME 2.6.18-308.el5 #1 SMP Tue Feb 21 20:06:06 EST 2012 x86_64 x86_64 x86_64 GNU/Linux
     - Local Machine: Linux MACHINENAME 2.6.18-274.12.1.el5 #1 SMP Tue Nov 8 21:37:35 EST 2011 x86_64 x86_64 x86_64 GNU/Linux
   - EC2 Machines
-    - (The cheapest ones with Ubuntu worked!) 
+    - (The cheapest ones with Ubuntu12.04 worked!) 
     - EC2 Free Machine: Linux MACHINENAME 3.2.0-58-virtual #88-Ubuntu SMP Tue Dec 3 17:58:13 UTC 2013 x86_64 x86_64 x86_64 GNU/Linux
   
 We haven't found machines that cannot work with this binary yet.
