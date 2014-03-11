@@ -117,11 +117,11 @@ namespace dd{
     for(long i_vif=n_start_i_vif+1;i_vif<n_start_i_vif+n_variables;i_vif++){
       const VariableInFactor & vif = vifs[i_vif];
       if(vif.vid == vid){
-        if sum != (vif.is_positive == true ? proposal : 1-proposal){
+        if(sum != (vif.is_positive == true ? proposal : 1-proposal)){
           return 0.0;
         }
       }else{
-        if sum != (vif.is_positive == true ? var_values[vif.vid] : 1-var_values[vif.vid]){
+        if(sum != (vif.is_positive == true ? var_values[vif.vid] : 1-var_values[vif.vid])){
           return 0.0;
         }
       }
