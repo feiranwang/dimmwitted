@@ -14,9 +14,6 @@
 
 
 
-
-
-
 /*
 enum _mm_hint
 {
