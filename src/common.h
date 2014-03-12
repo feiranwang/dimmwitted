@@ -17,9 +17,6 @@
 #include <math.h>
 #include <stdlib.h>
 
-#define LOG_2   0.693147180559945
-#define MINUS_LOG_THRESHOLD   -18.42
-
 #define numa_alloc_onnode(X,Y) malloc(X)
 
 #define numa_max_node() 0
@@ -27,6 +24,12 @@
 #define numa_run_on_node(X) 0
 
 #define numa_set_localalloc() 0
+
+#endif
+
+
+#define LOG_2   0.693147180559945
+#define MINUS_LOG_THRESHOLD   -18.42
 
 inline bool fast_exact_is_equal(double a, double b){
     return (a <= b && b <= a);
@@ -52,8 +55,5 @@ inline double logadd(double log_a, double log_b){
     
 }
 
-
-
-#endif
 
 #endif
