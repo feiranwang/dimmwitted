@@ -109,19 +109,19 @@ namespace dd{
     const VariableInFactor & vif = vifs[n_start_i_vif];
     double sum;
     if(vif.vid == vid){
-      sum = (vif.is_positive == true ? proposal : 1-proposal);
+      sum = (vif.is_positive == true ? (proposal==vif.equal_to) : 1-(proposal==vif.equal_to));
     }else{
-      sum = (vif.is_positive == true ? var_values[vif.vid] : 1-var_values[vif.vid]);
+      sum = (vif.is_positive == true ? (var_values[vif.vid]==vif.equal_to) : 1-(var_values[vif.vid]==vif.equal_to));
     }
 
     for(long i_vif=n_start_i_vif+1;i_vif<n_start_i_vif+n_variables;i_vif++){
       const VariableInFactor & vif = vifs[i_vif];
       if(vif.vid == vid){
-        if(sum != (vif.is_positive == true ? proposal : 1-proposal)){
+        if(sum != (vif.is_positive == true ? (proposal==vif.equal_to) : 1-(proposal==vif.equal_to))){
           return 0.0;
         }
       }else{
-        if(sum != (vif.is_positive == true ? var_values[vif.vid] : 1-var_values[vif.vid])){
+        if(sum != (vif.is_positive == true ? (var_values[vif.vid]==vif.equal_to) : 1-(var_values[vif.vid]==vif.equal_to))){
           return 0.0;
         }
       }
@@ -138,10 +138,10 @@ namespace dd{
     for(long i_vif=n_start_i_vif;i_vif<n_start_i_vif+n_variables;i_vif++){
       const VariableInFactor & vif = vifs[i_vif];
       if(vif.vid == vid){
-        sum += (vif.is_positive == false ? proposal : 1-proposal);
+        sum += (vif.is_positive == false ? (proposal==vif.equal_to) : 1-(proposal==vif.equal_to));
       }else{
-        sum += (vif.is_positive == false ? var_values[vif.vid]
-          : 1-var_values[vif.vid]);
+        sum += (vif.is_positive == false ? (var_values[vif.vid]==vif.equal_to)
+          : 1-(var_values[vif.vid]==vif.equal_to));
       }
     }
     if(sum != 0){
@@ -160,10 +160,10 @@ namespace dd{
     for(long i_vif=n_start_i_vif;i_vif<n_start_i_vif+n_variables;i_vif++){
       const VariableInFactor & vif = vifs[i_vif];
       if(vif.vid == vid){
-        sum += (vif.is_positive == true ? proposal : 1-proposal);
+        sum += (vif.is_positive == true ? (proposal==vif.equal_to) : 1-(proposal==vif.equal_to));
       }else{
-        sum += (vif.is_positive == true ? var_values[vif.vid]
-          : 1-var_values[vif.vid]);
+        sum += (vif.is_positive == true ? (var_values[vif.vid]==vif.equal_to)
+          : 1-(var_values[vif.vid]==vif.equal_to));
       }
     }
     if(sum != 0){
@@ -180,27 +180,30 @@ namespace dd{
       const long & vid, const double & proposal) const{
 
       double sum = 0.0;
+
       for(long i_vif=n_start_i_vif;i_vif<n_start_i_vif+n_variables;i_vif++){
         const VariableInFactor & vif = vifs[i_vif];
         if(vif.n_position == n_variables - 1){
           if(vif.vid == vid){
-            sum += (vif.is_positive == true ? proposal : 1-proposal);
+            sum += (vif.is_positive == true ? (proposal==vif.equal_to) : 1-(proposal==vif.equal_to));
           }else{
-            sum += (vif.is_positive == true ? var_values[vif.vid]
-              : 1-var_values[vif.vid]);
+            sum += (vif.is_positive == true ? (var_values[vif.vid]==vif.equal_to)
+              : 1-(var_values[vif.vid]==vif.equal_to));
           }
         }else{
           if(vif.vid == vid){
-            sum += (vif.is_positive == false ? proposal : 1-proposal);
+            sum += (vif.is_positive == false ? (proposal==vif.equal_to) : 1-(proposal==vif.equal_to));
           }else{
-            sum += (vif.is_positive == false ? var_values[vif.vid]
-              : var_values[vif.vid]);
+            sum += (vif.is_positive == false ? (var_values[vif.vid]==vif.equal_to)
+              : (var_values[vif.vid]==vif.equal_to));
           }
         }
       }
       if(sum != 0){
+        //std::cout << "f" << id << " " << proposal << " -> 1.0" << "    " << vifs[0].equal_to <<std::endl;
         return 1.0;
       }else{
+        //std::cout << "f" << id << " " << proposal << " -> 0.0" << "    " << vifs[0].equal_to <<std::endl;
         return 0.0;
       }
   }

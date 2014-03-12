@@ -112,11 +112,12 @@ void protobuf_AssignDesc_factor_5fgraph_2eproto() {
       sizeof(Factor));
   Factor_FactorFunctionType_descriptor_ = Factor_descriptor_->enum_type(0);
   GraphEdge_descriptor_ = file->message_type(3);
-  static const int GraphEdge_offsets_[4] = {
+  static const int GraphEdge_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GraphEdge, variableid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GraphEdge, factorid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GraphEdge, position_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GraphEdge, ispositive_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GraphEdge, equalpredicate_),
   };
   GraphEdge_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -251,18 +252,19 @@ void protobuf_AddDesc_factor_5fgraph_2eproto() {
     "(\0162#.deepdive.Factor.FactorFunctionType\022"
     "\021\n\tedgeCount\030\004 \001(\004\"G\n\022FactorFunctionType"
     "\022\t\n\005IMPLY\020\000\022\006\n\002OR\020\001\022\007\n\003AND\020\002\022\t\n\005EQUAL\020\003\022"
-    "\n\n\006ISTRUE\020\004\"]\n\tGraphEdge\022\022\n\nvariableId\030\001"
+    "\n\n\006ISTRUE\020\004\"u\n\tGraphEdge\022\022\n\nvariableId\030\001"
     " \002(\004\022\020\n\010factorId\030\002 \002(\004\022\020\n\010position\030\003 \002(\004"
-    "\022\030\n\nisPositive\030\004 \001(\010:\004true\"\261\001\n\013FactorGra"
-    "ph\022\022\n\nnumWeights\030\001 \002(\004\022\024\n\014numVariables\030\002"
-    " \002(\004\022\022\n\nnumFactors\030\003 \002(\004\022\020\n\010numEdges\030\004 \002"
-    "(\004\022\023\n\013weightsFile\030\005 \002(\t\022\025\n\rvariablesFile"
-    "\030\006 \002(\t\022\023\n\013factorsFile\030\007 \002(\t\022\021\n\tedgesFile"
-    "\030\010 \002(\t\"2\n\025WeightInferenceResult\022\n\n\002id\030\001 "
-    "\002(\004\022\r\n\005value\030\002 \002(\001\"L\n\027VariableInferenceR"
-    "esult\022\n\n\002id\030\001 \002(\004\022\020\n\010category\030\002 \001(\004\022\023\n\013e"
-    "xpectation\030\003 \002(\001B/\n\032org.deepdive.seriali"
-    "zationB\021FactorGraphProtos", 985);
+    "\022\030\n\nisPositive\030\004 \001(\010:\004true\022\026\n\016equalPredi"
+    "cate\030\005 \001(\004\"\261\001\n\013FactorGraph\022\022\n\nnumWeights"
+    "\030\001 \002(\004\022\024\n\014numVariables\030\002 \002(\004\022\022\n\nnumFacto"
+    "rs\030\003 \002(\004\022\020\n\010numEdges\030\004 \002(\004\022\023\n\013weightsFil"
+    "e\030\005 \002(\t\022\025\n\rvariablesFile\030\006 \002(\t\022\023\n\013factor"
+    "sFile\030\007 \002(\t\022\021\n\tedgesFile\030\010 \002(\t\"2\n\025Weight"
+    "InferenceResult\022\n\n\002id\030\001 \002(\004\022\r\n\005value\030\002 \002"
+    "(\001\"L\n\027VariableInferenceResult\022\n\n\002id\030\001 \002("
+    "\004\022\020\n\010category\030\002 \001(\004\022\023\n\013expectation\030\003 \002(\001"
+    "B/\n\032org.deepdive.serializationB\021FactorGr"
+    "aphProtos", 1009);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "factor_graph.proto", &protobuf_RegisterTypes);
   Weight::default_instance_ = new Weight();
@@ -1434,6 +1436,7 @@ const int GraphEdge::kVariableIdFieldNumber;
 const int GraphEdge::kFactorIdFieldNumber;
 const int GraphEdge::kPositionFieldNumber;
 const int GraphEdge::kIsPositiveFieldNumber;
+const int GraphEdge::kEqualPredicateFieldNumber;
 #endif  // !_MSC_VER
 
 GraphEdge::GraphEdge()
@@ -1456,6 +1459,7 @@ void GraphEdge::SharedCtor() {
   factorid_ = GOOGLE_ULONGLONG(0);
   position_ = GOOGLE_ULONGLONG(0);
   ispositive_ = true;
+  equalpredicate_ = GOOGLE_ULONGLONG(0);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1495,6 +1499,7 @@ void GraphEdge::Clear() {
     factorid_ = GOOGLE_ULONGLONG(0);
     position_ = GOOGLE_ULONGLONG(0);
     ispositive_ = true;
+    equalpredicate_ = GOOGLE_ULONGLONG(0);
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -1565,6 +1570,22 @@ bool GraphEdge::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(40)) goto parse_equalPredicate;
+        break;
+      }
+
+      // optional uint64 equalPredicate = 5;
+      case 5: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_equalPredicate:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
+                 input, &equalpredicate_)));
+          set_has_equalpredicate();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -1607,6 +1628,11 @@ void GraphEdge::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteBool(4, this->ispositive(), output);
   }
 
+  // optional uint64 equalPredicate = 5;
+  if (has_equalpredicate()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(5, this->equalpredicate(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -1633,6 +1659,11 @@ void GraphEdge::SerializeWithCachedSizes(
   // optional bool isPositive = 4 [default = true];
   if (has_ispositive()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(4, this->ispositive(), target);
+  }
+
+  // optional uint64 equalPredicate = 5;
+  if (has_equalpredicate()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(5, this->equalpredicate(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -1670,6 +1701,13 @@ int GraphEdge::ByteSize() const {
     // optional bool isPositive = 4 [default = true];
     if (has_ispositive()) {
       total_size += 1 + 1;
+    }
+
+    // optional uint64 equalPredicate = 5;
+    if (has_equalpredicate()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt64Size(
+          this->equalpredicate());
     }
 
   }
@@ -1711,6 +1749,9 @@ void GraphEdge::MergeFrom(const GraphEdge& from) {
     if (from.has_ispositive()) {
       set_ispositive(from.ispositive());
     }
+    if (from.has_equalpredicate()) {
+      set_equalpredicate(from.equalpredicate());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -1739,6 +1780,7 @@ void GraphEdge::Swap(GraphEdge* other) {
     std::swap(factorid_, other->factorid_);
     std::swap(position_, other->position_);
     std::swap(ispositive_, other->ispositive_);
+    std::swap(equalpredicate_, other->equalpredicate_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

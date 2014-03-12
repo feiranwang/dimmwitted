@@ -4,6 +4,10 @@
 #include "dstruct/factor_graph.h"
 
 void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
+
+  std::cout << "~~~~~~~" << std::endl;
+  std::cout << variable.datatype() << std::endl;
+
   if(variable.datatype() == deepdive::Variable_VariableDataType_BOOLEAN){
     if(variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
       fg.variables.push_back(
@@ -17,9 +21,23 @@ void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
       );
       fg.n_var_query ++;
     }
-    std::cout << "~~~~" << variable.id() << std::endl;
-  }else{
-    std::cout << "[ERROR] Only Boolean variables are supported now!" << std::endl;
+    //std::cout << "~~~~" << variable.id() << std::endl;
+  }else if(variable.datatype() == deepdive::Variable_VariableDataType_MULTINOMIAL){{
+    if(variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
+      fg.variables.push_back(
+        dd::Variable(variable.id(), DTYPE_MULTINOMIAL, true, 0, variable.cardinality(), 
+          variable.initialvalue(), variable.initialvalue())
+      );
+      fg.n_var_evid ++;
+    }else{
+      fg.variables.push_back(
+        dd::Variable(variable.id(), DTYPE_MULTINOMIAL, false, 0, variable.cardinality(), 0, 0)
+      );
+      fg.n_var_query ++;
+    }
+    //std::cout << "~~~~" << variable.id() << std::endl;
+  }else{    
+    std::cout << "[ERROR] Only Boolean and Multinomial variables are supported now!" << std::endl;
     assert(false);
   }
 }
@@ -37,9 +55,15 @@ void handle_weight(const deepdive::Weight & weight, dd::FactorGraph & fg){
 }
 
 void handle_edge(const deepdive::GraphEdge & edge, dd::FactorGraph & fg){
-  fg.factors[edge.factorid()].variables.push_back(
-    dd::VariableInFactor(edge.variableid(), edge.position(), edge.ispositive())
-  );
+  if(!edge.has_equalpredicate()){
+    fg.factors[edge.factorid()].variables.push_back(
+      dd::VariableInFactor(edge.variableid(), edge.position(), edge.ispositive())
+    );
+  }else{
+    fg.factors[edge.factorid()].variables.push_back(
+      dd::VariableInFactor(edge.variableid(), edge.position(), edge.ispositive(), edge.equalpredicate())
+    );
+  }
   fg.variables[edge.variableid()].factor_ids.push_back(
     edge.factorid()
   );
@@ -66,6 +90,8 @@ void dd::FactorGraph::load(const CmdParser & cmd){
   std::string filename_factors = factor_file;
   std::string filename_variables = variable_file;
   std::string filename_weights = weight_file;
+
+  std::cout << "!!!!!!!" << std::endl;
 
   long n_loaded = dd::stream_load_pb<deepdive::Variable, dd::FactorGraph, handle_variable>(filename_variables, *this);
   assert(n_loaded == this->variables.size());

@@ -581,6 +581,13 @@ class GraphEdge : public ::google::protobuf::Message {
   inline bool ispositive() const;
   inline void set_ispositive(bool value);
 
+  // optional uint64 equalPredicate = 5;
+  inline bool has_equalpredicate() const;
+  inline void clear_equalpredicate();
+  static const int kEqualPredicateFieldNumber = 5;
+  inline ::google::protobuf::uint64 equalpredicate() const;
+  inline void set_equalpredicate(::google::protobuf::uint64 value);
+
   // @@protoc_insertion_point(class_scope:deepdive.GraphEdge)
  private:
   inline void set_has_variableid();
@@ -591,16 +598,19 @@ class GraphEdge : public ::google::protobuf::Message {
   inline void clear_has_position();
   inline void set_has_ispositive();
   inline void clear_has_ispositive();
+  inline void set_has_equalpredicate();
+  inline void clear_has_equalpredicate();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::uint64 variableid_;
   ::google::protobuf::uint64 factorid_;
   ::google::protobuf::uint64 position_;
+  ::google::protobuf::uint64 equalpredicate_;
   bool ispositive_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
 
   friend void  protobuf_AddDesc_factor_5fgraph_2eproto();
   friend void protobuf_AssignDesc_factor_5fgraph_2eproto();
@@ -1438,6 +1448,28 @@ inline bool GraphEdge::ispositive() const {
 inline void GraphEdge::set_ispositive(bool value) {
   set_has_ispositive();
   ispositive_ = value;
+}
+
+// optional uint64 equalPredicate = 5;
+inline bool GraphEdge::has_equalpredicate() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void GraphEdge::set_has_equalpredicate() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void GraphEdge::clear_has_equalpredicate() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void GraphEdge::clear_equalpredicate() {
+  equalpredicate_ = GOOGLE_ULONGLONG(0);
+  clear_has_equalpredicate();
+}
+inline ::google::protobuf::uint64 GraphEdge::equalpredicate() const {
+  return equalpredicate_;
+}
+inline void GraphEdge::set_equalpredicate(::google::protobuf::uint64 value) {
+  set_has_equalpredicate();
+  equalpredicate_ = value;
 }
 
 // -------------------------------------------------------------------

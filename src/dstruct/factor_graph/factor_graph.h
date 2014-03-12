@@ -138,7 +138,6 @@ namespace dd{
       for(long i=0;i<variable.n_factors;i++){
         //_mm_prefetch(factors_dups_weightids + i + 1, _MM_HINT_T0);
         if(infrs->weights_isfixed[ws[i]] == false){
-          
           //volatile double tmp =  stepsize * (this->template potential<false>(fs[i]) 
           //    - this->template potential<true>(fs[i]));
           //std::cout << ws[i] << std::endl;
@@ -178,7 +177,6 @@ namespace dd{
               vifs, infrs->assignments_evid, variable.id, proposal);
         }
         pot += infrs->weight_values[ws[i]] * tmp;
-
       }
       return pot;
     }

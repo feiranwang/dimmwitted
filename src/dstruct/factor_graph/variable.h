@@ -52,6 +52,7 @@ namespace dd{
     long vid;
     int n_position;
     bool is_positive;
+    double equal_to;
 
     VariableInFactor(){
 
@@ -62,6 +63,15 @@ namespace dd{
       this->vid = _vid;
       this->n_position = _n_position;
       this->is_positive = _is_positive;
+      this->equal_to = 1.0;
+    }
+
+    VariableInFactor(const long & _vid, const int & _n_position, 
+                     const bool & _is_positive, const double & _equal_to){
+      this->vid = _vid;
+      this->n_position = _n_position;
+      this->is_positive = _is_positive;
+      this->equal_to = _equal_to;
     }
   };
 }

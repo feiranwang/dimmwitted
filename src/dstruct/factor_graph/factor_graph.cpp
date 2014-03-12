@@ -11,32 +11,39 @@ void handle_metadata(const deepdive::FactorGraph & factorgraph, dd::FactorGraph 
 }
 
 void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
+
   if(variable.datatype() == deepdive::Variable_VariableDataType_BOOLEAN){
-    //if(variable.has_initialvalue() || variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
     if(variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
-    //if(false){
-      //fg.variables.push_back(
-      //  dd::Variable(variable.id(), DTYPE_BOOLEAN, true, 0, 1, 
-      //    variable.initialvalue(), variable.initialvalue(), variable.edgecount())
-      //);
       fg.variables[fg.c_nvar] = dd::Variable(variable.id(), DTYPE_BOOLEAN, true, 0, 1, 
         variable.initialvalue(), variable.initialvalue(), variable.edgecount());
       fg.c_nvar ++;
       fg.n_evid ++;
     }else{
-      //fg.variables.push_back(
-      //  dd::Variable(variable.id(), DTYPE_BOOLEAN, false, 0, 1, 0, 0, variable.edgecount())
-      //);
       fg.variables[fg.c_nvar] = dd::Variable(variable.id(), DTYPE_BOOLEAN, false, 0, 1, 0, 0, 
         variable.edgecount());
       fg.c_nvar ++;
       fg.n_query ++;
     }
-    //std::cout << variable.id() << std::endl;
-  }else{
-    std::cout << "[ERROR] Only Boolean variables are supported now!" << std::endl;
+    //std::cout << "~~~~" << variable.id() << std::endl;
+  }else if(variable.datatype() == deepdive::Variable_VariableDataType_MULTINOMIAL){
+    if(variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
+      fg.variables[fg.c_nvar] = dd::Variable(variable.id(), DTYPE_MULTINOMIAL, true, 0, variable.cardinality(), 
+        variable.initialvalue(), variable.initialvalue(), variable.edgecount());
+      fg.c_nvar ++;
+      fg.n_query ++;
+    }else{
+      fg.variables[fg.c_nvar] = dd::Variable(variable.id(), DTYPE_MULTINOMIAL, false, 0, variable.cardinality(), 0, 0, 
+        variable.edgecount());
+      fg.c_nvar ++;
+      fg.n_query ++;
+    }
+    //std::cout << "~~~~" << variable.id() << std::endl;
+  }else{    
+    std::cout << "[ERROR] Only Boolean and Multinomial variables are supported now!" << std::endl;
     assert(false);
   }
+
+
 }
 
 void handle_factor(const deepdive::Factor & factor, dd::FactorGraph & fg){
@@ -56,9 +63,17 @@ void handle_weight(const deepdive::Weight & weight, dd::FactorGraph & fg){
 }
 
 void handle_edge(const deepdive::GraphEdge & edge, dd::FactorGraph & fg){
-  fg.factors[edge.factorid()].tmp_variables.push_back(
-    dd::VariableInFactor(edge.variableid(), edge.position(), edge.ispositive())
-  );
+
+  if(!edge.has_equalpredicate()){
+    fg.factors[edge.factorid()].tmp_variables.push_back(
+      dd::VariableInFactor(edge.variableid(), edge.position(), edge.ispositive())
+    );
+  }else{
+    fg.factors[edge.factorid()].tmp_variables.push_back(
+      dd::VariableInFactor(edge.variableid(), edge.position(), edge.ispositive(), edge.equalpredicate())
+    );
+  }
+
   
   fg.variables[edge.variableid()].tmp_factor_ids.push_back(
     edge.factorid()
