@@ -7,7 +7,7 @@ ifndef CXX
 CXX = g++
 endif
 OPT_FLAG = -Ofast
-GCC_INCLUDE = -I./lib/tclap/include/ -I./lib/protobuf/include/ -I./src
+GCC_INCLUDE = -I./lib/tclap/include/ -I./lib/protobuf/include/ -I./src -I./lib/numactl-2.0.9/
 GCC_LIB = -L./lib/protobuf/lib/
 CPP_FLAG = -std=c++0x -static-libgcc -Wl,-Bstatic -lnuma -lrt -lprotobuf
 endif
