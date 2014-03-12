@@ -27,6 +27,7 @@
 
 #endif
 
+#include <math.h>
 
 #define LOG_2   0.693147180559945
 #define MINUS_LOG_THRESHOLD   -18.42
