@@ -13,17 +13,19 @@ CPP_FLAG = -std=c++0x -static-libgcc -Wl,-Bstatic -lnuma -lrt -lprotobuf
 endif
 
 ifeq ($(UNAME), Darwin)
+#install_name_tool -change /Users/czhang/Desktop/dimmwitted/lib/protobuf-2.5.0/../protobuf/lib/libprotobuf.8.dylib ./lib/protobuf/lib/libprotobuf.8.dylib dw
 ifndef CXX
-CXX = clang++
+CXX = LIBRARY_PATH=$LIBRARY_PATH:./lib/protobuf/lib/ clang++
 endif
-OPT_FLAG = -O3 -stdlib=libc++
+OPT_FLAG =  -O3 -stdlib=libc++ -mmacosx-version-min=10.7
 GCC_INCLUDE = -I./lib/tclap/include/ -I./lib/protobuf/include/ -I./src
-GCC_LIB = -L./lib/protobuf/lib/
+GCC_LIB = 
 CPP_FLAG = -std=c++0x -lprotobuf 
 endif
 
 COMPILE_CMD = $(CXX) $(OPT_FLAG) $(GCC_INCLUDE) $(GCC_LIB) $(CPP_FLAG)
 
+# LIBRARY_PATH=$LIBRARY_PATH:./lib/protobuf/lib/
 
 #dw2:
 #	$(COMPILE_CMD) \
@@ -33,7 +35,7 @@ COMPILE_CMD = $(CXX) $(OPT_FLAG) $(GCC_INCLUDE) $(GCC_LIB) $(CPP_FLAG)
 #	src/app/gibbs/gibbs_sampling.cpp
 
 dw: factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o
-	$(COMPILE_CMD) -o dw factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o    
+	$(COMPILE_CMD) -o dw factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o  
 
 main.o: src/main.cpp
 	$(COMPILE_CMD) -c src/main.cpp
@@ -110,6 +112,16 @@ test:
 	./dw gibbs -e ./test/factor_graph/lr_inf/ 		\
 			   -o ./test/factor_graph/lr_inf/ 		\
 			   -i 100 -l 100 -s 10
+
+test_multi:
+	./dw gibbs -m test/generate/lr_multi/graph.meta.pb		\
+			   -e test/generate/lr_multi/graph.edges.pb 		\
+			   -w test/generate/lr_multi/graph.weights.pb 	\
+			   -v test/generate/lr_multi/graph.variables.pb 	\
+			   -f test/generate/lr_multi/graph.factors.pb    \
+			   -o test/generate/lr_multi/					\
+			   -i 100 -l 100 -s 10 --alpha 0.01 --diminish 0.95
+
 
 test_learn:
 	./dw gibbs -m test/generate/lr_learn/graph.meta.pb		\
