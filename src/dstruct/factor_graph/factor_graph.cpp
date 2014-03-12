@@ -12,8 +12,8 @@ void handle_metadata(const deepdive::FactorGraph & factorgraph, dd::FactorGraph 
 
 void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
   if(variable.datatype() == deepdive::Variable_VariableDataType_BOOLEAN){
-    if(variable.has_initialvalue() || variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
-    //if(variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
+    //if(variable.has_initialvalue() || variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
+    if(variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
     //if(false){
       //fg.variables.push_back(
       //  dd::Variable(variable.id(), DTYPE_BOOLEAN, true, 0, 1, 
@@ -32,6 +32,7 @@ void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
       fg.c_nvar ++;
       fg.n_query ++;
     }
+    //std::cout << variable.id() << std::endl;
   }else{
     std::cout << "[ERROR] Only Boolean variables are supported now!" << std::endl;
     assert(false);
@@ -110,9 +111,9 @@ void dd::FactorGraph::load(const CmdParser & cmd){
 }
 
 void dd::FactorGraph::finalize_loading(){
-  std::sort(&variables[0], &variables[n_var-1], idsorter<Variable>());
-  std::sort(&factors[0], &factors[n_factor-1], idsorter<Factor>());
-  std::sort(&weights[0], &weights[n_weight-1], idsorter<Weight>()); 
+  std::sort(&variables[0], &variables[n_var], idsorter<Variable>());
+  std::sort(&factors[0], &factors[n_factor], idsorter<Factor>());
+  std::sort(&weights[0], &weights[n_weight], idsorter<Weight>()); 
   this->loading_finalized = true;
   infrs->init(variables, weights);
 }
@@ -162,6 +163,7 @@ void dd::FactorGraph::safety_check(){
 
   long s = n_var;
   for(long i=0;i<s;i++){
+    //std::cout << this->variables[i].id << "    " << i << std::endl;
     assert(this->variables[i].id == i);
   }
   s = n_factor;

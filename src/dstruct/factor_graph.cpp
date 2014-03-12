@@ -5,7 +5,7 @@
 
 void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
   if(variable.datatype() == deepdive::Variable_VariableDataType_BOOLEAN){
-    if(variable.has_initialvalue()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
+    if(variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
       fg.variables.push_back(
         dd::Variable(variable.id(), DTYPE_BOOLEAN, true, 0, 1, 
           variable.initialvalue(), variable.initialvalue())
@@ -17,7 +17,7 @@ void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
       );
       fg.n_var_query ++;
     }
-    //std::cout << "~~~~" << variable.id() << std::endl;
+    std::cout << "~~~~" << variable.id() << std::endl;
   }else{
     std::cout << "[ERROR] Only Boolean variables are supported now!" << std::endl;
     assert(false);
