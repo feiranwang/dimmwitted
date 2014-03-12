@@ -25,6 +25,8 @@ namespace dd{
     long nweights;
     long ntallies;
 
+    int * multinomial_tallies; // this might be slow...
+
     double * const agg_means;
     double * const agg_nsamples; 
     double * const assignments_free;
@@ -42,14 +44,24 @@ namespace dd{
       nweights(_nweights),
       nvars(_nvars){}
 
-    void init(Variable * const variables, Weight * const weights){
+    void init(Variable * variables, Weight * const weights){
 
+      ntallies = 0;
       for(long t=0;t<nvars;t++){
         const Variable & variable = variables[t];
         assignments_free[variable.id] = variable.assignment_free;
         assignments_evid[variable.id] = variable.assignment_evid;
         agg_means[variable.id] = 0.0;
         agg_nsamples[variable.id] = 0.0;
+        if(variable.domain_type == DTYPE_MULTINOMIAL){
+          //variable.n_start_i_tally = ntallies;
+          ntallies += variable.upper_bound - variable.lower_bound + 1;
+        }
+      }
+
+      multinomial_tallies = new int[ntallies];
+      for(long i=0;i<ntallies;i++){
+        multinomial_tallies[i] = 0;
       }
 
       for(long t=0;t<nweights;t++){
@@ -116,6 +128,7 @@ namespace dd{
     }
 
     void copy_from(const FactorGraph * const p_other_fg){
+
       memcpy(variables, p_other_fg->variables, sizeof(Variable)*n_var);
       memcpy(factors, p_other_fg->factors, sizeof(Factor)*n_factor);
       memcpy(weights, p_other_fg->weights, sizeof(Weight)*n_weight);
@@ -133,6 +146,11 @@ namespace dd{
       safety_check_passed = p_other_fg->safety_check_passed;
 
       infrs->init(variables, weights);
+      infrs->ntallies = p_other_fg->infrs->ntallies;
+      infrs->multinomial_tallies = new int[p_other_fg->infrs->ntallies];
+      for(long i=0;i<infrs->ntallies;i++){
+        infrs->multinomial_tallies[i] = p_other_fg->infrs->multinomial_tallies[i];
+      }
     }
 
     double update_weight(const Variable & variable){
@@ -206,6 +224,9 @@ namespace dd{
     infrs->assignments_evid[variable.id] = new_value;
     infrs->agg_means[variable.id] += new_value;
     infrs->agg_nsamples[variable.id]  ++ ;
+    if(variable.domain_type == DTYPE_MULTINOMIAL){
+      infrs->multinomial_tallies[variable.n_start_i_tally + (int)(new_value)] ++;
+    }
   }
 
 

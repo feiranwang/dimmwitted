@@ -225,9 +225,15 @@ void dd::GibbsSampling::dump(){
 
   double * agg_means = new double[factorgraphs[0].n_var];
   double * agg_nsamples = new double[factorgraphs[0].n_var];
+  int * multinomial_tallies = new int[factorgraphs[0].infrs->ntallies];
+
   for(long i=0;i<factorgraphs[0].n_var;i++){
     agg_means[i] = 0;
     agg_nsamples[i] = 0;
+  }
+
+  for(long i=0;i<factorgraphs[0].infrs->ntallies;i++){
+    multinomial_tallies[i] = 0;
   }
 
   for(int i=0;i<=n_numa_nodes;i++){
@@ -237,6 +243,9 @@ void dd::GibbsSampling::dump(){
       agg_means[variable.id] += cfg.infrs->agg_means[variable.id];
       agg_nsamples[variable.id] += cfg.infrs->agg_nsamples[variable.id];
     }
+    for(long i=0;i<factorgraphs[0].infrs->ntallies;i++){
+      multinomial_tallies[i] += cfg.infrs->multinomial_tallies[i];
+    }
   }
 
   std::cout << "INFERENCE SNIPPETS (QUERY VARIABLES):" << std::endl;
@@ -245,9 +254,21 @@ void dd::GibbsSampling::dump(){
     const Variable & variable = factorgraphs[0].variables[i];
     if(variable.is_evid == false){
       ct ++;
-      std::cout << "   " << variable.id << " " 
-                << agg_means[variable.id]/agg_nsamples[variable.id] << "  @  " 
+      std::cout << "   " << variable.id << " EXP=" 
+                << agg_means[variable.id]/agg_nsamples[variable.id] << "  NSAMPLE=" 
                 << agg_nsamples[variable.id] << std::endl;
+
+      if(variable.domain_type != DTYPE_BOOLEAN){
+        if(variable.domain_type == DTYPE_MULTINOMIAL){
+          for(int j=0;j<=variable.upper_bound;j++){
+            std::cout << "        @ " << j << " -> " << 1.0*multinomial_tallies[variable.n_start_i_tally + j]/agg_nsamples[variable.id] << std::endl;
+          }
+        }else{
+          std::cout << "ERROR: Only support boolean variables for now!" << std::endl;
+          assert(false);
+        }
+      }
+
       if(ct % 10 == 0){
         break;
       }
@@ -273,19 +294,38 @@ void dd::GibbsSampling::dump(){
     if(variable.is_evid == true){
       continue;
     }
-    if(variable.domain_type != DTYPE_BOOLEAN){
-      std::cout << "ERROR: Only support boolean variables for now!" << std::endl;
-      assert(false);
-    }
-    fout_text << variable.id << " " << (agg_means[variable.id]/agg_nsamples[variable.id]) << std::endl;
+
     msg.set_id(variable.id);
     msg.set_category(1.0);
     msg.set_expectation(agg_means[variable.id]/agg_nsamples[variable.id]);
-    _CodedOutputStream->WriteVarint32(msg.ByteSize());
-    if ( !msg.SerializeToCodedStream(_CodedOutputStream) ){
-      std::cout << "SerializeToCodedStream error " << std::endl;
-      assert(false);
-    } 
+    
+    if(variable.domain_type != DTYPE_BOOLEAN){
+      if(variable.domain_type == DTYPE_MULTINOMIAL){
+        for(int j=0;j<=variable.upper_bound;j++){
+          msg.set_category(j);
+          msg.set_expectation(1.0*multinomial_tallies[variable.n_start_i_tally + j]/agg_nsamples[variable.id]);
+          
+          fout_text << variable.id << " " << j << " " << (1.0*multinomial_tallies[variable.n_start_i_tally + j]/agg_nsamples[variable.id]) << std::endl;
+
+          _CodedOutputStream->WriteVarint32(msg.ByteSize());
+          if ( !msg.SerializeToCodedStream(_CodedOutputStream) ){
+            std::cout << "SerializeToCodedStream error " << std::endl;
+            assert(false);
+          }
+        }
+      }else{
+        std::cout << "ERROR: Only support boolean variables for now!" << std::endl;
+        assert(false);
+      }
+    }else{
+      fout_text << variable.id << " " << 1 << " " << (agg_means[variable.id]/agg_nsamples[variable.id]) << std::endl;
+
+      _CodedOutputStream->WriteVarint32(msg.ByteSize());
+      if ( !msg.SerializeToCodedStream(_CodedOutputStream) ){
+        std::cout << "SerializeToCodedStream error " << std::endl;
+        assert(false);
+      }
+    }
   }
   delete _CodedOutputStream;
   delete _OstreamOutputStream;

@@ -162,9 +162,14 @@ void dd::FactorGraph::safety_check(){
   }
 
   c_edge = 0;
+  long ntallies = 0;
   for(long i=0;i<n_var;i++){
     Variable & variable = variables[i];
     variable.n_start_i_factors = c_edge;
+    if(variable.domain_type == DTYPE_MULTINOMIAL){
+      variable.n_start_i_tally = ntallies;
+      ntallies += variable.upper_bound - variable.lower_bound + 1;
+    }
     for(const long & fid : variable.tmp_factor_ids){
       factor_ids[c_edge] = fid;
       factors_dups[c_edge].id = factors[fid].id;

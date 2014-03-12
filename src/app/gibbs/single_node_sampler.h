@@ -46,11 +46,14 @@ namespace dd{
     }
 
     void clear_variabletally(){
-      for(size_t i=0;i<p_fg->n_var;i++){
+      for(long i=0;i<p_fg->n_var;i++){
         //p_fg->variables[i].agg_mean = 0.0;
         //p_fg->variables[i].n_sample = 0.0;
         p_fg->infrs->agg_means[i] = 0.0;
         p_fg->infrs->agg_nsamples[i] = 0.0;
+      }
+      for(long i=0;i<p_fg->infrs->ntallies;i++){
+        p_fg->infrs->multinomial_tallies[i] = 0;
       }
     }
 
