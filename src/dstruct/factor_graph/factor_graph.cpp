@@ -27,12 +27,12 @@ void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
     //std::cout << "~~~~" << variable.id() << std::endl;
   }else if(variable.datatype() == deepdive::Variable_VariableDataType_MULTINOMIAL){
     if(variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
-      fg.variables[fg.c_nvar] = dd::Variable(variable.id(), DTYPE_MULTINOMIAL, true, 0, variable.cardinality(), 
+      fg.variables[fg.c_nvar] = dd::Variable(variable.id(), DTYPE_MULTINOMIAL, true, 0, variable.cardinality()-1, 
         variable.initialvalue(), variable.initialvalue(), variable.edgecount());
       fg.c_nvar ++;
       fg.n_query ++;
     }else{
-      fg.variables[fg.c_nvar] = dd::Variable(variable.id(), DTYPE_MULTINOMIAL, false, 0, variable.cardinality(), 0, 0, 
+      fg.variables[fg.c_nvar] = dd::Variable(variable.id(), DTYPE_MULTINOMIAL, false, 0, variable.cardinality()-1, 0, 0, 
         variable.edgecount());
       fg.c_nvar ++;
       fg.n_query ++;

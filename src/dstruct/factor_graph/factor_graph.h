@@ -23,6 +23,7 @@ namespace dd{
 
     long nvars;
     long nweights;
+    long ntallies;
 
     double * const agg_means;
     double * const agg_nsamples; 
@@ -75,6 +76,7 @@ namespace dd{
     long n_factor;
     long n_weight;
     long n_edge;
+    long n_tally;
 
     long c_nvar;
     long c_nfactor;
@@ -83,6 +85,7 @@ namespace dd{
 
     long n_evid;
     long n_query;
+
 
     bool loading_finalized;
     bool safety_check_passed;

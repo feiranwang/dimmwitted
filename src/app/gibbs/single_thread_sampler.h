@@ -94,7 +94,7 @@ namespace dd{
           
       }else if(variable.domain_type == DTYPE_MULTINOMIAL){
 
-        while(variable.upper_bound > varlen_potential_buffer.size()){
+        while(variable.upper_bound >= varlen_potential_buffer.size()){
           varlen_potential_buffer.push_back(0.0);
         }
 
@@ -102,13 +102,13 @@ namespace dd{
           sum = -100000.0;
           acc = 0.0;
           multi_proposal = -1;
-          for(int propose=0;propose < variable.upper_bound; propose++){
+          for(int propose=0;propose <= variable.upper_bound; propose++){
             varlen_potential_buffer[propose] = p_fg->template potential<false>(variable, propose);
             sum = logadd(sum, varlen_potential_buffer[propose]);
           }
 
           *this->p_rand_obj_buf = erand48(this->p_rand_seed);
-          for(int propose=0;propose < variable.upper_bound; propose++){
+          for(int propose=0;propose <= variable.upper_bound; propose++){
             acc += exp(varlen_potential_buffer[propose]-sum);
             if(*this->p_rand_obj_buf <= acc){
               multi_proposal = propose;
@@ -122,13 +122,13 @@ namespace dd{
         sum = -100000.0;
         acc = 0.0;
         multi_proposal = -1;
-        for(int propose=0;propose < variable.upper_bound; propose++){
+        for(int propose=0;propose <= variable.upper_bound; propose++){
           varlen_potential_buffer[propose] = p_fg->template potential<true>(variable, propose);
           sum = logadd(sum, varlen_potential_buffer[propose]);
         }
 
         *this->p_rand_obj_buf = erand48(this->p_rand_seed);
-        for(int propose=0;propose < variable.upper_bound; propose++){
+        for(int propose=0;propose <= variable.upper_bound; propose++){
           acc += exp(varlen_potential_buffer[propose]-sum);
           if(*this->p_rand_obj_buf <= acc){
             multi_proposal = propose;
@@ -169,7 +169,7 @@ namespace dd{
 
       }else if(variable.domain_type == DTYPE_MULTINOMIAL){
 
-        while(variable.upper_bound > varlen_potential_buffer.size()){
+        while(variable.upper_bound >= varlen_potential_buffer.size()){
           varlen_potential_buffer.push_back(0.0);
         }
 
@@ -177,13 +177,13 @@ namespace dd{
           sum = -100000.0;
           acc = 0.0;
           multi_proposal = -1;
-          for(int propose=0;propose < variable.upper_bound; propose++){
+          for(int propose=0;propose <= variable.upper_bound; propose++){
             varlen_potential_buffer[propose] = p_fg->template potential<false>(variable, propose);
             sum = logadd(sum, varlen_potential_buffer[propose]);
           }
 
           *this->p_rand_obj_buf = erand48(this->p_rand_seed);
-          for(int propose=0;propose < variable.upper_bound; propose++){
+          for(int propose=0;propose <= variable.upper_bound; propose++){
             acc += exp(varlen_potential_buffer[propose]-sum);
             if(*this->p_rand_obj_buf <= acc){
               multi_proposal = propose;

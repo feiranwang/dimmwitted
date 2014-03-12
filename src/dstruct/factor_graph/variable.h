@@ -18,6 +18,8 @@ namespace dd{
     int n_factors;
     long n_start_i_factors;
 
+    long n_start_i_tally;
+
     std::vector<long> tmp_factor_ids;
 
     double agg_mean;
