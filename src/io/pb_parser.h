@@ -9,6 +9,7 @@
 
 namespace dd{
 
+
   // These two functions are so ugly and should be
   // merged by template... Why not?
   // Working on getting the multinomial working
@@ -29,8 +30,11 @@ namespace dd{
     coded_input->SetTotalBytesLimit(1e9, 9e8);
     while(coded_input->ReadVarint32(&bytes)){      
       msgLimit = coded_input->PushLimit(bytes);
+      //if(a)
+      //  std::cout << "~~~" << bytes << std::endl;
       //coded_input->Skip(3);
       if(tmp.ParseFromCodedStream(coded_input)){
+        fg.tmp = bytes;
         handler(tmp, fg);
         ct ++;
       }else{

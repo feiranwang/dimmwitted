@@ -30,7 +30,7 @@ void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
       fg.variables[fg.c_nvar] = dd::Variable(variable.id(), DTYPE_MULTINOMIAL, true, 0, variable.cardinality()-1, 
         variable.initialvalue(), variable.initialvalue(), variable.edgecount());
       fg.c_nvar ++;
-      fg.n_query ++;
+      fg.n_evid ++;
     }else{
       fg.variables[fg.c_nvar] = dd::Variable(variable.id(), DTYPE_MULTINOMIAL, false, 0, variable.cardinality()-1, 0, 0, 
         variable.edgecount());
@@ -50,6 +50,7 @@ void handle_factor(const deepdive::Factor & factor, dd::FactorGraph & fg){
   //fg.factors.push_back(
   //  dd::Factor(factor.id(), factor.weightid(), factor.factorfunction(), factor.edgecount())
   //);
+  std::cout << factor.id() << std::endl;
   fg.factors[fg.c_nfactor] = dd::Factor(factor.id(), factor.weightid(), factor.factorfunction(), factor.edgecount());
   fg.c_nfactor ++;
 }
@@ -63,6 +64,12 @@ void handle_weight(const deepdive::Weight & weight, dd::FactorGraph & fg){
 }
 
 void handle_edge(const deepdive::GraphEdge & edge, dd::FactorGraph & fg){
+
+  std::cout << fg.tmp << std::endl;
+  std::cout << fg.n_factor << std::endl;
+  std::cout << edge.factorid() << "    " << edge.variableid() << std::endl;
+  std::cout << edge.position() << "    " << edge.ispositive() << std::endl;
+  std::cout << edge.equalpredicate() << std::endl;
 
   if(!edge.has_equalpredicate()){
     fg.factors[edge.factorid()].tmp_variables.push_back(
@@ -130,6 +137,7 @@ void dd::FactorGraph::finalize_loading(){
   std::sort(&factors[0], &factors[n_factor], idsorter<Factor>());
   std::sort(&weights[0], &weights[n_weight], idsorter<Weight>()); 
   this->loading_finalized = true;
+  
   infrs->init(variables, weights);
 }
 
@@ -150,6 +158,7 @@ void dd::FactorGraph::safety_check(){
       c_edge ++;
     }
   }*/
+
 
   c_edge = 0;
   for(long i=0;i<n_factor;i++){

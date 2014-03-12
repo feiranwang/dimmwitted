@@ -106,6 +106,8 @@ namespace dd{
 
     double stepsize;
 
+    int tmp;
+
     FactorGraph(long _n_var, long _n_factor, long _n_weight, long _n_edge) : 
       variables(new Variable[_n_var]),
       factors(new Factor[_n_factor]),
