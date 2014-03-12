@@ -9,7 +9,7 @@ endif
 OPT_FLAG = -Ofast
 GCC_INCLUDE = -I./lib/tclap/include/ -I./lib/protobuf/include/ -I./src -I./lib/numactl-2.0.9/
 GCC_LIB = -L./lib/protobuf/lib/ -L./lib/numactl-2.0.9/
-CPP_FLAG = -std=c++0x -static-libgcc -Wl,-Bstatic -lnuma -lrt -lprotobuf
+CPP_FLAG = -std=c++0x -Wl,-Bstatic -lprotobuf -Wl,-Bdynamic -lnuma -lrt
 endif
 
 ifeq ($(UNAME), Darwin)
@@ -35,7 +35,7 @@ COMPILE_CMD = $(CXX) $(OPT_FLAG) $(GCC_INCLUDE) $(GCC_LIB) $(CPP_FLAG)
 #	src/app/gibbs/gibbs_sampling.cpp
 
 dw: factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o
-	$(COMPILE_CMD) -o dw factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o  
+	$(COMPILE_CMD) -o dw factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o $(CPP_FLAG) 
 
 main.o: src/main.cpp
 	$(COMPILE_CMD) -c src/main.cpp
