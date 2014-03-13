@@ -183,6 +183,7 @@ namespace dd{
 
       for(long i_vif=n_start_i_vif;i_vif<n_start_i_vif+n_variables;i_vif++){
         const VariableInFactor & vif = vifs[i_vif];
+        std::cout << vif.is_positive << std::endl;
         if(vif.n_position == n_variables - 1){
           if(vif.vid == vid){
             sum += (vif.is_positive == true ? (proposal==vif.equal_to) : 1-(proposal==vif.equal_to));
