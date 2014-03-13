@@ -191,6 +191,7 @@ namespace dd{
               : 1-(var_values[vif.vid]==vif.equal_to));
           }
         }else{
+          std::cout << "~~~" << std::endl;
           if(vif.vid == vid){
             sum += (vif.is_positive == false ? (proposal==vif.equal_to) : 1-(proposal==vif.equal_to));
           }else{

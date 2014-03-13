@@ -201,7 +201,7 @@ namespace dd{
         }
         pot += infrs->weight_values[ws[i]] * tmp;
       }
-      std::cout << proposal << "  -> " << pot << std::endl;
+      //std::cout << proposal << "  -> " << pot << std::endl;
       return pot;
     }
 
