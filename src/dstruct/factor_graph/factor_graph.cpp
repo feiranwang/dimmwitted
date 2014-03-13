@@ -73,7 +73,7 @@ void handle_edge(const deepdive::GraphEdge & edge, dd::FactorGraph & fg){
   //std::cout << edge.position() << "    " << edge.ispositive() << std::endl;
   //std::cout << edge.equalpredicate() << std::endl;
 
-  if(fg.variables[edge.variableid()].upper_bound() == 1){
+  if(fg.variables[edge.variableid()].upper_bound == 1){
     fg.factors[edge.factorid()].tmp_variables.push_back(
       dd::VariableInFactor(edge.variableid(), edge.position(), edge.ispositive())
     );
