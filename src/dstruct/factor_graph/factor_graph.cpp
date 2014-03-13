@@ -67,11 +67,11 @@ void handle_weight(const deepdive::Weight & weight, dd::FactorGraph & fg){
 
 void handle_edge(const deepdive::GraphEdge & edge, dd::FactorGraph & fg){
 
-  std::cout << fg.tmp << std::endl;
-  std::cout << fg.n_factor << std::endl;
-  std::cout << edge.factorid() << "    " << edge.variableid() << std::endl;
-  std::cout << edge.position() << "    " << edge.ispositive() << std::endl;
-  std::cout << edge.equalpredicate() << std::endl;
+  //std::cout << fg.tmp << std::endl;
+  //std::cout << fg.n_factor << std::endl;
+  //std::cout << edge.factorid() << "    " << edge.variableid() << std::endl;
+  //std::cout << edge.position() << "    " << edge.ispositive() << std::endl;
+  //std::cout << edge.equalpredicate() << std::endl;
 
   if(!edge.has_equalpredicate()){
     fg.factors[edge.factorid()].tmp_variables.push_back(
