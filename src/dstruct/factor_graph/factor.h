@@ -200,10 +200,10 @@ namespace dd{
         }
       }
       if(sum != 0){
-        //std::cout << "f" << id << " " << proposal << " -> 1.0" << "    " << vifs[0].equal_to <<std::endl;
+        std::cout << "f" << id << " " << proposal << " -> 1.0" << "    " << vifs[0].equal_to <<std::endl;
         return 1.0;
       }else{
-        //std::cout << "f" << id << " " << proposal << " -> 0.0" << "    " << vifs[0].equal_to <<std::endl;
+        std::cout << "f" << id << " " << proposal << " -> 0.0" << "    " << vifs[0].equal_to <<std::endl;
         return 0.0;
       }
   }
