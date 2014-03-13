@@ -13,6 +13,7 @@ void handle_metadata(const deepdive::FactorGraph & factorgraph, dd::FactorGraph 
 void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
 
   if(variable.datatype() == deepdive::Variable_VariableDataType_BOOLEAN){
+
     if(variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
       fg.variables[fg.c_nvar] = dd::Variable(variable.id(), DTYPE_BOOLEAN, true, 0, 1, 
         variable.initialvalue(), variable.initialvalue(), variable.edgecount());
@@ -26,6 +27,7 @@ void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
     }
     //std::cout << "~~~~" << variable.id() << std::endl;
   }else if(variable.datatype() == deepdive::Variable_VariableDataType_MULTINOMIAL){
+    std::cout << "~~" << std::endl;
     if(variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
       fg.variables[fg.c_nvar] = dd::Variable(variable.id(), DTYPE_MULTINOMIAL, true, 0, variable.cardinality()-1, 
         variable.initialvalue(), variable.initialvalue(), variable.edgecount());
