@@ -73,7 +73,7 @@ void handle_edge(const deepdive::GraphEdge & edge, dd::FactorGraph & fg){
   //std::cout << edge.position() << "    " << edge.ispositive() << std::endl;
   //std::cout << edge.equalpredicate() << std::endl;
 
-  if(!edge.has_equalpredicate()){
+  if(variable.datatype() == deepdive::Variable_VariableDataType_BOOLEAN){
     fg.factors[edge.factorid()].tmp_variables.push_back(
       dd::VariableInFactor(edge.variableid(), edge.position(), edge.ispositive())
     );
@@ -82,7 +82,6 @@ void handle_edge(const deepdive::GraphEdge & edge, dd::FactorGraph & fg){
       dd::VariableInFactor(edge.variableid(), edge.position(), edge.ispositive(), edge.equalpredicate())
     );
   }
-
   
   fg.variables[edge.variableid()].tmp_factor_ids.push_back(
     edge.factorid()
