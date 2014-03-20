@@ -62,7 +62,6 @@ void handle_weight(const deepdive::Weight & weight, dd::FactorGraph & fg){
   //  dd::Weight(weight.id(), weight.initialvalue(), weight.isfixed())
   //);
   //std::cout << weight.initialvalue() << "    " << weight.isfixed() << std::endl;
-  //std::cout << weight.id() << std::endl;
   fg.weights[fg.c_nweight] = dd::Weight(weight.id(), weight.initialvalue(), weight.isfixed());
   fg.c_nweight ++;
 }

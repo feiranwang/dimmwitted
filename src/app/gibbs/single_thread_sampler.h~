@@ -70,7 +70,7 @@ namespace dd{
       if(variable.domain_type == DTYPE_BOOLEAN){
 
           if(variable.is_evid == false){
-	    //return;
+	    return;
             potential_pos = p_fg->template potential<false>(variable, 1);
             potential_neg = p_fg->template potential<false>(variable, 0);
             *this->p_rand_obj_buf = erand48(this->p_rand_seed);

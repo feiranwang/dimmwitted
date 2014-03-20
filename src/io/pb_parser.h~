@@ -27,10 +27,8 @@ namespace dd{
                   = new google::protobuf::io::CodedInputStream(raw_input);
     google::protobuf::uint32 bytes;
     google::protobuf::io::CodedInputStream::Limit msgLimit;
-    coded_input->SetTotalBytesLimit(2e9, 9e8);
+    coded_input->SetTotalBytesLimit(1e9, 9e8);
     while(coded_input->ReadVarint32(&bytes)){      
-      //std::cout << bytes << std::endl;
-      //assert(bytes > 0);
       msgLimit = coded_input->PushLimit(bytes);
       //if(a)
       //  std::cout << "~~~" << bytes << std::endl;
