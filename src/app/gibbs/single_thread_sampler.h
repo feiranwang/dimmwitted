@@ -67,6 +67,10 @@ namespace dd{
       
       Variable & variable = p_fg->variables[vid];
 
+      if(variable.is_evid == false){
+	return;
+      }
+
       if(variable.domain_type == DTYPE_BOOLEAN){
 
           if(variable.is_evid == false){

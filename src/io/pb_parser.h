@@ -35,6 +35,7 @@ namespace dd{
       //if(a)
       //  std::cout << "~~~" << bytes << std::endl;
       //coded_input->Skip(3);
+      
       if(tmp.ParseFromCodedStream(coded_input)){
         fg.tmp = bytes;
         handler(tmp, fg);

@@ -53,6 +53,12 @@ void handle_factor(const deepdive::Factor & factor, dd::FactorGraph & fg){
   //  dd::Factor(factor.id(), factor.weightid(), factor.factorfunction(), factor.edgecount())
   //);
   //std::cout << factor.id() << std::endl;
+  //std::cout << factor.id() << std::endl;
+  //assert(fg.c_nfactor >= 0);
+  //assert(fg.c_nfactor < 175407502);
+  
+  //fg.factors[fg.c_nfactor].id = 0;
+
   fg.factors[fg.c_nfactor] = dd::Factor(factor.id(), factor.weightid(), factor.factorfunction(), factor.edgecount());
   fg.c_nfactor ++;
 }
