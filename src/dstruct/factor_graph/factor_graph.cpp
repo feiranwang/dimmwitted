@@ -3,13 +3,6 @@
 #include "io/pb_parser.h"
 #include "dstruct/factor_graph/factor_graph.h"
 
-void handle_metadata(const deepdive::FactorGraph & factorgraph, dd::FactorGraph & fg){
-  std::cout << factorgraph.numweights() << std::endl;
-  std::cout << factorgraph.numvariables() << std::endl;
-  std::cout << factorgraph.numfactors() << std::endl;
-  std::cout << factorgraph.numedges() << std::endl;
-}
-
 void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
 
   if(variable.datatype() == deepdive::Variable_VariableDataType_BOOLEAN){
@@ -117,7 +110,7 @@ void dd::FactorGraph::load(const CmdParser & cmd){
   std::string filename_variables = variable_file;
   std::string filename_weights = weight_file;
 
-  long n_loaded = dd::stream_load_pb<deepdive::Variable, dd::FactorGraph, handle_variable>(filename_variables, *this);
+  long long n_loaded = dd::stream_load_pb<deepdive::Variable, dd::FactorGraph, handle_variable>(filename_variables, *this);
   assert(n_loaded == n_var);
   std::cout << "LOADED VARIABLES: #" << n_loaded << std::endl;
   std::cout << "         N_QUERY: #" << n_query << std::endl;

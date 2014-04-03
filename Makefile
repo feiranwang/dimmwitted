@@ -18,7 +18,7 @@ ifndef CXX
 CXX = LIBRARY_PATH=$LIBRARY_PATH:./lib/protobuf/lib/ clang++
 endif
 OPT_FLAG =  -O3 -stdlib=libc++ -mmacosx-version-min=10.7
-GCC_INCLUDE = -I./lib/tclap/include/ -I./lib/protobuf/include/ -I./src
+GCC_INCLUDE = -L./lib/protobuf/lib/ -I./lib/tclap/include/ -I./lib/protobuf/include/ -I./src
 GCC_LIB = 
 CPP_FLAG = -std=c++0x -lprotobuf 
 endif
@@ -159,4 +159,12 @@ gibbs_pb:
 gibbs_pb_py:
 	./lib/protobuf/bin/protoc -I=./src/dstruct/factor_graph/ --python_out=./test/generate/ ./src/dstruct/factor_graph/factor_graph.proto
 
+test_binary:
+	./dw gibbs -m data3/graph.meta.csv		\
+			   -e data3/graph.edges 		\
+			   -w data3/graph.weights 	\
+			   -v data3/graph.variables 	\
+			   -f data3/graph.factors    \
+			   -o data3/					\
+			   -i 100 -l 100 -s 10 --alpha 0.01 --diminish 0.95
 
