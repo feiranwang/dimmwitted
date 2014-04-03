@@ -34,8 +34,11 @@ COMPILE_CMD = $(CXX) $(OPT_FLAG) $(GCC_INCLUDE) $(GCC_LIB) $(CPP_FLAG)
 #	src/dstruct/factor_graph/factor_graph.pb.cc \
 #	src/app/gibbs/gibbs_sampling.cpp
 
-dw: factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o
-	$(COMPILE_CMD) -o dw factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o $(CPP_FLAG) 
+dw: factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o binary_parser.o
+	$(COMPILE_CMD) -o dw factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o binary_parser.o $(CPP_FLAG) 
+
+binary_parser.o: src/io/binary_parser.cpp
+	$(COMPILE_CMD) -c src/io/binary_parser.cpp
 
 main.o: src/main.cpp
 	$(COMPILE_CMD) -c src/main.cpp
