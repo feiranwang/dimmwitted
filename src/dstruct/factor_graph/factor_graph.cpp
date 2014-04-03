@@ -111,11 +111,12 @@ void dd::FactorGraph::load(const CmdParser & cmd){
   std::string filename_variables = variable_file;
   std::string filename_weights = weight_file;
 
-  long long n_loaded;// = dd::stream_load_pb<deepdive::Variable, dd::FactorGraph, handle_variable>(filename_variables, *this);
-  // assert(n_loaded == n_var);
-  // std::cout << "LOADED VARIABLES: #" << n_loaded << std::endl;
-  // std::cout << "         N_QUERY: #" << n_query << std::endl;
-  // std::cout << "         N_EVID : #" << n_evid << std::endl;  
+  // long long n_loaded = dd::stream_load_pb<deepdive::Variable, dd::FactorGraph, handle_variable>(filename_variables, *this);
+  long long n_loaded = read_variables(filename_variables, *this);
+  assert(n_loaded == n_var);
+  std::cout << "LOADED VARIABLES: #" << n_loaded << std::endl;
+  std::cout << "         N_QUERY: #" << n_query << std::endl;
+  std::cout << "         N_EVID : #" << n_evid << std::endl;  
   // n_loaded = dd::stream_load_pb<deepdive::Factor, dd::FactorGraph, handle_factor>(filename_factors, *this);
   // assert(n_loaded == n_factor);
   // std::cout << "LOADED FACTORS: #" << n_loaded << std::endl;

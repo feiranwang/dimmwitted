@@ -1,8 +1,7 @@
-
-using namespace std;
-
 #ifndef META_H
 #define META_H
+
+using namespace std;
 
 	// meta data
 	typedef struct {
