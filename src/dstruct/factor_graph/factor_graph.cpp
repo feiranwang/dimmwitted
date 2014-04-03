@@ -118,8 +118,9 @@ void dd::FactorGraph::load(const CmdParser & cmd){
   std::cout << "         N_QUERY: #" << n_query << std::endl;
   std::cout << "         N_EVID : #" << n_evid << std::endl;  
   // n_loaded = dd::stream_load_pb<deepdive::Factor, dd::FactorGraph, handle_factor>(filename_factors, *this);
-  // assert(n_loaded == n_factor);
-  // std::cout << "LOADED FACTORS: #" << n_loaded << std::endl;
+  n_loaded = read_factors(filename_factors, *this);
+  assert(n_loaded == n_factor);
+  std::cout << "LOADED FACTORS: #" << n_loaded << std::endl;
 
   // n_loaded = dd::stream_load_pb<deepdive::Weight, dd::FactorGraph, handle_weight>(filename_weights, *this);
   n_loaded = read_weights(filename_weights, *this);
@@ -129,6 +130,7 @@ void dd::FactorGraph::load(const CmdParser & cmd){
   this->finalize_loading();
 
   //n_loaded = dd::stream_load_pb<deepdive::GraphEdge, dd::FactorGraph, handle_edge>(filename_edges, *this);
+  n_loaded = read_edges(edge_file, *this);
   std::cout << "LOADED EDGES: #" << n_loaded << std::endl;
 
   this->safety_check();

@@ -88,29 +88,28 @@ long long read_variables(string filename, dd::FactorGraph &fg)
     bool isevidence;
     char padding1;
     double initial_value;
-    char type;
-    short padding2;
+    short type;
     long long edge_count;
     long long cardinality;
     while (file.good()) {
         file.read((char *)&id, 8);
         file.read((char *)&padding1, 1);
         file.read((char *)&initial_value, 8);
-        file.read((char *)&padding2, 2);
+        file.read((char *)&type, 2);
         file.read((char *)&edge_count, 8);
         if (!file.read((char *)&cardinality, 8)) break;
         id = __bswap_64(id);
         isevidence = padding1;
-        type = __bswap_16(padding2);
+        type = __bswap_16(type);
         long long tmp = __bswap_64(*(uint64_t *)&initial_value);
         initial_value = *(double *)&tmp;
         edge_count = __bswap_64(edge_count);
         cardinality = __bswap_64(cardinality);
         count++;
-        printf("id=%lli isevidence=%d initial=%f type=%c edge_count=%lli cardinality=%lli\n", id, isevidence, initial_value, type, edge_count, cardinality);
+        //printf("id=%lli isevidence=%d initial=%f type=%c edge_count=%lli cardinality=%lli\n", id, isevidence, initial_value, type, edge_count, cardinality);
 
         // add to factor graph
-        if (type == 'B'){
+        if (type == 0){
             if (isevidence) {
                 fg.variables[fg.c_nvar] = dd::Variable(id, DTYPE_BOOLEAN, true, 0, 1, 
                     initial_value, initial_value, edge_count);
@@ -122,7 +121,7 @@ long long read_variables(string filename, dd::FactorGraph &fg)
                 fg.c_nvar++;
                 fg.n_query++;
             }
-        } else if (type == 'M') {
+        } else if (type == 1) {
             if (isevidence) {
                 fg.variables[fg.c_nvar] = dd::Variable(id, DTYPE_MULTINOMIAL, true, 0, 
                     cardinality-1, initial_value, initial_value, edge_count);
@@ -140,6 +139,71 @@ long long read_variables(string filename, dd::FactorGraph &fg)
         }
     }
     file.close();
-    cout << count << endl;
     return count;
 }
+
+long long read_factors(string filename, dd::FactorGraph &fg)
+{
+    ifstream file;
+    file.open(filename.c_str(), ios::in | ios::binary);
+    long long count = 0;
+    long long id;
+    long long weightid;
+    short type;
+    long long edge_count;
+    while (file.good()) {
+        file.read((char *)&id, 8);
+        file.read((char *)&weightid, 8);
+        file.read((char *)&type, 2);
+        if (!file.read((char *)&edge_count, 8)) break;
+        id = __bswap_64(id);
+        weightid = __bswap_64(weightid);
+        type = __bswap_16(type);
+        edge_count = __bswap_64(edge_count);
+        count++;
+        //printf("id=%lli weightid=%lli type=%c edge_count=%lli\n", id, weightid, type, edge_count);
+        fg.factors[fg.c_nfactor] = dd::Factor(id, weightid, type, edge_count);
+        fg.c_nfactor ++;
+    }
+    file.close();
+    return count;
+}
+
+long long read_edges(string filename, dd::FactorGraph &fg)
+{
+    ifstream file;
+    file.open(filename.c_str(), ios::in | ios::binary);
+    long long count = 0;
+    long long variable_id;
+    long long factor_id;
+    long long position;
+    bool ispositive;
+    char padding;
+    long long equal_predicate;
+    while (file.good()) {
+        file.read((char *)&variable_id, 8);
+        file.read((char *)&factor_id, 8);
+        file.read((char *)&position, 8);
+        file.read((char *)&padding, 1);
+        if (!file.read((char *)&equal_predicate, 8)) break;
+        variable_id = __bswap_64(variable_id);
+        factor_id = __bswap_64(factor_id);
+        position = __bswap_64(position);
+        ispositive = padding;
+        equal_predicate = __bswap_64(equal_predicate);
+        count++;
+        //printf("id=%lli weightid=%lli type=%c edge_count=%lli\n", id, weightid, type, edge_count);
+        
+        if (fg.variables[variable_id].upper_bound == 1) {
+            fg.factors[factor_id].tmp_variables.push_back(
+                dd::VariableInFactor(variable_id, position, ispositive));
+        } else {
+            fg.factors[factor_id].tmp_variables.push_back(
+                dd::VariableInFactor(variable_id, position, ispositive, equal_predicate));
+        }
+        fg.variables[variable_id].tmp_factor_ids.push_back(factor_id);
+    }
+    file.close();
+    return count;   
+}
+
