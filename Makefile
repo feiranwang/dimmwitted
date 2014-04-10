@@ -93,8 +93,8 @@ clean:
 	rm -rf factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o
 	rm -rf dw
 
-gibbs:
-	./dw gibbs -m data2/graph.meta.pb		\
+#gibbs:
+#	./dw gibbs -m data2/graph.meta.pb		\
 			   -e data2/graph.edges.pb 		\
 			   -w data2/graph.weights.pb 	\
 			   -v data2/graph.variables.pb 	\
@@ -162,7 +162,7 @@ gibbs_pb:
 gibbs_pb_py:
 	./lib/protobuf/bin/protoc -I=./src/dstruct/factor_graph/ --python_out=./test/generate/ ./src/dstruct/factor_graph/factor_graph.proto
 
-test_binary:
+gibbs:
 	./dw gibbs -m data3/graph.meta.csv		\
 			   -e data3/graph.edges 		\
 			   -w data3/graph.weights 	\
