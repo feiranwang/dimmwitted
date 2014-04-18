@@ -1,14 +1,7 @@
 
 #include <iostream>
-#include "io/pb_parser.h"
+#include "io/binary_parser.h"
 #include "dstruct/factor_graph/factor_graph.h"
-
-void handle_metadata(const deepdive::FactorGraph & factorgraph, dd::FactorGraph & fg){
-  std::cout << factorgraph.numweights() << std::endl;
-  std::cout << factorgraph.numvariables() << std::endl;
-  std::cout << factorgraph.numfactors() << std::endl;
-  std::cout << factorgraph.numedges() << std::endl;
-}
 
 void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
 
@@ -117,22 +110,26 @@ void dd::FactorGraph::load(const CmdParser & cmd){
   std::string filename_variables = variable_file;
   std::string filename_weights = weight_file;
 
-  long n_loaded = dd::stream_load_pb<deepdive::Variable, dd::FactorGraph, handle_variable>(filename_variables, *this);
+  // long long n_loaded = dd::stream_load_pb<deepdive::Variable, dd::FactorGraph, handle_variable>(filename_variables, *this);
+  long long n_loaded = read_variables(filename_variables, *this);
   assert(n_loaded == n_var);
   std::cout << "LOADED VARIABLES: #" << n_loaded << std::endl;
   std::cout << "         N_QUERY: #" << n_query << std::endl;
   std::cout << "         N_EVID : #" << n_evid << std::endl;  
-  n_loaded = dd::stream_load_pb<deepdive::Factor, dd::FactorGraph, handle_factor>(filename_factors, *this);
+  // n_loaded = dd::stream_load_pb<deepdive::Factor, dd::FactorGraph, handle_factor>(filename_factors, *this);
+  n_loaded = read_factors(filename_factors, *this);
   assert(n_loaded == n_factor);
   std::cout << "LOADED FACTORS: #" << n_loaded << std::endl;
 
-  n_loaded = dd::stream_load_pb<deepdive::Weight, dd::FactorGraph, handle_weight>(filename_weights, *this);
+  // n_loaded = dd::stream_load_pb<deepdive::Weight, dd::FactorGraph, handle_weight>(filename_weights, *this);
+  n_loaded = read_weights(filename_weights, *this);
   assert(n_loaded == n_weight);
   std::cout << "LOADED WEIGHTS: #" << n_loaded << std::endl;
 
   this->finalize_loading();
 
-  n_loaded = dd::stream_load_pb<deepdive::GraphEdge, dd::FactorGraph, handle_edge>(filename_edges, *this);
+  //n_loaded = dd::stream_load_pb<deepdive::GraphEdge, dd::FactorGraph, handle_edge>(filename_edges, *this);
+  n_loaded = read_edges(edge_file, *this);
   std::cout << "LOADED EDGES: #" << n_loaded << std::endl;
 
   this->safety_check();

@@ -6,6 +6,7 @@
 #include "dstruct/factor_graph/variable.h"
 #include "dstruct/factor_graph/factor.h"
 #include "dstruct/factor_graph/weight.h"
+#include "dstruct/factor_graph/meta.h"
 
 #include <xmmintrin.h>
 
@@ -155,7 +156,7 @@ namespace dd{
       }
     }
 
-    double update_weight(const Variable & variable){
+    void update_weight(const Variable & variable){
       const CompactFactor * const fs = factors_dups + variable.n_start_i_factors;
       const int * const ws = factors_dups_weightids + variable.n_start_i_factors;
       for(long i=0;i<variable.n_factors;i++){

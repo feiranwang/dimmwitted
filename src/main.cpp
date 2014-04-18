@@ -6,6 +6,7 @@
 
 #include "io/cmd_parser.h"
 #include "io/pb_parser.h"
+#include "io/binary_parser.h"
 
 #include "app/gibbs/gibbs_sampling.h"
 #include "dstruct/factor_graph/factor_graph.h"
@@ -78,17 +79,25 @@ void gibbs(dd::CmdParser & cmd_parser){
   std::cout << "################################################" << std::endl;
 
 
-  deepdive::FactorGraph meta = dd::read_single_pb<deepdive::FactorGraph>(fg_file);
-  std::cout << "# nvar               : " << meta.numvariables() << std::endl;
-  std::cout << "# nfac               : " << meta.numfactors() << std::endl;
-  std::cout << "# nweight            : " << meta.numweights() << std::endl;
-  std::cout << "# nedge              : " << meta.numedges() << std::endl;
+  //deepdive::FactorGraph meta = dd::read_single_pb<deepdive::FactorGraph>(fg_file);
+  Meta meta = read_meta(fg_file); 
+  std::cout << "# nvar               : " << meta.num_variables << std::endl;
+  std::cout << "# nfac               : " << meta.num_factors << std::endl;
+  std::cout << "# nweight            : " << meta.num_weights << std::endl;
+  std::cout << "# nedge              : " << meta.num_edges << std::endl;
   std::cout << "################################################" << std::endl;
+
+  // std::cout << "# nvar               : " << meta.numvariables() << std::endl;
+  // std::cout << "# nfac               : " << meta.numfactors() << std::endl;
+  // std::cout << "# nweight            : " << meta.numweights() << std::endl;
+  // std::cout << "# nedge              : " << meta.numedges() << std::endl;
+  // std::cout << "################################################" << std::endl;
 
 
   numa_run_on_node(0);
   numa_set_localalloc();
-  dd::FactorGraph fg(meta.numvariables(), meta.numfactors(), meta.numweights(), meta.numedges());
+  // dd::FactorGraph fg(meta.numvariables(), meta.numfactors(), meta.numweights(), meta.numedges());
+  dd::FactorGraph fg(meta.num_variables, meta.num_factors, meta.num_weights, meta.num_edges);
   fg.load(cmd_parser);
   dd::GibbsSampling gibbs(&fg, &cmd_parser);
 

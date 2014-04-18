@@ -18,7 +18,7 @@ ifndef CXX
 CXX = LIBRARY_PATH=$LIBRARY_PATH:./lib/protobuf/lib/ clang++
 endif
 OPT_FLAG =  -O3 -stdlib=libc++ -mmacosx-version-min=10.7
-GCC_INCLUDE = -I./lib/tclap/include/ -I./lib/protobuf/include/ -I./src
+GCC_INCLUDE = -L./lib/protobuf/lib/ -I./lib/tclap/include/ -I./lib/protobuf/include/ -I./src
 GCC_LIB = 
 CPP_FLAG = -std=c++0x -lprotobuf 
 endif
@@ -34,8 +34,11 @@ COMPILE_CMD = $(CXX) $(OPT_FLAG) $(GCC_INCLUDE) $(GCC_LIB) $(CPP_FLAG)
 #	src/dstruct/factor_graph/factor_graph.pb.cc \
 #	src/app/gibbs/gibbs_sampling.cpp
 
-dw: factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o
-	$(COMPILE_CMD) -o dw factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o $(CPP_FLAG) 
+dw: factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o binary_parser.o
+	$(COMPILE_CMD) -o dw factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o binary_parser.o $(CPP_FLAG) 
+
+binary_parser.o: src/io/binary_parser.cpp
+	$(COMPILE_CMD) -c src/io/binary_parser.cpp
 
 main.o: src/main.cpp
 	$(COMPILE_CMD) -c src/main.cpp
@@ -90,8 +93,8 @@ clean:
 	rm -rf factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o
 	rm -rf dw
 
-gibbs:
-	./dw gibbs -m data2/graph.meta.pb		\
+#gibbs:
+#	./dw gibbs -m data2/graph.meta.pb		\
 			   -e data2/graph.edges.pb 		\
 			   -w data2/graph.weights.pb 	\
 			   -v data2/graph.variables.pb 	\
@@ -159,4 +162,12 @@ gibbs_pb:
 gibbs_pb_py:
 	./lib/protobuf/bin/protoc -I=./src/dstruct/factor_graph/ --python_out=./test/generate/ ./src/dstruct/factor_graph/factor_graph.proto
 
+gibbs:
+	./dw gibbs -m data3/graph.meta.csv		\
+			   -e data3/graph.edges 		\
+			   -w data3/graph.weights 	\
+			   -v data3/graph.variables 	\
+			   -f data3/graph.factors    \
+			   -o data3/					\
+			   -i 100 -l 100 -s 10 --alpha 0.01 --diminish 0.95
 
