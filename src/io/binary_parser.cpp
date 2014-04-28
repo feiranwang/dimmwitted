@@ -67,7 +67,7 @@ long long read_weights(string filename, dd::FactorGraph &fg)
 		fg.c_nweight++;
 		count++;
 
-        //printf("id=%lli isfixed=%d initial=%f\n", id, isfixed, initial_value);
+        // printf("id=%lli isfixed=%d initial=%f\n", id, isfixed, initial_value);
     }
     file.close();
     return count;
@@ -102,7 +102,7 @@ long long read_variables(string filename, dd::FactorGraph &fg)
         edge_count = __bswap_64(edge_count);
         cardinality = __bswap_64(cardinality);
         count++;
-        //printf("id=%lli isevidence=%d initial=%f type=%c edge_count=%lli cardinality=%lli\n", id, isevidence, initial_value, type, edge_count, cardinality);
+        // printf("----- id=%lli isevidence=%d initial=%f type=%d edge_count=%lli cardinality=%lli\n", id, isevidence, initial_value, type, edge_count, cardinality);
 
         // add to factor graph
         if (type == 0){
@@ -133,6 +133,8 @@ long long read_variables(string filename, dd::FactorGraph &fg)
             cout << "[ERROR] Only Boolean and Multinomial variables are supported now!" << endl;
             exit(1);
         }
+
+        //std::cout << "~~~~" << variable.id() << std::endl;
     }
     file.close();
     return count;
@@ -157,7 +159,7 @@ long long read_factors(string filename, dd::FactorGraph &fg)
         type = __bswap_16(type);
         edge_count = __bswap_64(edge_count);
         count++;
-        //printf("id=%lli weightid=%lli type=%c edge_count=%lli\n", id, weightid, type, edge_count);
+        // printf("id=%lli weightid=%lli type=%d edge_count=%lli\n", id, weightid, type, edge_count);
         fg.factors[fg.c_nfactor] = dd::Factor(id, weightid, type, edge_count);
         fg.c_nfactor ++;
     }
@@ -188,16 +190,24 @@ long long read_edges(string filename, dd::FactorGraph &fg)
         ispositive = padding;
         equal_predicate = __bswap_64(equal_predicate);
         count++;
-        //printf("id=%lli weightid=%lli type=%c edge_count=%lli\n", id, weightid, type, edge_count);
-        
+        // printf("varid=%lli factorid=%lli\n", variable_id, factor_id);
+
+        // std::cout << "vid " << variable_id << std::endl;        
+        // std::cout << "fid " << factor_id << std::endl;
+
         if (fg.variables[variable_id].upper_bound == 1) {
+            // std::cout << "-" << std::endl;
             fg.factors[factor_id].tmp_variables.push_back(
                 dd::VariableInFactor(variable_id, position, ispositive));
+            // std::cout << "--" << std::endl;
         } else {
+            // std::cout << "+" << std::endl;
             fg.factors[factor_id].tmp_variables.push_back(
                 dd::VariableInFactor(variable_id, position, ispositive, equal_predicate));
         }
+        // std::cout << "---" << std::endl;
         fg.variables[variable_id].tmp_factor_ids.push_back(factor_id);
+        // std::cout << "~~~~~~~" << std::endl;
     }
     file.close();
     return count;   

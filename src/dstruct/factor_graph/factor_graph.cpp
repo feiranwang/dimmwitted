@@ -180,6 +180,8 @@ void dd::FactorGraph::safety_check(){
   long ntallies = 0;
   for(long i=0;i<n_var;i++){
     Variable & variable = variables[i];
+    variable.n_factors = variable.tmp_factor_ids.size();  // no edge count any more
+    
     variable.n_start_i_factors = c_edge;
     if(variable.domain_type == DTYPE_MULTINOMIAL){
       variable.n_start_i_tally = ntallies;
@@ -198,7 +200,7 @@ void dd::FactorGraph::safety_check(){
 
   long s = n_var;
   for(long i=0;i<s;i++){
-    //std::cout << this->variables[i].id << "    " << i << std::endl;
+    // std::cout << this->variables[i].id << "    " << i << std::endl;
     assert(this->variables[i].id == i);
   }
   s = n_factor;
