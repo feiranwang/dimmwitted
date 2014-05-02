@@ -5,7 +5,7 @@
 
 
 // 64-bit big endian to little endian
-# define __bswap_64(x) \
+# define bswap_64(x) \
      ((((x) & 0xff00000000000000ull) >> 56)                                   \
       | (((x) & 0x00ff000000000000ull) >> 40)                                 \
       | (((x) & 0x0000ff0000000000ull) >> 24)                                 \
@@ -16,7 +16,7 @@
       | (((x) & 0x00000000000000ffull) << 56))
 
 // 16-bit big endian to little endian
-#define __bswap_16(x) \
+#define bswap_16(x) \
      ((unsigned short int) ((((x) >> 8) & 0xff) | (((x) & 0xff) << 8)))
 
 // Read meta data file, return Meta struct 
@@ -58,9 +58,9 @@ long long read_weights(string filename, dd::FactorGraph &fg)
         file.read((char *)&padding, 1);
         if (!file.read((char *)&initial_value, 8)) break;
         // convert endian
-        id = __bswap_64(id);
+        id = bswap_64(id);
         isfixed = padding;
-        long long tmp = __bswap_64(*(uint64_t *)&initial_value);
+        long long tmp = bswap_64(*(uint64_t *)&initial_value);
         initial_value = *(double *)&tmp;
         // load into factor graph
         fg.weights[fg.c_nweight] = dd::Weight(id, initial_value, isfixed);
@@ -94,13 +94,13 @@ long long read_variables(string filename, dd::FactorGraph &fg)
         file.read((char *)&type, 2);
         file.read((char *)&edge_count, 8);
         if (!file.read((char *)&cardinality, 8)) break;
-        id = __bswap_64(id);
+        id = bswap_64(id);
         isevidence = padding1;
-        type = __bswap_16(type);
-        long long tmp = __bswap_64(*(uint64_t *)&initial_value);
+        type = bswap_16(type);
+        long long tmp = bswap_64(*(uint64_t *)&initial_value);
         initial_value = *(double *)&tmp;
-        edge_count = __bswap_64(edge_count);
-        cardinality = __bswap_64(cardinality);
+        edge_count = bswap_64(edge_count);
+        cardinality = bswap_64(cardinality);
         count++;
         // printf("----- id=%lli isevidence=%d initial=%f type=%d edge_count=%lli cardinality=%lli\n", id, isevidence, initial_value, type, edge_count, cardinality);
 
@@ -154,10 +154,10 @@ long long read_factors(string filename, dd::FactorGraph &fg)
         file.read((char *)&weightid, 8);
         file.read((char *)&type, 2);
         if (!file.read((char *)&edge_count, 8)) break;
-        id = __bswap_64(id);
-        weightid = __bswap_64(weightid);
-        type = __bswap_16(type);
-        edge_count = __bswap_64(edge_count);
+        id = bswap_64(id);
+        weightid = bswap_64(weightid);
+        type = bswap_16(type);
+        edge_count = bswap_64(edge_count);
         count++;
         // printf("id=%lli weightid=%lli type=%d edge_count=%lli\n", id, weightid, type, edge_count);
         fg.factors[fg.c_nfactor] = dd::Factor(id, weightid, type, edge_count);
@@ -178,30 +178,33 @@ long long read_edges(string filename, dd::FactorGraph &fg)
     bool ispositive;
     char padding;
     long long equal_predicate;
+    cout << "start loading edges..." << endl;
     while (file.good()) {
-        file.read((char *)&variable_id, 8);
+        //cout << "reading edge file..." << endl;
+	file.read((char *)&variable_id, 8);
         file.read((char *)&factor_id, 8);
         file.read((char *)&position, 8);
         file.read((char *)&padding, 1);
         if (!file.read((char *)&equal_predicate, 8)) break;
-        variable_id = __bswap_64(variable_id);
-        factor_id = __bswap_64(factor_id);
-        position = __bswap_64(position);
+	//cout << "read one tuple..." << endl;
+        variable_id = bswap_64(variable_id);
+        factor_id = bswap_64(factor_id);
+        position = bswap_64(position);
         ispositive = padding;
-        equal_predicate = __bswap_64(equal_predicate);
+        equal_predicate = bswap_64(equal_predicate);
         count++;
-        // printf("varid=%lli factorid=%lli\n", variable_id, factor_id);
+        //printf("varid=%lli, factorid=%lli, position=%lli, predicate=%lli\n", variable_id, factor_id, position, equal_predicate);
 
         // std::cout << "vid " << variable_id << std::endl;        
         // std::cout << "fid " << factor_id << std::endl;
 
         if (fg.variables[variable_id].upper_bound == 1) {
-            // std::cout << "-" << std::endl;
+        //     std::cout << "-" << std::endl;
             fg.factors[factor_id].tmp_variables.push_back(
                 dd::VariableInFactor(variable_id, position, ispositive));
-            // std::cout << "--" << std::endl;
+        //     std::cout << "--" << std::endl;
         } else {
-            // std::cout << "+" << std::endl;
+        //     std::cout << "+" << std::endl;
             fg.factors[factor_id].tmp_variables.push_back(
                 dd::VariableInFactor(variable_id, position, ispositive, equal_predicate));
         }
