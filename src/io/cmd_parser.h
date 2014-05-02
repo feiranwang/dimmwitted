@@ -53,8 +53,6 @@ namespace dd{
         n_inference_epoch = new TCLAP::ValueArg<int>("i","n_inference_epoch","Number of Samples for Inference",true,-1,"int");
 
         stepsize = new TCLAP::ValueArg<double>("a","alpha","Stepsize",false,0.01,"double");
-        if (stepsize->getValue() == 0.95)
-            stepsize = new TCLAP::ValueArg<double>("p","stepsize","Stepsize",false,0.01,"double");
         decay = new TCLAP::ValueArg<double>("d","diminish","Decay of stepsize per epoch",false,0.95,"double");
 
         n_thread = new TCLAP::ValueArg<int>("t","threads","This setting is no longer supported and will be ignored.",false,-1,"int");
