@@ -30,6 +30,7 @@ namespace dd{
     TCLAP::ValueArg<int> * n_thread;
 
     TCLAP::ValueArg<double> * stepsize;
+    TCLAP::ValueArg<double> * stepsize2;
     TCLAP::ValueArg<double> * decay;
 
     TCLAP::CmdLine * cmd;
@@ -53,6 +54,7 @@ namespace dd{
         n_inference_epoch = new TCLAP::ValueArg<int>("i","n_inference_epoch","Number of Samples for Inference",true,-1,"int");
 
         stepsize = new TCLAP::ValueArg<double>("a","alpha","Stepsize",false,0.01,"double");
+        stepsize2 = new TCLAP::ValueArg<double>("p","stepsize","Stepsize",false,0.01,"double");
         decay = new TCLAP::ValueArg<double>("d","diminish","Decay of stepsize per epoch",false,0.95,"double");
 
         n_thread = new TCLAP::ValueArg<int>("t","threads","This setting is no longer supported and will be ignored.",false,-1,"int");
@@ -70,6 +72,7 @@ namespace dd{
         cmd->add(*n_inference_epoch);
 
         cmd->add(*stepsize);
+        cmd->add(*stepsize2);
         cmd->add(*decay);
         cmd->add(*n_thread);
       }else{

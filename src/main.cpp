@@ -53,6 +53,8 @@ void gibbs(dd::CmdParser & cmd_parser){
   int n_inference_epoch = cmd_parser.n_inference_epoch->getValue();
 
   double stepsize = cmd_parser.stepsize->getValue();
+  double stepsize2 = cmd_parser.stepsize2->getValue();
+  if (stepsize == 0.01) stepsize = stepsize2;
   double decay = cmd_parser.decay->getValue();
 
   std::cout << std::endl;

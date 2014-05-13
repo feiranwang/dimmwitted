@@ -178,7 +178,7 @@ long long read_edges(string filename, dd::FactorGraph &fg)
     bool ispositive;
     char padding;
     long long equal_predicate;
-    cout << "start loading edges..." << endl;
+    // cout << "start loading edges..." << endl;
     while (file.good()) {
         //cout << "reading edge file..." << endl;
 	file.read((char *)&variable_id, 8);
