@@ -166,10 +166,9 @@ namespace dd{
           //    - this->template potential<true>(fs[i]));
           //std::cout << ws[i] << std::endl;
 	  //std::cout << infrs->weight_values[ws[i]] << "  free=" << this->template potential<true>(fs[i]) << "   evid=" << this->template potential<false>(fs[i]) << std::endl;
-	  infrs->weight_values[ws[i]] += 
+          infrs->weight_values[ws[i]] += 
             stepsize * (this->template potential<false>(fs[i]) 
               - this->template potential<true>(fs[i]));
-
         }
       }
     }

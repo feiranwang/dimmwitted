@@ -135,7 +135,9 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
 
     for(int j=0;j<nweight;j++){
       cfg.infrs->weight_values[j] /= nnode;
-      cfg.infrs->weight_values[j] *= (1.0/(1.0+0.01*current_stepsize));
+      if(cfg.infrs->weights_isfixed[j] == false){
+        cfg.infrs->weight_values[j] *= (1.0/(1.0+0.01*current_stepsize));
+      }
     }
 
     for(int i=1;i<=n_numa_nodes;i++){
