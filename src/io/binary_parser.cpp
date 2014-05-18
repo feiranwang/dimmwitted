@@ -193,12 +193,12 @@ long long read_edges(string filename, dd::FactorGraph &fg)
         ispositive = padding;
         equal_predicate = bswap_64(equal_predicate);
         count++;
-        //printf("varid=%lli, factorid=%lli, position=%lli, predicate=%lli\n", variable_id, factor_id, position, equal_predicate);
+        // printf("varid=%lli, factorid=%lli, position=%lli, predicate=%lli\n", variable_id, factor_id, position, equal_predicate);
 
         // std::cout << "vid " << variable_id << std::endl;        
         // std::cout << "fid " << factor_id << std::endl;
 
-        if (fg.variables[variable_id].upper_bound == 1) {
+        if (fg.variables[variable_id].domain_type == DTYPE_BOOLEAN) {
         //     std::cout << "-" << std::endl;
             fg.factors[factor_id].tmp_variables.push_back(
                 dd::VariableInFactor(variable_id, position, ispositive));
