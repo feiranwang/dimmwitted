@@ -42,11 +42,11 @@ namespace dd{
       if(app_name == "gibbs"){
         cmd = new TCLAP::CmdLine("DimmWitted GIBBS", ' ', "0.01");
 
-        fg_file = new TCLAP::ValueArg<std::string>("m","fg_meta","factor graph metadata file in protocol buffer format",true,"","string"); 
-        edge_file = new TCLAP::ValueArg<std::string>("e","edges","edges file in protocol buffer format",true,"","string"); 
-        weight_file = new TCLAP::ValueArg<std::string>("w","weights","weights file in protocol buffer format",true,"","string"); 
-        variable_file = new TCLAP::ValueArg<std::string>("v","variables","variables file in protocol buffer format",true,"","string"); 
-        factor_file = new TCLAP::ValueArg<std::string>("f","factors","factors file in protocol buffer format",true,"","string"); 
+        fg_file = new TCLAP::ValueArg<std::string>("m","fg_meta","factor graph metadata file",true,"","string"); 
+        edge_file = new TCLAP::ValueArg<std::string>("e","edges","edges file",true,"","string"); 
+        weight_file = new TCLAP::ValueArg<std::string>("w","weights","weights file",true,"","string"); 
+        variable_file = new TCLAP::ValueArg<std::string>("v","variables","variables file",true,"","string"); 
+        factor_file = new TCLAP::ValueArg<std::string>("f","factors","factors file",true,"","string"); 
         output_folder = new TCLAP::ValueArg<std::string>("o","outputFile","Output Folder",true,"","string");
         
         n_learning_epoch = new TCLAP::ValueArg<int>("l","n_learning_epoch","Number of Learning Epochs",true,-1,"int");
@@ -82,8 +82,8 @@ namespace dd{
       }
     }
 
-    void parse(int argv, char** argc){
-      cmd->parse(argv, argc);
+    void parse(int argc, char** argv){
+      cmd->parse(argc, argv);
     }
 
   };
