@@ -13,4 +13,5 @@
 *.a
 
 # others
-.DS_Store
+*/.DS_Store
+data3/
