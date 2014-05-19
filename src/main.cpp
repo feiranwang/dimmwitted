@@ -11,26 +11,34 @@
 #include "app/gibbs/gibbs_sampling.h"
 #include "dstruct/factor_graph/factor_graph.h"
 
-dd::CmdParser parse_input(int argv, char** argc){
-  if(argv == 1){
-    std::cout << "ERROR: APP_NAME REQUIRED " << std::endl;
-    std::cout << "AVAILABLE APP_NAME {gibbs}" << std::endl;
-    std::cout << "USAGE ./dw APP_NAME" << std::endl;
-    assert(false);
-  }
+/*
+ * Parse input arguments
+ */
+dd::CmdParser parse_input(int argc, char** argv){
+  // if(argv == 1){
+  //   std::cout << "ERROR: APP_NAME REQUIRED " << std::endl;
+  //   std::cout << "AVAILABLE APP_NAME {gibbs}" << std::endl;
+  //   std::cout << "USAGE ./dw APP_NAME" << std::endl;
+  //   assert(false);
+  // }
   std::vector<std::string> new_args;
-  new_args.push_back(std::string(argc[0]) + " " + std::string(argc[1]));
-  for(int i=2;i<argv;i++){
-    new_args.push_back(std::string(argc[i]));
+  if (argc < 2 || strcmp(argv[1], "gibbs") != 0) {
+    new_args.push_back(std::string(argv[0]) + " " + "gibbs");
+    new_args.push_back("-h");
+  } else {
+    new_args.push_back(std::string(argv[0]) + " " + std::string(argv[1]));
+    for(int i=2;i<argc;i++){
+      new_args.push_back(std::string(argv[i]));
+    }
   }
-  char ** new_argc = new char*[new_args.size()];
+  char ** new_argv = new char*[new_args.size()];
   for(int i=0;i<new_args.size();i++){
-    new_argc[i] = new char[new_args[i].length() + 1];
-    std::copy(new_args[i].begin(), new_args[i].end(), new_argc[i]);
-    new_argc[i][new_args[i].length()] = '\0';
+    new_argv[i] = new char[new_args[i].length() + 1];
+    std::copy(new_args[i].begin(), new_args[i].end(), new_argv[i]);
+    new_argv[i][new_args[i].length()] = '\0';
   }
-  dd::CmdParser cmd_parser(argc[1]);
-  cmd_parser.parse(new_args.size(), new_argc);
+  dd::CmdParser cmd_parser("gibbs");
+  cmd_parser.parse(new_args.size(), new_argv);
   return cmd_parser;
 }
 
