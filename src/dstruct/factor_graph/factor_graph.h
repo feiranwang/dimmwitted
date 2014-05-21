@@ -156,22 +156,81 @@ namespace dd{
       }
     }
 
+    /*
+     * For multinomial weights, given a factor and variable assignment,
+     * return corresponding weight id
+     */
+    long get_weightid(const double *assignments, const CompactFactor& fs, long vid, long proposal) {
+      long weight_offset = 0;
+      for (long i = fs.n_start_i_vif; i < fs.n_start_i_vif + fs.n_variables; i++) {
+        const VariableInFactor & vif = vifs[i];
+        if (vif.vid == vid) {
+          weight_offset = weight_offset * (variables[vif.vid].upper_bound+1) + proposal;
+        } else {
+          weight_offset = weight_offset * (variables[vif.vid].upper_bound+1) + assignments[vif.vid];
+        }
+      }
+      return weight_offset;
+    }
+
     void update_weight(const Variable & variable){
       const CompactFactor * const fs = factors_dups + variable.n_start_i_factors;
       const int * const ws = factors_dups_weightids + variable.n_start_i_factors;
       for(long i=0;i<variable.n_factors;i++){
-        //_mm_prefetch(factors_dups_weightids + i + 1, _MM_HINT_T0);
-        if(infrs->weights_isfixed[ws[i]] == false){
-          //volatile double tmp =  stepsize * (this->template potential<false>(fs[i]) 
-          //    - this->template potential<true>(fs[i]));
-          //std::cout << ws[i] << std::endl;
-	  //std::cout << infrs->weight_values[ws[i]] << "  free=" << this->template potential<true>(fs[i]) << "   evid=" << this->template potential<false>(fs[i]) << std::endl;
-          infrs->weight_values[ws[i]] += 
-            stepsize * (this->template potential<false>(fs[i]) 
-              - this->template potential<true>(fs[i]));
+        if (variable.domain_type == DTYPE_BOOLEAN) {
+          if(infrs->weights_isfixed[ws[i]] == false){
+            infrs->weight_values[ws[i]] += 
+              stepsize * (this->template potential<false>(fs[i]) - this->template potential<true>(fs[i]));
+          }
+        } else if (variable.domain_type == DTYPE_MULTINOMIAL) {
+          // two weights need to be updated
+          // sample with evidence fixed, I0, with variable assignment d0
+          // sample without evidence unfixed, I1, with variable assigment d1 
+          // gradient of wd0 = f(I0) - I(d0==d1)f(I1)
+          // gradient of wd1 = I(d0==d1)f(I0) - f(I1)
+          long wid1 = get_weightid(infrs->assignments_evid, fs[i], -1, -1);
+          long wid2 = get_weightid(infrs->assignments_free, fs[i], -1, -1);
+          int equal = infrs->assignments_evid[variable.id] == infrs->assignments_free[variable.id];
+
+          if(infrs->weights_isfixed[wid1] == false){
+            infrs->weight_values[wid1] += 
+              stepsize * (this->template potential<false>(fs[i]) - equal * this->template potential<true>(fs[i]));
+          }
+
+          if(infrs->weights_isfixed[wid2] == false){
+            infrs->weight_values[wid2] += 
+              stepsize * (equal * this->template potential<false>(fs[i]) - this->template potential<true>(fs[i]));
+          }
         }
       }
     }
+
+    // void update_weight_multinomial(const Variable & variable){
+    //   const CompactFactor * const fs = factors_dups + variable.n_start_i_factors;
+    //   const int * const ws = factors_dups_weightids + variable.n_start_i_factors;
+
+    //   // for each factor
+    //   for(long i = 0; i < variable.n_factors; i++){
+    //     // two weights need to be updated
+    //     // sample with evidence fixed, I0, with variable assignment d0
+    //     // sample without evidence unfixed, I1, with variable assigment d1 
+    //     // gradient of wd0 = f(I0) - I(d0==d1)f(I1)
+    //     // gradient of wd1 = I(d0==d1)f(I0) - f(I1)
+    //     long wid1 = get_weightid(false, fs[i], -1, -1);
+    //     long wid2 = get_weightid(true, fs[i], -1, -1);
+    //     int equal = infrs->assignments_evid[variable.id] == infrs->assignments_free[variable.id];
+
+    //     if(infrs->weights_isfixed[wid1] == false){
+    //       infrs->weight_values[wid1] += 
+    //         stepsize * (this->template potential<false>(fs[i]) - equal * this->template potential<true>(fs[i]));
+    //     }
+
+    //     if(infrs->weights_isfixed[wid2] == false){
+    //       infrs->weight_values[wid2] += 
+    //         stepsize * (equal * this->template potential<false>(fs[i]) - this->template potential<true>(fs[i]));
+    //     }
+    //   }
+    // }
 
     template<bool does_change_evid>
     inline double potential(const CompactFactor & factor){
@@ -189,20 +248,32 @@ namespace dd{
     inline double potential(const Variable & variable, const double & proposal){
       double pot = 0.0;  
       double tmp;
+      double weight = 0.0;
       const CompactFactor * const fs = &factors_dups[variable.n_start_i_factors];
-      const int * const ws = &factors_dups_weightids[variable.n_start_i_factors];      
-      for(long i=0;i<variable.n_factors;i++){
-        //_mm_prefetch(infrs->weight_values + ws[i], _MM_HINT_T0);
-        if(does_change_evid == true){
-          tmp = fs[i].potential(
-              vifs, infrs->assignments_free, variable.id, proposal);
-        }else{
-          tmp = fs[i].potential(
-              vifs, infrs->assignments_evid, variable.id, proposal);
+      const int * const ws = &factors_dups_weightids[variable.n_start_i_factors];   
+      if (variable.domain_type == DTYPE_BOOLEAN) {   
+        for(long i=0;i<variable.n_factors;i++){
+          if(does_change_evid == true){
+            tmp = fs[i].potential(
+                vifs, infrs->assignments_free, variable.id, proposal);
+          }else{
+            tmp = fs[i].potential(
+                vifs, infrs->assignments_evid, variable.id, proposal);
+          }
+          pot += infrs->weight_values[ws[i]] * tmp;
         }
-        pot += infrs->weight_values[ws[i]] * tmp;
+      } else if (variable.domain_type == DTYPE_MULTINOMIAL) {
+        for (long i = 0; i < variable.n_factors; i++) {
+          if(does_change_evid == true) {
+            tmp = fs[i].potential(vifs, infrs->assignments_free, variable.id, proposal);
+            weight = get_weightid(infrs->assignments_free, fs[i], variable.id, proposal);
+          } else {
+            tmp = fs[i].potential(vifs, infrs->assignments_evid, variable.id, proposal);
+            weight = get_weightid(infrs->assignments_evid, fs[i], variable.id, proposal);
+          }
+          pot += weight * tmp;
+        }
       }
-      //std::cout << proposal << "  -> " << pot << std::endl;
       return pot;
     }
 

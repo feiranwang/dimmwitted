@@ -49,6 +49,10 @@ namespace dd{
     inline double _potential_imply(const VariableInFactor * const vifs,
                                    const double * const var_values, 
                                    const long &, const double &) const;
+    
+    inline double _potential_multinomial(const VariableInFactor * const vifs,
+                                   const double * const var_values, 
+                                   const long &, const double &) const;
 
     inline double potential(const VariableInFactor * const vifs,
       const double * const var_values,
@@ -64,6 +68,8 @@ namespace dd{
         return _potential_and(vifs, var_values, vid, proposal);   
       }else if(func_id == 3){ // EQUAL
         return _potential_equal(vifs, var_values, vid, proposal);     
+      } else if (func_id == 5) {
+        return _potential_multinomial(vifs, var_values, vid, proposal);
       }
       else{
         std::cout << "Unsupported Factor Function ID= " << func_id << std::endl;
@@ -100,6 +106,13 @@ namespace dd{
     }
  
   };
+
+  // potential for multinomial variable
+  inline double dd::CompactFactor::_potential_multinomial(const VariableInFactor * vifs, 
+    const double * var_values, const long & vid, const double & proposal) const {
+
+    return 1.0;
+  }
 
   inline double dd::CompactFactor::_potential_equal(
     const VariableInFactor * const vifs,
