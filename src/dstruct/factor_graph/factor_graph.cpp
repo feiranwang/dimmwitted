@@ -3,92 +3,6 @@
 #include "io/binary_parser.h"
 #include "dstruct/factor_graph/factor_graph.h"
 
-void handle_variable(const deepdive::Variable & variable, dd::FactorGraph & fg){
-
-  if(variable.datatype() == deepdive::Variable_VariableDataType_BOOLEAN){
-
-    if(variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
-      fg.variables[fg.c_nvar] = dd::Variable(variable.id(), DTYPE_BOOLEAN, true, 0, 1, 
-        variable.initialvalue(), variable.initialvalue(), variable.edgecount());
-      fg.c_nvar ++;
-      fg.n_evid ++;
-    }else{
-      fg.variables[fg.c_nvar] = dd::Variable(variable.id(), DTYPE_BOOLEAN, false, 0, 1, 0, 0, 
-        variable.edgecount());
-      fg.c_nvar ++;
-      fg.n_query ++;
-    }
-    //std::cout << "~~~~" << variable.id() << std::endl;
-  }else if(variable.datatype() == deepdive::Variable_VariableDataType_MULTINOMIAL){
-    //std::cout << "~~" << std::endl;
-    if(variable.isevidence()){ //TODO: SHOULD NTO CHECK variable.has_initialvalue()
-      fg.variables[fg.c_nvar] = dd::Variable(variable.id(), DTYPE_MULTINOMIAL, true, 0, variable.cardinality()-1, 
-        variable.initialvalue(), variable.initialvalue(), variable.edgecount());
-      fg.c_nvar ++;
-      fg.n_evid ++;
-    }else{
-      fg.variables[fg.c_nvar] = dd::Variable(variable.id(), DTYPE_MULTINOMIAL, false, 0, variable.cardinality()-1, 0, 0, 
-        variable.edgecount());
-      fg.c_nvar ++;
-      fg.n_query ++;
-    }
-    //std::cout << "~~~~" << variable.id() << std::endl;
-  }else{    
-    std::cout << "[ERROR] Only Boolean and Multinomial variables are supported now!" << std::endl;
-    assert(false);
-  }
-
-
-}
-
-void handle_factor(const deepdive::Factor & factor, dd::FactorGraph & fg){
-  //fg.factors.push_back(
-  //  dd::Factor(factor.id(), factor.weightid(), factor.factorfunction(), factor.edgecount())
-  //);
-  //std::cout << factor.id() << std::endl;
-  //std::cout << factor.id() << std::endl;
-  //assert(fg.c_nfactor >= 0);
-  //assert(fg.c_nfactor < 175407502);
-  
-  //fg.factors[fg.c_nfactor].id = 0;
-
-  fg.factors[fg.c_nfactor] = dd::Factor(factor.id(), factor.weightid(), factor.factorfunction(), factor.edgecount());
-  fg.c_nfactor ++;
-}
-
-void handle_weight(const deepdive::Weight & weight, dd::FactorGraph & fg){
-  //fg.weights.push_back(
-  //  dd::Weight(weight.id(), weight.initialvalue(), weight.isfixed())
-  //);
-  //std::cout << weight.initialvalue() << "    " << weight.isfixed() << std::endl;
-  //std::cout << weight.id() << std::endl;
-  fg.weights[fg.c_nweight] = dd::Weight(weight.id(), weight.initialvalue(), weight.isfixed());
-  fg.c_nweight ++;
-}
-
-void handle_edge(const deepdive::GraphEdge & edge, dd::FactorGraph & fg){
-
-  //std::cout << fg.tmp << std::endl;
-  //std::cout << fg.n_factor << std::endl;
-  //std::cout << edge.factorid() << "    " << edge.variableid() << std::endl;
-  //std::cout << edge.position() << "    " << edge.ispositive() << std::endl;
-  //std::cout << edge.equalpredicate() << std::endl;
-
-  if(fg.variables[edge.variableid()].upper_bound == 1){
-    fg.factors[edge.factorid()].tmp_variables.push_back(
-      dd::VariableInFactor(edge.variableid(), edge.position(), edge.ispositive())
-    );
-  }else{
-    fg.factors[edge.factorid()].tmp_variables.push_back(
-      dd::VariableInFactor(edge.variableid(), edge.position(), edge.ispositive(), edge.equalpredicate())
-    );
-  }
-  
-  fg.variables[edge.variableid()].tmp_factor_ids.push_back(
-    edge.factorid()
-  );
-}
-
 
 template <class OBJTOSORT>
 class idsorter : public std::binary_function<OBJTOSORT, OBJTOSORT, bool>{
@@ -148,23 +62,6 @@ void dd::FactorGraph::finalize_loading(){
 }
 
 void dd::FactorGraph::safety_check(){
-
-  /*
-  c_edge = 0;
-  for(long i=0;i<n_var;i++){
-    Variable & variable = variables[i];
-    variable.n_start_i_factors = c_edge;
-    for(const long & fid : variable.tmp_factor_ids){
-      factor_ids[c_edge] = fid;
-      factors_dups[c_edge].id = factors[fid].id;
-      factors_dups[c_edge].func_id = factors[fid].func_id;
-      factors_dups[c_edge].n_variables = factors[fid].n_variables;
-      factors_dups[c_edge].n_start_i_vif = factors[fid].n_start_i_vif;
-      factors_dups_weightids[c_edge] = factors[fid].weight_id;
-      c_edge ++;
-    }
-  }*/
-
 
   c_edge = 0;
   for(long i=0;i<n_factor;i++){
