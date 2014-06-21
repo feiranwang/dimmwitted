@@ -95,6 +95,7 @@ void dd::FactorGraph::safety_check(){
     }
   }
 
+
   long s = n_var;
   for(long i=0;i<s;i++){
     // std::cout << this->variables[i].id << "    " << i << std::endl;

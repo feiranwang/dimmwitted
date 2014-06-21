@@ -17,6 +17,8 @@
 #define DTYPE_REAL        0x01
 #define DTYPE_MULTINOMIAL 0x04
 
+#define CUSTOM -1
+
 namespace dd{
 
   class InferenceResult{
@@ -164,13 +166,18 @@ namespace dd{
       long weight_offset = 0;
       for (long i = fs.n_start_i_vif; i < fs.n_start_i_vif + fs.n_variables; i++) {
         const VariableInFactor & vif = vifs[i];
+        if (vif.equal_to >= 0) continue;
         if (vif.vid == vid) {
           weight_offset = weight_offset * (variables[vif.vid].upper_bound+1) + proposal;
         } else {
           weight_offset = weight_offset * (variables[vif.vid].upper_bound+1) + assignments[vif.vid];
+          // printf("assignment = %f, ", assignments[vif.vid]);
         }
       }
       long base_offset = &fs - factors_dups; // note c++ will auto scale by sizeof(CompactFactor)
+      long wid = *(factors_dups_weightids + base_offset) + weight_offset;
+      // printf("wid = %li\n", wid);
+      // printf("base offset = %li, weight id = %li\n", base_offset, wid);
       return *(factors_dups_weightids + base_offset) + weight_offset;
     }
 
@@ -206,33 +213,6 @@ namespace dd{
       }
     }
 
-    // void update_weight_multinomial(const Variable & variable){
-    //   const CompactFactor * const fs = factors_dups + variable.n_start_i_factors;
-    //   const int * const ws = factors_dups_weightids + variable.n_start_i_factors;
-
-    //   // for each factor
-    //   for(long i = 0; i < variable.n_factors; i++){
-    //     // two weights need to be updated
-    //     // sample with evidence fixed, I0, with variable assignment d0
-    //     // sample without evidence unfixed, I1, with variable assigment d1 
-    //     // gradient of wd0 = f(I0) - I(d0==d1)f(I1)
-    //     // gradient of wd1 = I(d0==d1)f(I0) - f(I1)
-    //     long wid1 = get_weightid(false, fs[i], -1, -1);
-    //     long wid2 = get_weightid(true, fs[i], -1, -1);
-    //     int equal = infrs->assignments_evid[variable.id] == infrs->assignments_free[variable.id];
-
-    //     if(infrs->weights_isfixed[wid1] == false){
-    //       infrs->weight_values[wid1] += 
-    //         stepsize * (this->template potential<false>(fs[i]) - equal * this->template potential<true>(fs[i]));
-    //     }
-
-    //     if(infrs->weights_isfixed[wid2] == false){
-    //       infrs->weight_values[wid2] += 
-    //         stepsize * (equal * this->template potential<false>(fs[i]) - this->template potential<true>(fs[i]));
-    //     }
-    //   }
-    // }
-
     template<bool does_change_evid>
     inline double potential(const CompactFactor & factor){
       if(does_change_evid == true){
@@ -265,6 +245,7 @@ namespace dd{
         }
       } else if (variable.domain_type == DTYPE_MULTINOMIAL) {
         for (long i = 0; i < variable.n_factors; i++) {
+          // printf("i = %li, factor id = %li\n", i, fs[i].id);
           if(does_change_evid == true) {
             tmp = fs[i].potential(vifs, infrs->assignments_free, variable.id, proposal);
             wid = get_weightid(infrs->assignments_free, fs[i], variable.id, proposal);
@@ -274,10 +255,15 @@ namespace dd{
             // for (int j = 0; j < n_var; j++) {
             //   printf("%f ", infrs->assignments_evid[j]);
             // }
-            // printf("proposal = %d, weight id = %d\n", proposal, weight);
+            // printf("weight id = %ld\n", wid);
           }
           pot += infrs->weight_values[wid] * tmp;
+          // if (infrs->weight_values[wid] > 100 || infrs->weight_values[wid] < -100) {
+            // printf("variable id = %li, proposal = %f, factor id = %li, weight id = %li, weight = %f, potential = %f\n", 
+              // variable.id, proposal, fs[i].id, wid, infrs->weight_values[wid], pot);
+          // }
         }
+        // printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
       }
       return pot;
     }

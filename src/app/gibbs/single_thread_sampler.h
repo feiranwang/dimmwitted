@@ -73,6 +73,7 @@ namespace dd{
 
       if(variable.domain_type == DTYPE_BOOLEAN){
 
+
           if(variable.is_evid == false){
 	    //return;
             potential_pos = p_fg->template potential<false>(variable, 1);
@@ -99,6 +100,8 @@ namespace dd{
           
       }else if(variable.domain_type == DTYPE_MULTINOMIAL){
 
+        if (variable.is_fixed) return;
+
         while(variable.upper_bound >= varlen_potential_buffer.size()){
           varlen_potential_buffer.push_back(0.0);
         }
@@ -124,22 +127,38 @@ namespace dd{
           p_fg->template update<false>(variable, multi_proposal);
         }
 
-        sum = -100000.0;
+        sum = -1000000000000.0;
         acc = 0.0;
         multi_proposal = -1;
         for(int propose=0;propose <= variable.upper_bound; propose++){
           varlen_potential_buffer[propose] = p_fg->template potential<true>(variable, propose);
+          //printf("potential2 = %f\n", varlen_potential_buffer[propose]);
           sum = logadd(sum, varlen_potential_buffer[propose]);
         }
+
+        //printf("sum = %f\n", sum);
 
         *this->p_rand_obj_buf = erand48(this->p_rand_seed);
         for(int propose=0;propose <= variable.upper_bound; propose++){
           acc += exp(varlen_potential_buffer[propose]-sum);
+          //printf("~~~~~potential2 = %f   sum = %f   acc = %f\n", varlen_potential_buffer[propose], sum, acc);
+
           if(*this->p_rand_obj_buf <= acc){
             multi_proposal = propose;
             break;
           }
         }
+
+        /*
+        if(multi_proposal == -1.0){
+          acc = 0.0;
+          for(int propose=0;propose <= variable.upper_bound; propose++){
+            acc += exp(varlen_potential_buffer[propose]-sum);
+            printf("~~~~~potential2 = %f   sum = %f   acc = %f\n", varlen_potential_buffer[propose], sum, acc);
+          }
+        }
+        */
+        
         assert(multi_proposal != -1.0);
         p_fg->template update<true>(variable, multi_proposal);
 

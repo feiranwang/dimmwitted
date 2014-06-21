@@ -111,7 +111,24 @@ namespace dd{
   inline double dd::CompactFactor::_potential_multinomial(const VariableInFactor * vifs, 
     const double * var_values, const long & vid, const double & proposal) const {
 
-    return 1.0;
+    int sum = 0;
+    for (long i_vif = n_start_i_vif; i_vif < n_start_i_vif + n_variables; i_vif++) {
+      const VariableInFactor& vif = vifs[i_vif];
+      // no predicate
+      if (vif.equal_to < 0) continue;
+      // check predicate
+      if (vif.vid == vid) {
+        sum += 1 - (proposal == vif.equal_to);
+      } else {
+        sum += 1 - (var_values[vif.vid] == vif.equal_to);
+      }
+    }
+
+    if (sum == 0) {
+      return 1.0;
+    } else {
+      return 0.0;
+    }
   }
 
   inline double dd::CompactFactor::_potential_equal(
