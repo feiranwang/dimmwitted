@@ -168,9 +168,9 @@ namespace dd{
         const VariableInFactor & vif = vifs[i];
         if (vif.equal_to >= 0) continue;
         if (vif.vid == vid) {
-          weight_offset = weight_offset * (variables[vif.vid].upper_bound+1) + proposal;
+          weight_offset = weight_offset * (variables[vif.vid].cardinality) + proposal;
         } else {
-          weight_offset = weight_offset * (variables[vif.vid].upper_bound+1) + assignments[vif.vid];
+          weight_offset = weight_offset * (variables[vif.vid].cardinality) + assignments[vif.vid];
           // printf("assignment = %f, ", assignments[vif.vid]);
         }
       }

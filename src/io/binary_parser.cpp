@@ -108,24 +108,24 @@ long long read_variables(string filename, dd::FactorGraph &fg)
         if (type == 0){
             if (isevidence) {
                 fg.variables[fg.c_nvar] = dd::Variable(id, DTYPE_BOOLEAN, true, 0, 1, 
-                    initial_value, initial_value, edge_count, edge_count == -2); // edge_count == -2 indicates fixed...
+                    initial_value, initial_value, edge_count, edge_count & 0x1, 2); // edge_count == -2 indicates fixed...
                 fg.c_nvar++;
                 fg.n_evid++;
             } else {
                 fg.variables[fg.c_nvar] = dd::Variable(id, DTYPE_BOOLEAN, false, 0, 1, 
-                    0, 0, edge_count, edge_count == -2);
+                    0, 0, edge_count, edge_count & 0x1, edge_count >> 1);
                 fg.c_nvar++;
                 fg.n_query++;
             }
         } else if (type == 1) {
             if (isevidence) {
                 fg.variables[fg.c_nvar] = dd::Variable(id, DTYPE_MULTINOMIAL, true, 0, 
-                    cardinality-1, initial_value, initial_value, edge_count, edge_count == -2);
+                    cardinality-1, initial_value, initial_value, edge_count, edge_count & 0x1, 2);
                 fg.c_nvar ++;
                 fg.n_evid ++;
             } else {
                 fg.variables[fg.c_nvar] = dd::Variable(id, DTYPE_MULTINOMIAL, false, 0, 
-                    cardinality-1, 0, 0, edge_count, edge_count == -2);
+                    cardinality-1, 0, 0, edge_count, edge_count & 0x1, edge_count >> 1);
                 fg.c_nvar ++;
                 fg.n_query ++;
             }
