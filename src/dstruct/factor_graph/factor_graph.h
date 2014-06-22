@@ -173,6 +173,7 @@ namespace dd{
           weight_offset = weight_offset * (variables[vif.vid].cardinality) + assignments[vif.vid];
           // printf("assignment = %f, ", assignments[vif.vid]);
         }
+        // printf("cardinality = %d\n", variables[vif.vid].cardinality);
       }
       long base_offset = &fs - factors_dups; // note c++ will auto scale by sizeof(CompactFactor)
       long wid = *(factors_dups_weightids + base_offset) + weight_offset;
@@ -260,7 +261,7 @@ namespace dd{
           pot += infrs->weight_values[wid] * tmp;
           // if (infrs->weight_values[wid] > 100 || infrs->weight_values[wid] < -100) {
             // printf("variable id = %li, proposal = %f, factor id = %li, weight id = %li, weight = %f, potential = %f\n", 
-              // variable.id, proposal, fs[i].id, wid, infrs->weight_values[wid], pot);
+            //   variable.id, proposal, fs[i].id, wid, infrs->weight_values[wid], pot);
           // }
         }
         // printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
