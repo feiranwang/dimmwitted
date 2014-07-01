@@ -8,16 +8,16 @@
 #define _SINGLE_NODE_SAMPLER_H
 
 namespace dd{
-  void gibbs_single_thread_task(FactorGraph * const _p_fg, int i_worker, int n_worker){
+  void gibbs_single_thread_task(FactorGraph * const _p_fg, int i_worker, int n_worker, double t0){
     //numa_set_localalloc();
     //int cpu = sched_getcpu();
     //int node = numa_node_of_cpu(cpu);
     //std::cout << node << std::endl;
     SingleThreadSampler sampler = SingleThreadSampler(_p_fg);
-    sampler.sample(i_worker,n_worker);
+    sampler.sample(i_worker,n_worker, t0);
   }
 
-  void gibbs_single_thread_sgd_task(FactorGraph * const _p_fg, int i_worker, int n_worker){
+  void gibbs_single_thread_sgd_task(FactorGraph * const _p_fg, int i_worker, int n_worker, double null){
     //numa_set_localalloc();
     SingleThreadSampler sampler = SingleThreadSampler(_p_fg);
     sampler.sample_sgd(i_worker,n_worker);
@@ -57,8 +57,8 @@ namespace dd{
       }
     }
 
-    void sample(){
-      this->sample_worker->execute();
+    void sample(double t0){
+      this->sample_worker->execute(t0);
     }
 
     void wait(){
@@ -66,7 +66,7 @@ namespace dd{
     }
 
     void sample_sgd(){
-      this->sgd_worker->execute();
+      this->sgd_worker->execute(0);
     }
 
 

@@ -39,14 +39,14 @@ namespace dd{
       p_rand_seed[2] = rand();
     }
 
-    void sample(const int & i_sharding, const int & n_sharding){
+    void sample(const int & i_sharding, const int & n_sharding, double t0){
       long nvar = p_fg->n_var;
       long start = ((long)(nvar/n_sharding)+1) * i_sharding;
       long end = ((long)(nvar/n_sharding)+1) * (i_sharding+1);
       end = end > nvar ? nvar : end;
       //for(int i=0;i<100;i++){
       for(long i=start; i<end; i++){
-        this->sample_single_variable(i);
+        this->sample_single_variable(i, t0);
       }
       //}
     }
@@ -171,7 +171,7 @@ namespace dd{
       
     }
 
-    void sample_single_variable(long vid){
+    void sample_single_variable(long vid, double t0){
 
       Variable & variable = this->p_fg->variables[vid];
 
@@ -202,7 +202,7 @@ namespace dd{
           acc = 0.0;
           multi_proposal = -1;
           for(int propose=0;propose <= variable.upper_bound; propose++){
-            varlen_potential_buffer[propose] = p_fg->template potential<false>(variable, propose);
+            varlen_potential_buffer[propose] = 1/t0 * p_fg->template potential<false>(variable, propose);
             sum = logadd(sum, varlen_potential_buffer[propose]);
           }
 

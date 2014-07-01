@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <fstream>
 #include "timer.h"
+#include <cmath>
 
 /*!
  * \brief In this function, the factor graph is located to each NUMA node.
@@ -64,6 +65,7 @@ void dd::GibbsSampling::inference(const int & n_epoch){
     single_node_samplers[i].clear_variabletally();
   }
 
+  double t0 = 1;
   for(int i_epoch=0;i_epoch<n_epoch;i_epoch++){
 
     std::cout << std::setprecision(2) << "INFERENCE EPOCH " << i_epoch * nnode <<  "~" 
@@ -72,8 +74,9 @@ void dd::GibbsSampling::inference(const int & n_epoch){
     t.restart();
 
     for(int i=0;i<nnode;i++){
-      single_node_samplers[i].sample();
+      single_node_samplers[i].sample(t0);
     }
+    t0 = 1 / log(i_epoch+2);
 
     for(int i=0;i<nnode;i++){
       single_node_samplers[i].wait();
@@ -302,15 +305,18 @@ void dd::GibbsSampling::dump(){
 
     msg.set_id(variable.id);
     msg.set_category(1.0);
-    msg.set_expectation(agg_means[variable.id]/agg_nsamples[variable.id]);
+    // msg.set_expectation(agg_means[variable.id]/agg_nsamples[variable.id]);
+    msg.set_expectation(factorgraphs[0].infrs->assignments_evid[variable.id] == 1.0);
     
     if(variable.domain_type != DTYPE_BOOLEAN){
       if(variable.domain_type == DTYPE_MULTINOMIAL){
         for(int j=0;j<=variable.upper_bound;j++){
           msg.set_category(j);
-          msg.set_expectation(1.0*multinomial_tallies[variable.n_start_i_tally + j]/agg_nsamples[variable.id]);
+          // msg.set_expectation(1.0*multinomial_tallies[variable.n_start_i_tally + j]/agg_nsamples[variable.id]);
+          double expectation = factorgraphs[0].infrs->assignments_evid[variable.id] == j;
+          msg.set_expectation(expectation);
           
-          fout_text << variable.id << " " << j << " " << (1.0*multinomial_tallies[variable.n_start_i_tally + j]/agg_nsamples[variable.id]) << std::endl;
+          fout_text << variable.id << " " << j << " " << (expectation) << std::endl;
 
           _CodedOutputStream->WriteVarint32(msg.ByteSize());
           if ( !msg.SerializeToCodedStream(_CodedOutputStream) ){

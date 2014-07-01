@@ -7,7 +7,7 @@
 #ifndef _SINGLE_NODE_WORKER_H
 #define _SINGLE_NODE_WORKER_H
 
-template<class WORKAREA, void (*worker) (WORKAREA * const, int, int)>
+template<class WORKAREA, void (*worker) (WORKAREA * const, int, int, double)>
 class SingeNodeWorker{
 public:
 
@@ -24,13 +24,13 @@ public:
     this->nodeid = _nodeid;
   }
 
-  void execute(){
+  void execute(double t0){
     numa_run_on_node(this->nodeid);
     //numa_set_localalloc();
 
     this->threads.clear();
     for(int i=0;i<this->nthread;i++){
-      this->threads.push_back(std::thread(worker, this->p_workarea, i, this->nthread));
+      this->threads.push_back(std::thread(worker, this->p_workarea, i, this->nthread, t0));
     }
   }
 
