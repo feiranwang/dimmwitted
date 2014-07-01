@@ -305,16 +305,18 @@ void dd::GibbsSampling::dump(){
 
     msg.set_id(variable.id);
     msg.set_category(1.0);
-    // msg.set_expectation(agg_means[variable.id]/agg_nsamples[variable.id]);
-    msg.set_expectation(factorgraphs[0].infrs->assignments_evid[variable.id] == 1.0);
+    msg.set_expectation(agg_means[variable.id]/agg_nsamples[variable.id]);
+    // msg.set_expectation(factorgraphs[0].infrs->assignments_evid[variable.id] == 1.0);
     
     if(variable.domain_type != DTYPE_BOOLEAN){
       if(variable.domain_type == DTYPE_MULTINOMIAL){
         for(int j=0;j<=variable.upper_bound;j++){
           msg.set_category(j);
           // msg.set_expectation(1.0*multinomial_tallies[variable.n_start_i_tally + j]/agg_nsamples[variable.id]);
-          double expectation = factorgraphs[0].infrs->assignments_evid[variable.id] == j;
+          double expectation = (factorgraphs[0].infrs->assignments_evid[variable.id] >= j) && (factorgraphs[0].infrs->assignments_evid[variable.id] < j+1);
           msg.set_expectation(expectation);
+
+          // cout << variable.id << " " << j << " " << factorgraphs[0].infrs->assignments_evid[variable.id] << (expectation) << std::endl;
           
           fout_text << variable.id << " " << j << " " << (expectation) << std::endl;
 
