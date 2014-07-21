@@ -91,6 +91,8 @@ namespace dd{
 
     std::vector<VariableInFactor> tmp_variables;
 
+    bool is_sampled;
+
     Factor(){
 
     }

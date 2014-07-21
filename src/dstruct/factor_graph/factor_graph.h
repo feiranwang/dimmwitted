@@ -200,15 +200,33 @@ namespace dd{
           long wid1 = get_weightid(infrs->assignments_evid, fs[i], -1, -1);
           long wid2 = get_weightid(infrs->assignments_free, fs[i], -1, -1);
           int equal = infrs->assignments_evid[variable.id] == infrs->assignments_free[variable.id];
+          // std::cout << wid1 << ' ' << wid2 << std::endl;
 
           if(infrs->weights_isfixed[wid1] == false){
+            if (wid1 == 93420 || wid1 == 97209 || wid1 == 98787) {
+              printf("wid1 = %li, weight = %f, variable = %li, assign_evid = %f, assign_free = %f\n", wid1, 
+                infrs->weight_values[wid1], variable.id, 
+                infrs->assignments_evid[variable.id],
+                infrs->assignments_free[variable.id]);
+            }
             infrs->weight_values[wid1] += 
               stepsize * (this->template potential<false>(fs[i]) - equal * this->template potential<true>(fs[i]));
+            
+            //infrs->weight_values[wid1] *= (1.0/(1.0+0.01*stepsize));
+
           }
 
-          if(infrs->weights_isfixed[wid2] == false){
+          if(wid1 != wid2 && infrs->weights_isfixed[wid2] == false){
+            if (wid2 == 93420 || wid2 == 97209 || wid2 == 98787) {
+              printf("wid2 = %li, weight = %f, potential1 = %f, potential2 = %f, variable = %li\n", wid2, 
+                infrs->weight_values[wid2],
+                this->template potential<false>(fs[i]), 
+                this->template potential<true>(fs[i]), variable.id);
+            }
             infrs->weight_values[wid2] += 
               stepsize * (equal * this->template potential<false>(fs[i]) - this->template potential<true>(fs[i]));
+
+            //infrs->weight_values[wid2] *= (1.0/(1.0+0.01*stepsize));
           }
         }
       }
