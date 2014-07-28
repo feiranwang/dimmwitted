@@ -74,7 +74,7 @@ namespace dd{
       } else if (func_id == 5) {
         return _potential_multinomial(vifs, var_values, vid, proposal);
       } else if (func_id == 6) {
-        return 0;
+        return _potential_tree(vifs, var_values, vid, proposal);
       } else{
         std::cout << "Unsupported Factor Function ID= " << func_id << std::endl;
         assert(false);
