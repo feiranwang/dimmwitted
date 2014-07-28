@@ -55,59 +55,55 @@ namespace dd{
     }
 
     void sample_sgd(const int & i_sharding, const int & n_sharding){
-      ____nn ++;
       long nvar = p_fg->n_var;
       long start = ((long)(nvar/n_sharding)+1) * i_sharding;
       long end = ((long)(nvar/n_sharding)+1) * (i_sharding+1);
       end = end > nvar ? nvar : end;
 
-      //for(int j=0;j<20;j++){
       for(long i=start; i<end; i++){
           this->sample_sgd_single_variable(i);
       }
-      //}
 
-      // std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+      // for(long i = 0; i < p_fg->n_factor; i++){
+      //   p_fg->factors[i].is_sampled = false;
+      // }
 
-      for(long i=0;i<p_fg->n_factor;i++){
-        p_fg->factors[i].is_sampled = false;
-      }
-      for(long i=0;i<p_fg->n_edge;i++){
-        const CompactFactor & f = p_fg->factors_dups[i];
-        if (p_fg->factors[f.id].is_sampled == true)
-          continue;
-        // if(p_fg->factors[f.id].is_sampled == true){
-        //   std::cout << "skip f.id = " << f.id << "  edgeid = " << i << std::endl;
-        //   continue;
-        // }
+      // for(long i = 0; i < p_fg->n_weight; i++){
+      //   p_fg->infrs->weights_isupdated[i] = false;
+      // }
 
-        long wid1 = p_fg->get_weightid(p_fg->infrs->assignments_evid, f, -1, -1);
-        long wid2 = p_fg->get_weightid(p_fg->infrs->assignments_free, f, -1, -1);
+      // for(long i = 0; i < p_fg->n_edge; i++){
+      //   const CompactFactor & f = p_fg->factors_dups[i];
+      //   // if (p_fg->factors[f.id].is_sampled == true)
+      //   //   continue;
+      //   // if(p_fg->factors[f.id].is_sampled == true){
+      //   //   std::cout << "skip f.id = " << f.id << "  edgeid = " << i << std::endl;
+      //   //   continue;
+      //   // }
 
-        int equal = (wid1 == wid2);
+      //   long wid1 = p_fg->get_weightid(p_fg->infrs->assignments_evid, f, -1, -1);
+      //   long wid2 = p_fg->get_weightid(p_fg->infrs->assignments_free, f, -1, -1);
 
-        if(p_fg->infrs->weights_isfixed[wid1] == false){
-          p_fg->infrs->weight_values[wid1] += 
-              p_fg->stepsize * (p_fg->template potential<false>(f) - equal * p_fg->template potential<true>(f));
-        }
+      //   int equal = (wid1 == wid2);
 
-        if(wid1 != wid2 && p_fg->infrs->weights_isfixed[wid2] == false){
-            p_fg->infrs->weight_values[wid2] += 
-              p_fg->stepsize * (equal * p_fg->template potential<false>(f) - p_fg->template potential<true>(f));
-        }
+      //   if(p_fg->infrs->weights_isupdated[wid1] == false && p_fg->infrs->weights_isfixed[wid1] == false){
+      //     p_fg->infrs->weight_values[wid1] += 
+      //         p_fg->stepsize * (p_fg->template potential<false>(f) - equal * p_fg->template potential<true>(f));
+      //     p_fg->infrs->weights_isupdated[wid1] = true;
+      //   }
 
-        // if (wid1 == 93420 || wid1 == 97209 || wid1 == 98787) {
-        //   printf("wid1 = %li, weight = %f\n", wid1, 
-        //     p_fg->infrs->weight_values[wid1]);
-        // }
+      //   if(wid1 != wid2 && p_fg->infrs->weights_isupdated[wid2] == false && p_fg->infrs->weights_isfixed[wid2] == false){
+      //       p_fg->infrs->weight_values[wid2] += 
+      //         p_fg->stepsize * (equal * p_fg->template potential<false>(f) - p_fg->template potential<true>(f));
+      //       p_fg->infrs->weights_isupdated[wid2] = true;
+      //   }
 
-        p_fg->factors[f.id].is_sampled = true;
+      //   // p_fg->factors[f.id].is_sampled = true;
 
-        // std::cout << "WID " << wid1 << " = " << p_fg->infrs->weight_values[wid1] << std::endl;
-        // std::cout << "WID " << wid2 << " = " << p_fg->infrs->weight_values[wid2] << std::endl;
-        // std::cout << "####" << std::endl;
-      }
-      // std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+      //   // std::cout << "WID " << wid1 << " = " << p_fg->infrs->weight_values[wid1] << std::endl;
+      //   // std::cout << "WID " << wid2 << " = " << p_fg->infrs->weight_values[wid2] << std::endl;
+      //   // std::cout << "####" << std::endl;
+      // }
 
 
     }
@@ -219,12 +215,9 @@ namespace dd{
 
         //std::cout << "~~~~" << ____nn << std::endl;
 
-        //if(____nn % 100 == 0){
-          //if(variable.id == 1){
-          //this->p_fg->update_weight(variable);
+        // std::cout << "~~~~~~called update on " << variable.id << std::endl; 
+        this->p_fg->update_weight(variable);
           
-          //}
-        //}
 
       }else{
         std::cout << "[ERROR] Only Boolean and Multinomial variables are supported now!" << std::endl;

@@ -26,9 +26,9 @@ void dd::GibbsSampling::prepare(){
 
   //n_thread_per_numa /= 2;
   //if(n_thread_per_numa == 0){
-  //  n_thread_per_numa = 1;
+   // n_thread_per_numa = 1;
   //}
-  n_thread_per_numa = 1;
+  // n_thread_per_numa = 1;
 
   this->factorgraphs.push_back(*p_fg);
   for(int i=1;i<=n_numa_nodes;i++){

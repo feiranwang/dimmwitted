@@ -54,6 +54,9 @@ namespace dd{
                                    const double * const var_values, 
                                    const long &, const double &) const;
 
+    inline double _potential_tree(const VariableInFactor * const vifs, 
+    const double * const var_values, const long &, const double &) const;
+
     inline double potential(const VariableInFactor * const vifs,
       const double * const var_values,
       const long & vid, const double & proposal) const{ 
@@ -70,8 +73,9 @@ namespace dd{
         return _potential_equal(vifs, var_values, vid, proposal);     
       } else if (func_id == 5) {
         return _potential_multinomial(vifs, var_values, vid, proposal);
-      }
-      else{
+      } else if (func_id == 6) {
+        return 0;
+      } else{
         std::cout << "Unsupported Factor Function ID= " << func_id << std::endl;
         assert(false);
       }
@@ -109,12 +113,38 @@ namespace dd{
  
   };
 
+
+  // parser: factor for enforcing tree structure
+  inline double dd::CompactFactor::_potential_tree(const VariableInFactor * vifs, 
+    const double * var_values, const long & vid, const double & proposal) const {
+    int sum = 0;
+    long i_vif = n_start_i_vif;
+    const VariableInFactor& vif = vifs[i_vif];
+    for (i_vif = n_start_i_vif + 1; i_vif < n_start_i_vif + n_variables; i_vif++) {
+      if (vif.vid == vid) {
+        sum += (proposal == vif.equal_to);
+      } else {
+        sum += (var_values[vif.vid] == vif.equal_to);
+      }
+    }
+    // the first variable == 0
+    if ((vif.vid != vid && var_values[vif.vid] == 0) || (vif.vid == vid && proposal == 0)) {
+      return sum != 0 ? 1.0 : 0.0;
+    } else {
+      return sum != 0 ? 0.0 : 1.0;
+    }
+
+    
+  }
+
   // potential for multinomial variable
   inline double dd::CompactFactor::_potential_multinomial(const VariableInFactor * vifs, 
     const double * var_values, const long & vid, const double & proposal) const {
 
+
     int sum = 0;
     for (long i_vif = n_start_i_vif; i_vif < n_start_i_vif + n_variables; i_vif++) {
+
       const VariableInFactor& vif = vifs[i_vif];
       // no predicate
       if (vif.equal_to < 0) continue;

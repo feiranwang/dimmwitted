@@ -67,7 +67,7 @@ long long read_weights(string filename, dd::FactorGraph &fg)
 		fg.c_nweight++;
 		count++;
 
-        // printf("============id=%lli isfixed=%d initial=%f\n", id, isfixed, initial_value);
+        // printf("WEIGHT: id=%lli isfixed=%d initial=%f\n", id, isfixed, initial_value);
     }
     file.close();
     return count;
@@ -102,7 +102,8 @@ long long read_variables(string filename, dd::FactorGraph &fg)
         edge_count = bswap_64(edge_count);
         cardinality = bswap_64(cardinality);
         count++;
-        // printf("----- id=%lli isevidence=%d initial=%f type=%d edge_count=%lli cardinality=%lli\n", id, isevidence, initial_value, type, edge_count, cardinality);
+        // printf("VARIABLE: id=%lli isevidence=%d initial=%f type=%d edge_count=%lli upperbound=%lli isfixed = %d cardinality = %lli\n", 
+        //     id, isevidence, initial_value, type, edge_count, cardinality-1, edge_count & 0x1, edge_count >> 1);
 
         // add to factor graph
         if (type == 0){
@@ -159,7 +160,7 @@ long long read_factors(string filename, dd::FactorGraph &fg)
         type = bswap_16(type);
         edge_count = bswap_64(edge_count);
         count++;
-        // printf("id=%lli weightid=%lli type=%d edge_count=%lli\n", id, weightid, type, edge_count);
+        // printf("FACTOR: id=%lli weightid=%lli type=%d edge_count=%lli\n", id, weightid, type, edge_count);
         fg.factors[fg.c_nfactor] = dd::Factor(id, weightid, type, edge_count);
         fg.c_nfactor ++;
     }
@@ -193,7 +194,7 @@ long long read_edges(string filename, dd::FactorGraph &fg)
         ispositive = padding;
         equal_predicate = bswap_64(equal_predicate);
         count++;
-        // printf("varid=%lli, factorid=%lli, position=%lli, predicate=%lli\n", variable_id, factor_id, position, equal_predicate);
+        // printf("EDGE: varid=%lli, factorid=%lli, position=%lli, predicate=%lli\n", variable_id, factor_id, position, equal_predicate);
 
         // std::cout << "vid " << variable_id << std::endl;        
         // std::cout << "fid " << factor_id << std::endl;

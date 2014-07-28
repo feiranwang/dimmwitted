@@ -36,6 +36,7 @@ namespace dd{
     double * const assignments_evid;
     double * const weight_values;
     bool * const weights_isfixed;
+    bool * const weights_isupdated;
 
     InferenceResult(long _nvars, long _nweights):
       assignments_free(new double[_nvars]),
@@ -44,6 +45,7 @@ namespace dd{
       agg_nsamples(new double[_nvars]),
       weight_values(new double [_nweights]),
       weights_isfixed(new bool [_nweights]),
+      weights_isupdated(new bool [_nweights]),
       nweights(_nweights),
       nvars(_nvars){}
 
@@ -186,12 +188,12 @@ namespace dd{
       const CompactFactor * const fs = factors_dups + variable.n_start_i_factors;
       const int * const ws = factors_dups_weightids + variable.n_start_i_factors;
       for(long i=0;i<variable.n_factors;i++){
-        if (variable.domain_type == DTYPE_BOOLEAN) {
+        if (fs[i].func_id != 5) {
           if(infrs->weights_isfixed[ws[i]] == false){
             infrs->weight_values[ws[i]] += 
               stepsize * (this->template potential<false>(fs[i]) - this->template potential<true>(fs[i]));
           }
-        } else if (variable.domain_type == DTYPE_MULTINOMIAL) {
+        } else if (fs[i].func_id == 5) {
           // two weights need to be updated
           // sample with evidence fixed, I0, with variable assignment d0
           // sample without evidence unfixed, I1, with variable assigment d1 
@@ -201,14 +203,19 @@ namespace dd{
           long wid2 = get_weightid(infrs->assignments_free, fs[i], -1, -1);
           int equal = infrs->assignments_evid[variable.id] == infrs->assignments_free[variable.id];
           // std::cout << wid1 << ' ' << wid2 << std::endl;
+          // std::cout << infrs->assignments_evid[variable.id] << ' ' << infrs->assignments_free[variable.id] << endl;
 
           if(infrs->weights_isfixed[wid1] == false){
-            if (wid1 == 93420 || wid1 == 97209 || wid1 == 98787) {
-              printf("wid1 = %li, weight = %f, variable = %li, assign_evid = %f, assign_free = %f\n", wid1, 
-                infrs->weight_values[wid1], variable.id, 
-                infrs->assignments_evid[variable.id],
-                infrs->assignments_free[variable.id]);
-            }
+            // if (true) {
+            //   printf("fid = %li, wid1 = %li, weight = %f, assign_evid = %f, assign_free = %f, potential1 = %f, potential2 = %f\n",
+            //     fs[i].id,
+            //     wid1, 
+            //     infrs->weight_values[wid1], 
+            //     infrs->assignments_evid[variable.id],
+            //     infrs->assignments_free[variable.id],
+            //     this->template potential<false>(fs[i]),
+            //     this->template potential<true>(fs[i]));
+            // }
             infrs->weight_values[wid1] += 
               stepsize * (this->template potential<false>(fs[i]) - equal * this->template potential<true>(fs[i]));
             
@@ -217,14 +224,20 @@ namespace dd{
           }
 
           if(wid1 != wid2 && infrs->weights_isfixed[wid2] == false){
-            if (wid2 == 93420 || wid2 == 97209 || wid2 == 98787) {
-              printf("wid2 = %li, weight = %f, potential1 = %f, potential2 = %f, variable = %li\n", wid2, 
-                infrs->weight_values[wid2],
-                this->template potential<false>(fs[i]), 
-                this->template potential<true>(fs[i]), variable.id);
-            }
+            // if (true) {
+            //   printf("fid = %li, wid2 = %li, weight = %f, assign_evid = %f, assign_free = %f, potential1 = %f, potential2 = %f\n", 
+            //     fs[i].id,
+            //     wid2, 
+            //     infrs->weight_values[wid2], 
+            //     infrs->assignments_evid[variable.id],
+            //     infrs->assignments_free[variable.id],
+            //     this->template potential<false>(fs[i]),
+            //     this->template potential<true>(fs[i]));
+            // }
             infrs->weight_values[wid2] += 
               stepsize * (equal * this->template potential<false>(fs[i]) - this->template potential<true>(fs[i]));
+
+            // std::cout << infrs->weight_values[wid2] << std::endl;
 
             //infrs->weight_values[wid2] *= (1.0/(1.0+0.01*stepsize));
           }
@@ -276,13 +289,16 @@ namespace dd{
             // }
             // printf("weight id = %ld\n", wid);
           }
+          // parser: for pointers, zero probability for pointer != predicate (invalid structure)
+          // if (tmp == 0.0) {
+          //   return -1000000;
+          // }
           pot += infrs->weight_values[wid] * tmp;
           // if (infrs->weight_values[wid] > 100 || infrs->weight_values[wid] < -100) {
             // printf("variable id = %li, proposal = %f, factor id = %li, weight id = %li, weight = %f, potential = %f\n", 
             //   variable.id, proposal, fs[i].id, wid, infrs->weight_values[wid], pot);
           // }
         }
-        // printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
       }
       return pot;
     }
