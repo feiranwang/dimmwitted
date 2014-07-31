@@ -112,6 +112,26 @@ namespace dd{
 
     void sample_sgd_single_variable(long vid){
 
+      // if (vid == 317 ||
+      //     vid == 328 ||
+      //     vid == 340 ||
+      //     vid == 353 ||
+      //     vid == 367 ||
+      //     vid == 382 ||
+      //     vid == 398 ||
+      //     vid == 415 ||
+      //     vid == 262 ||
+      //     vid == 263 ||
+      //     vid == 265 ||
+      //     vid == 268 ||
+      //     vid == 272 ||
+      //     vid == 277 ||
+      //     vid == 283 ||
+      //     vid == 290 ||
+      //     vid == 298 ||
+      //     vid == 307 ) {
+      //   printf("\nVID = %li, VALUE = %f", vid, p_fg->infrs->assignments_free[vid]);
+      // }
       
       
       Variable & variable = p_fg->variables[vid];
@@ -184,15 +204,20 @@ namespace dd{
           varlen_potential_buffer[propose] = p_fg->template potential<true>(variable, propose);
           //printf("potential2 = %f\n", varlen_potential_buffer[propose]);
           sum = logadd(sum, varlen_potential_buffer[propose]);
+          // if (variable.id == 328) {
+          //   printf("propose = %d   potential2 = %f   sum = %f\n", propose, varlen_potential_buffer[propose], sum);
+          // }
         }
 
-        //printf("sum = %f\n", sum);
+        
 
         *this->p_rand_obj_buf = erand48(this->p_rand_seed);
         for(int propose=0;propose <= variable.upper_bound; propose++){
           acc += exp(varlen_potential_buffer[propose]-sum);
           
-          // printf("~~~~~potential2 = %f   sum = %f   acc = %f    rand = %f\n", varlen_potential_buffer[propose], sum, acc, *this->p_rand_obj_buf);
+          // if (variable.id == 328) {
+          //   printf("propose = %d   potential2 = %f   sum = %f   acc = %f   rand = %f\n", propose, varlen_potential_buffer[propose], sum, acc, *this->p_rand_obj_buf);
+          // }
 
           if(*this->p_rand_obj_buf <= acc){
             multi_proposal = propose;
@@ -200,16 +225,6 @@ namespace dd{
           }
         }
 
-        /*
-        if(multi_proposal == -1.0){
-          acc = 0.0;
-          for(int propose=0;propose <= variable.upper_bound; propose++){
-            acc += exp(varlen_potential_buffer[propose]-sum);
-            printf("~~~~~potential2 = %f   sum = %f   acc = %f\n", varlen_potential_buffer[propose], sum, acc);
-          }
-        }
-        */
-        
         assert(multi_proposal != -1.0);
         p_fg->template update<true>(variable, multi_proposal);
 

@@ -206,8 +206,9 @@ namespace dd{
           // std::cout << infrs->assignments_evid[variable.id] << ' ' << infrs->assignments_free[variable.id] << endl;
 
           if(infrs->weights_isfixed[wid1] == false){
-            // if (true) {
-            //   printf("fid = %li, wid1 = %li, weight = %f, assign_evid = %f, assign_free = %f, potential1 = %f, potential2 = %f\n",
+            // if (wid1 == 41991) {
+            //   printf("vid = %li, fid = %li, wid1 = %li, weight = %f, assign_evid = %f, assign_free = %f, potential1 = %f, potential2 = %f\n",
+            //     variable.id,
             //     fs[i].id,
             //     wid1, 
             //     infrs->weight_values[wid1], 
@@ -224,7 +225,7 @@ namespace dd{
           }
 
           if(wid1 != wid2 && infrs->weights_isfixed[wid2] == false){
-            // if (true) {
+            // if (wid2 == 41991) {
             //   printf("fid = %li, wid2 = %li, weight = %f, assign_evid = %f, assign_free = %f, potential1 = %f, potential2 = %f\n", 
             //     fs[i].id,
             //     wid2, 
@@ -264,42 +265,60 @@ namespace dd{
       long wid = 0;
       const CompactFactor * const fs = &factors_dups[variable.n_start_i_factors];
       const int * const ws = &factors_dups_weightids[variable.n_start_i_factors];   
-      if (variable.domain_type == DTYPE_BOOLEAN) {   
-        for(long i=0;i<variable.n_factors;i++){
-          if(does_change_evid == true){
-            tmp = fs[i].potential(
-                vifs, infrs->assignments_free, variable.id, proposal);
-          }else{
-            tmp = fs[i].potential(
-                vifs, infrs->assignments_evid, variable.id, proposal);
-          }
-          pot += infrs->weight_values[ws[i]] * tmp;
+      // if (variable.domain_type == DTYPE_BOOLEAN) {   
+      //   for(long i=0;i<variable.n_factors;i++){
+      //     if(does_change_evid == true){
+      //       tmp = fs[i].potential(
+      //           vifs, infrs->assignments_free, variable.id, proposal);
+      //     }else{
+      //       tmp = fs[i].potential(
+      //           vifs, infrs->assignments_evid, variable.id, proposal);
+      //     }
+      //     pot += infrs->weight_values[ws[i]] * tmp;
+      //   }
+      // } else if (variable.domain_type == DTYPE_MULTINOMIAL) {
+      //   for (long i = 0; i < variable.n_factors; i++) {
+      //     if(does_change_evid == true) {
+      //       tmp = fs[i].potential(vifs, infrs->assignments_free, variable.id, proposal);
+      //       wid = get_weightid(infrs->assignments_free, fs[i], variable.id, proposal);
+      //     } else {
+      //       tmp = fs[i].potential(vifs, infrs->assignments_evid, variable.id, proposal);
+      //       wid = get_weightid(infrs->assignments_evid, fs[i], variable.id, proposal);
+      //       // for (int j = 0; j < n_var; j++) {
+      //       //   printf("%f ", infrs->assignments_evid[j]);
+      //       // }
+      //       // printf("weight id = %ld\n", wid);
+      //     }
+      //     pot += infrs->weight_values[wid] * tmp;
+      //     if (variable.id == 328) {
+      //       printf("variable id = %li, proposal = %f, factor id = %li, weight id = %li, weight = %f, potential = %f\n", 
+      //         variable.id, proposal, fs[i].id, wid, infrs->weight_values[wid], pot);
+      //     }
+      //   }
+      // }
+
+      for (long i=0;i<variable.n_factors;i++){
+        if (does_change_evid){
+          tmp = fs[i].potential(vifs, infrs->assignments_free, variable.id, proposal);
+        } else {
+          tmp = fs[i].potential(vifs, infrs->assignments_evid, variable.id, proposal);
         }
-      } else if (variable.domain_type == DTYPE_MULTINOMIAL) {
-        for (long i = 0; i < variable.n_factors; i++) {
-          // printf("i = %li, factor id = %li\n", i, fs[i].id);
-          if(does_change_evid == true) {
-            tmp = fs[i].potential(vifs, infrs->assignments_free, variable.id, proposal);
+        if (fs[i].func_id == 5) {
+          if(does_change_evid) {
             wid = get_weightid(infrs->assignments_free, fs[i], variable.id, proposal);
           } else {
-            tmp = fs[i].potential(vifs, infrs->assignments_evid, variable.id, proposal);
             wid = get_weightid(infrs->assignments_evid, fs[i], variable.id, proposal);
-            // for (int j = 0; j < n_var; j++) {
-            //   printf("%f ", infrs->assignments_evid[j]);
-            // }
-            // printf("weight id = %ld\n", wid);
           }
-          // parser: for pointers, zero probability for pointer != predicate (invalid structure)
-          // if (tmp == 0.0) {
-          //   return -1000000;
-          // }
-          pot += infrs->weight_values[wid] * tmp;
-          // if (infrs->weight_values[wid] > 100 || infrs->weight_values[wid] < -100) {
-            // printf("variable id = %li, proposal = %f, factor id = %li, weight id = %li, weight = %f, potential = %f\n", 
-            //   variable.id, proposal, fs[i].id, wid, infrs->weight_values[wid], pot);
-          // }
+        } else {
+          wid = ws[i];
         }
+        pot += infrs->weight_values[wid] * tmp;
+        // if (variable.id == 328) {
+        //   printf("variable id = %li, proposal = %f, factor id = %li, weight id = %li, weight = %f, potential = %f\n", 
+        //     variable.id, proposal, fs[i].id, wid, infrs->weight_values[wid], tmp);
+        // }
       }
+
       return pot;
     }
 

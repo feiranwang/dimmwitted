@@ -118,22 +118,22 @@ namespace dd{
   inline double dd::CompactFactor::_potential_tree(const VariableInFactor * vifs, 
     const double * var_values, const long & vid, const double & proposal) const {
     int sum = 0;
-    long i_vif = n_start_i_vif;
-    const VariableInFactor& vif = vifs[i_vif];
-    for (i_vif = n_start_i_vif + 1; i_vif < n_start_i_vif + n_variables; i_vif++) {
+    for (long i_vif = n_start_i_vif + 1; i_vif < n_start_i_vif + n_variables; i_vif++) {
+      const VariableInFactor& vif = vifs[i_vif];
       if (vif.vid == vid) {
         sum += (proposal == vif.equal_to);
       } else {
         sum += (var_values[vif.vid] == vif.equal_to);
       }
     }
+
+    const VariableInFactor& vif = vifs[n_start_i_vif];
     // the first variable == 0
     if ((vif.vid != vid && var_values[vif.vid] == 0) || (vif.vid == vid && proposal == 0)) {
       return sum != 0 ? 1.0 : 0.0;
     } else {
       return sum != 0 ? 0.0 : 1.0;
     }
-
     
   }
 
@@ -248,20 +248,15 @@ namespace dd{
         
         if(vif.n_position == n_variables - 1){
           if(vif.vid == vid){
-            //if(vid == 548590 || vid == 2531610) std::cout << "  head  " << vif.vid << " , " << proposal << " , " << vif.is_positive << " , " << (proposal==vif.equal_to) << std::endl;
             sum += (vif.is_positive == true ? (proposal==vif.equal_to) : 1-(proposal==vif.equal_to));
-            //std::cout << proposal << " --> " << (proposal==vif.equal_to) << " " << vif.equal_to << std::endl; 
           }else{
-            //if(vid == 548590 || vid == 2531610) std::cout << "  head  " << vif.vid << " , " << var_values[vif.vid] << " , " << vif.is_positive << " , " << (var_values[vif.vid]==vif.equal_to) << std::endl;
             sum += (vif.is_positive == true ? (var_values[vif.vid]==vif.equal_to)
               : 1-(var_values[vif.vid]==vif.equal_to));
           }
         }else{
           if(vif.vid == vid){
-            //if(vid == 548590 || vid == 2531610) std::cout << "  body  " << vif.vid << " , " << proposal << " , " << vif.is_positive << " , " << (proposal==vif.equal_to) << std::endl;
             sum += (vif.is_positive == false ? (proposal==vif.equal_to) : 1-(proposal==vif.equal_to));
           }else{
-            //if(vid == 548590 || vid == 2531610) std::cout << "  body  " << vif.vid << " , " << var_values[vif.vid] << " , " << vif.is_positive << " , " << (var_values[vif.vid]==vif.equal_to) << std::endl;
             sum += (vif.is_positive == false ? (var_values[vif.vid]==vif.equal_to)
               : (var_values[vif.vid]==vif.equal_to));
           }

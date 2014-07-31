@@ -160,7 +160,27 @@ long long read_factors(string filename, dd::FactorGraph &fg)
         type = bswap_16(type);
         edge_count = bswap_64(edge_count);
         count++;
-        // printf("FACTOR: id=%lli weightid=%lli type=%d edge_count=%lli\n", id, weightid, type, edge_count);
+        // if (id == 65  ||
+        //     id == 77  ||
+        //     id == 78  ||
+        //     id == 90  ||
+        //     id == 92  ||
+        //     id == 104 ||
+        //     id == 107 ||
+        //     id == 119 ||
+        //     id == 123 ||
+        //     id == 135 ||
+        //     id == 140 ||
+        //     id == 152 ||
+        //     id == 158 ||
+        //     id == 395 ||
+        //     id == 396 ||
+        //     id == 397 ||
+        //     id == 398 ||
+        //     id == 399 ||
+        //     id == 400) {
+        //     printf("FACTOR: id=%lli weightid=%lli type=%d edge_count=%lli\n", id, weightid, type, edge_count);
+        // }
         fg.factors[fg.c_nfactor] = dd::Factor(id, weightid, type, edge_count);
         fg.c_nfactor ++;
     }
@@ -194,8 +214,9 @@ long long read_edges(string filename, dd::FactorGraph &fg)
         ispositive = padding;
         equal_predicate = bswap_64(equal_predicate);
         count++;
-        // printf("EDGE: varid=%lli, factorid=%lli, position=%lli, predicate=%lli\n", variable_id, factor_id, position, equal_predicate);
-
+        // if (variable_id == 328) {
+        //     printf("EDGE: varid=%lli, factorid=%lli, position=%lli, predicate=%lli\n", variable_id, factor_id, position, equal_predicate);
+        // }
         // std::cout << "vid " << variable_id << std::endl;        
         // std::cout << "fid " << factor_id << std::endl;
 
