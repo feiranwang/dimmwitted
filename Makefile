@@ -90,7 +90,7 @@ endif
 
 
 clean:
-	rm -rf factor_graph.o factor_graph.pb.o gibbs_sampling.o main.o
+	rm -rf factor_graph.o factor_graph.pb.o gibbs_sampling.o binary_parser.o main.o
 	rm -rf dw
 
 #gibbs:
