@@ -42,34 +42,56 @@ Meta read_meta(string meta_file)
 	return meta;
 }
 
+// // Read weights and load into factor graph
+// long long read_weights(string filename, dd::FactorGraph &fg)
+// {
+// 	ifstream file;
+//     file.open(filename.c_str(), ios::in | ios::binary);
+//     long long count = 0;
+//     long long id;
+//     bool isfixed;
+//     char padding;
+//     double initial_value;
+//     while (file.good()) {
+//     	// read fields
+//         file.read((char *)&id, 8);
+//         file.read((char *)&padding, 1);
+//         if (!file.read((char *)&initial_value, 8)) break;
+//         // convert endian
+//         id = bswap_64(id);
+//         isfixed = padding;
+//         long long tmp = bswap_64(*(uint64_t *)&initial_value);
+//         initial_value = *(double *)&tmp;
+//         // load into factor graph
+//         fg.weights[fg.c_nweight] = dd::Weight(id, initial_value, isfixed);
+// 		fg.c_nweight++;
+// 		count++;
+
+//         printf("WEIGHT: id=%lli isfixed=%d initial=%f\n", id, isfixed, initial_value);
+//     }
+//     file.close();
+//     return count;
+// }
+
 // Read weights and load into factor graph
 long long read_weights(string filename, dd::FactorGraph &fg)
 {
-	ifstream file;
-    file.open(filename.c_str(), ios::in | ios::binary);
-    long long count = 0;
-    long long id;
-    bool isfixed;
-    char padding;
-    double initial_value;
-    while (file.good()) {
-    	// read fields
-        file.read((char *)&id, 8);
-        file.read((char *)&padding, 1);
-        if (!file.read((char *)&initial_value, 8)) break;
-        // convert endian
-        id = bswap_64(id);
-        isfixed = padding;
-        long long tmp = bswap_64(*(uint64_t *)&initial_value);
-        initial_value = *(double *)&tmp;
-        // load into factor graph
-        fg.weights[fg.c_nweight] = dd::Weight(id, initial_value, isfixed);
-		fg.c_nweight++;
-		count++;
 
-        // printf("WEIGHT: id=%lli isfixed=%d initial=%f\n", id, isfixed, initial_value);
+    std::ifstream fin(filename.c_str());
+
+    long wid;
+    int isfixed;
+    double initvalue;
+    long long count = 0;
+
+    while(fin >> wid >> isfixed >> initvalue){
+        fg.weights[fg.c_nweight] = dd::Weight(wid, initvalue, isfixed);
+        fg.c_nweight++;
+        count++;
+        // printf("WEIGHT: id=%lli isfixed=%d initial=%f\n", wid, isfixed, initvalue);
     }
-    file.close();
+
+    fin.close();
     return count;
 }
 
@@ -160,27 +182,6 @@ long long read_factors(string filename, dd::FactorGraph &fg)
         type = bswap_16(type);
         edge_count = bswap_64(edge_count);
         count++;
-        // if (id == 65  ||
-        //     id == 77  ||
-        //     id == 78  ||
-        //     id == 90  ||
-        //     id == 92  ||
-        //     id == 104 ||
-        //     id == 107 ||
-        //     id == 119 ||
-        //     id == 123 ||
-        //     id == 135 ||
-        //     id == 140 ||
-        //     id == 152 ||
-        //     id == 158 ||
-        //     id == 395 ||
-        //     id == 396 ||
-        //     id == 397 ||
-        //     id == 398 ||
-        //     id == 399 ||
-        //     id == 400) {
-        //     printf("FACTOR: id=%lli weightid=%lli type=%d edge_count=%lli\n", id, weightid, type, edge_count);
-        // }
         fg.factors[fg.c_nfactor] = dd::Factor(id, weightid, type, edge_count);
         fg.c_nfactor ++;
     }
