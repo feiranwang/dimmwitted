@@ -81,21 +81,19 @@ long long read_variables(string filename, dd::FactorGraph &fg)
     file.open(filename.c_str(), ios::in | ios::binary);
     long long count = 0;
     long long id;
-    bool isevidence;
-    char padding1;
+    char isevidence;
     double initial_value;
     short type;
     long long edge_count;
     long long cardinality;
     while (file.good()) {
         file.read((char *)&id, 8);
-        file.read((char *)&padding1, 1);
+        file.read((char *)&isevidence, 1);
         file.read((char *)&initial_value, 8);
         file.read((char *)&type, 2);
         file.read((char *)&edge_count, 8);
         if (!file.read((char *)&cardinality, 8)) break;
         id = bswap_64(id);
-        isevidence = padding1;
         type = bswap_16(type);
         long long tmp = bswap_64(*(uint64_t *)&initial_value);
         initial_value = *(double *)&tmp;
@@ -105,33 +103,34 @@ long long read_variables(string filename, dd::FactorGraph &fg)
         // printf("----- id=%lli isevidence=%d initial=%f type=%d edge_count=%lli cardinality=%lli\n", id, isevidence, initial_value, type, edge_count, cardinality);
 
         // add to factor graph
-        if (type == 0){
-            if (isevidence) {
-                fg.variables[fg.c_nvar] = dd::Variable(id, DTYPE_BOOLEAN, true, 0, 1, 
-                    initial_value, initial_value, edge_count);
-                fg.c_nvar++;
-                fg.n_evid++;
-            } else {
-                fg.variables[fg.c_nvar] = dd::Variable(id, DTYPE_BOOLEAN, false, 0, 1, 
-                    0, 0, edge_count);
-                fg.c_nvar++;
-                fg.n_query++;
-            }
+        int type_const;
+        int upper_bound;
+        if (type == 0) {
+            type_const = DTYPE_BOOLEAN;
+            upper_bound = 1;
         } else if (type == 1) {
-            if (isevidence) {
-                fg.variables[fg.c_nvar] = dd::Variable(id, DTYPE_MULTINOMIAL, true, 0, 
-                    cardinality-1, initial_value, initial_value, edge_count);
-                fg.c_nvar ++;
-                fg.n_evid ++;
-            } else {
-                fg.variables[fg.c_nvar] = dd::Variable(id, DTYPE_MULTINOMIAL, false, 0, 
-                    cardinality-1, 0, 0, edge_count);
-                fg.c_nvar ++;
-                fg.n_query ++;
-            }
+            type_const = DTYPE_MULTINOMIAL;
+            upper_bound = cardinality-1;
         } else {
             cout << "[ERROR] Only Boolean and Multinomial variables are supported now!" << endl;
             exit(1);
+        }
+
+        if (isevidence == 1) {
+            fg.variables[fg.c_nvar] = dd::Variable(id, type_const, true, 0, upper_bound, 
+                initial_value, initial_value, edge_count, false);
+            fg.c_nvar++;
+            fg.n_evid++;
+        } else if (isevidence == 2) {
+            fg.variables[fg.c_nvar] = dd::Variable(id, type_const, true, 0, upper_bound, 
+                initial_value, initial_value, edge_count, true);
+            fg.c_nvar++;
+            fg.n_evid++;
+        } else {
+            fg.variables[fg.c_nvar] = dd::Variable(id, type_const, false, 0, upper_bound, 
+                0, 0, edge_count, false);
+            fg.c_nvar++;
+            fg.n_query++;
         }
 
         //std::cout << "~~~~" << variable.id() << std::endl;

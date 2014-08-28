@@ -9,6 +9,7 @@ namespace dd{
     long id;
     int domain_type;
     bool is_evid;
+    bool is_observation; // the variable is observation (fixed during sampling)
     double lower_bound;
     double upper_bound;
     
@@ -32,7 +33,8 @@ namespace dd{
     Variable(const long & _id, const int & _domain_type, 
              const bool & _is_evid, const double & _lower_bound,
              const double & _upper_bound, const double & _init_value, 
-             const double & _current_value, const int & _n_factors){
+             const double & _current_value, const int & _n_factors,
+             bool is_observation){
 
       this->id = _id;
       this->domain_type = _domain_type;
@@ -43,6 +45,7 @@ namespace dd{
       this->assignment_free = _current_value;
 
       this->n_factors = _n_factors;
+      this->is_observation = is_observation;
 
       this->n_sample = 0;
       this->agg_mean = 0.0;

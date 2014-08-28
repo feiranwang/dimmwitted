@@ -67,9 +67,13 @@ namespace dd{
       
       Variable & variable = p_fg->variables[vid];
 
-      if(variable.is_evid == false){
-	return;
+      if (variable.is_observation) {
+        return;
       }
+
+ //      if(variable.is_evid == false){
+	// return;
+ //      }
 
       if(variable.domain_type == DTYPE_BOOLEAN){
 
@@ -155,6 +159,10 @@ namespace dd{
     void sample_single_variable(long vid){
 
       Variable & variable = this->p_fg->variables[vid];
+
+      if (variable.is_observation) {
+        return;
+      }
 
       if(variable.domain_type == DTYPE_BOOLEAN){
 
