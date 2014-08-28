@@ -170,7 +170,8 @@ namespace dd{
           weight_offset = weight_offset * (variables[vif.vid].upper_bound+1) + assignments[vif.vid];
         }
       }
-      return weight_offset;
+      long base_offset = &fs - factors_dups; // note c++ will auto scale by sizeof(CompactFactor)
+      return *(factors_dups_weightids + base_offset) + weight_offset;
     }
 
     void update_weight(const Variable & variable){
@@ -248,7 +249,7 @@ namespace dd{
     inline double potential(const Variable & variable, const double & proposal){
       double pot = 0.0;  
       double tmp;
-      double weight = 0.0;
+      long wid = 0;
       const CompactFactor * const fs = &factors_dups[variable.n_start_i_factors];
       const int * const ws = &factors_dups_weightids[variable.n_start_i_factors];   
       if (variable.domain_type == DTYPE_BOOLEAN) {   
@@ -266,12 +267,16 @@ namespace dd{
         for (long i = 0; i < variable.n_factors; i++) {
           if(does_change_evid == true) {
             tmp = fs[i].potential(vifs, infrs->assignments_free, variable.id, proposal);
-            weight = get_weightid(infrs->assignments_free, fs[i], variable.id, proposal);
+            wid = get_weightid(infrs->assignments_free, fs[i], variable.id, proposal);
           } else {
             tmp = fs[i].potential(vifs, infrs->assignments_evid, variable.id, proposal);
-            weight = get_weightid(infrs->assignments_evid, fs[i], variable.id, proposal);
+            wid = get_weightid(infrs->assignments_evid, fs[i], variable.id, proposal);
+            // for (int j = 0; j < n_var; j++) {
+            //   printf("%f ", infrs->assignments_evid[j]);
+            // }
+            // printf("proposal = %d, weight id = %d\n", proposal, weight);
           }
-          pot += weight * tmp;
+          pot += infrs->weight_values[wid] * tmp;
         }
       }
       return pot;
