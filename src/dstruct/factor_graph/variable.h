@@ -56,12 +56,29 @@ namespace dd{
     bool is_positive;
     double equal_to;
 
+    int dimension;
+
     VariableInFactor(){
 
     }
 
+
+    VariableInFactor(int dummy,
+                      const int & _dimension, 
+                      const long & _vid, const int & _n_position, 
+                     const bool & _is_positive){
+      //std::cout << "~~~~~" << _dimension << std::endl;
+      this->dimension = _dimension;
+      this->vid = _vid;
+      this->n_position = _n_position;
+      this->is_positive = _is_positive;
+      this->equal_to = 1.0;
+    }
+
+
     VariableInFactor(const long & _vid, const int & _n_position, 
                      const bool & _is_positive){
+      this->dimension = -1;
       this->vid = _vid;
       this->n_position = _n_position;
       this->is_positive = _is_positive;
@@ -70,6 +87,7 @@ namespace dd{
 
     VariableInFactor(const long & _vid, const int & _n_position, 
                      const bool & _is_positive, const double & _equal_to){
+      this->dimension = -1;
       this->vid = _vid;
       this->n_position = _n_position;
       this->is_positive = _is_positive;

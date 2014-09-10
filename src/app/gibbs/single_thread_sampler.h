@@ -68,7 +68,7 @@ namespace dd{
       Variable & variable = p_fg->variables[vid];
 
       if(variable.is_evid == false){
-	return;
+	      return;
       }
 
       if(variable.domain_type == DTYPE_BOOLEAN){
@@ -146,8 +146,9 @@ namespace dd{
         this->p_fg->update_weight(variable);
 
       }else{
-        std::cout << "[ERROR] Only Boolean and Multinomial variables are supported now!" << std::endl;
-        assert(false);
+        //std::cout << "[ERROR] Only Boolean and Multinomial variables are supported now!" << std::endl;
+        //assert(false);
+        return;
       }
       
     }
@@ -200,8 +201,9 @@ namespace dd{
         }
 
       }else{
-        std::cout << "[ERROR] Only Boolean and Multinomial variables are supported now!" << std::endl;
-        assert(false);
+        //std::cout << "[ERROR] Only Boolean and Multinomial variables are supported now!" << std::endl;
+        //assert(false);
+        return;
       }
 
     }

@@ -31,6 +31,11 @@ namespace dd{
       id = _id;
     }
 
+    inline double _potential_continuousLR(const VariableInFactor * const vifs,
+                                   const double * const var_values, 
+                                   const long &, const double &) const;
+
+
     inline double _potential_or(const VariableInFactor * const vifs,
                                    const double * const var_values, 
                                    const long &, const double &) const;
@@ -70,8 +75,15 @@ namespace dd{
         return _potential_equal(vifs, var_values, vid, proposal);     
       } else if (func_id == 5) {
         return _potential_multinomial(vifs, var_values, vid, proposal);
-      }
-      else{
+      }else if(func_id == 10){ // SQLSELECT
+        assert(false);
+        return 0.0;
+        //return _potential_sqlselect(vifs, var_values, vid, proposal);   
+      }else if(func_id == 20){ // YUKE -- ContinuousLR
+        assert(false);
+        //return _potential_continuousLR(vifs, var_values, vid, proposal);  
+        return 0.0;
+      }else{
         std::cout << "Unsupported Factor Function ID= " << func_id << std::endl;
         assert(false);
       }

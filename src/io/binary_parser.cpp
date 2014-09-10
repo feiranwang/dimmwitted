@@ -129,7 +129,23 @@ long long read_variables(string filename, dd::FactorGraph &fg)
                 fg.c_nvar ++;
                 fg.n_query ++;
             }
-        } else {
+        } else if (type == 3){
+            //assert(false);
+            //std::cout << id << " -> " << initial_value << std::endl;
+            if (isevidence) {
+                fg.variables[fg.c_nvar] = dd::Variable(id, DTYPE_REAL, true, 0, cardinality, 
+                    initial_value, initial_value, edge_count);
+                fg.c_nvar++;
+                fg.n_evid++;
+            }else{
+                fg.variables[fg.c_nvar] = dd::Variable(id, DTYPE_REAL, true, 0, cardinality, 
+                    initial_value, initial_value, edge_count);
+                fg.c_nvar++;
+                fg.n_evid++;         
+                //cout << "[ERROR] Only Boolean and Multinomial variables are supported now!" << endl;
+                //exit(1);  
+            }
+        }else {
             cout << "[ERROR] Only Boolean and Multinomial variables are supported now!" << endl;
             exit(1);
         }
@@ -198,10 +214,11 @@ long long read_edges(string filename, dd::FactorGraph &fg)
         // std::cout << "vid " << variable_id << std::endl;        
         // std::cout << "fid " << factor_id << std::endl;
 
-        if (fg.variables[variable_id].domain_type == DTYPE_BOOLEAN) {
+        if (fg.variables[variable_id].domain_type == DTYPE_BOOLEAN || fg.variables[variable_id].domain_type == DTYPE_REAL) {
         //     std::cout << "-" << std::endl;
             fg.factors[factor_id].tmp_variables.push_back(
-                dd::VariableInFactor(variable_id, position, ispositive));
+                //dd::VariableInFactor(variable_id, position, ispositive));
+                dd::VariableInFactor(0, fg.variables[variable_id].upper_bound, variable_id, position, ispositive));
         //     std::cout << "--" << std::endl;
         } else {
         //     std::cout << "+" << std::endl;
