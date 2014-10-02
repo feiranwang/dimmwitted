@@ -11,5 +11,6 @@ long long read_weights(string filename, dd::FactorGraph &);
 long long read_variables(string filename, dd::FactorGraph &);
 long long read_factors(string filename, dd::FactorGraph &);
 long long read_edges(string filename, dd::FactorGraph &);
+void read_weightmap(string filename, dd::FactorGraph &);
 
 #endif

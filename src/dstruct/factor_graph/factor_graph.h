@@ -2,6 +2,7 @@
 #include "dstruct/factor_graph/factor_graph.pb.h"
 #include "io/cmd_parser.h"
 #include "common.h"
+#include <unordered_map>
 
 #include "dstruct/factor_graph/variable.h"
 #include "dstruct/factor_graph/factor.h"
@@ -88,6 +89,9 @@ namespace dd{
     int * const factors_dups_weightids;
     long * const factor_ids;
     VariableInFactor * const vifs;
+    // std::unordered_map<std::string, int> weightmap;
+    std::map<long, long> weightmap;
+
 
     long n_var;
     long n_factor;
@@ -160,28 +164,54 @@ namespace dd{
       }
     }
 
+    // /*
+    //  * For multinomial weights, given a factor and variable assignment,
+    //  * return corresponding weight id
+    //  */
+    // long get_weightid(const double *assignments, const CompactFactor& fs, long vid, long proposal) {
+    //   long weight_offset = 0;
+    //   for (long i = fs.n_start_i_vif; i < fs.n_start_i_vif + fs.n_variables; i++) {
+    //     const VariableInFactor & vif = vifs[i];
+    //     if (vif.equal_to >= 0) continue;
+    //     if (vif.vid == vid) {
+    //       weight_offset = weight_offset * (variables[vif.vid].cardinality) + proposal;
+    //     } else {
+    //       weight_offset = weight_offset * (variables[vif.vid].cardinality) + assignments[vif.vid];
+    //       // printf("assignment = %f, ", assignments[vif.vid]);
+    //     }
+    //     // printf("cardinality = %d\n", variables[vif.vid].cardinality);
+    //   }
+    //   long base_offset = &fs - factors_dups; // note c++ will auto scale by sizeof(CompactFactor)
+    //   long wid = *(factors_dups_weightids + base_offset) + weight_offset;
+    //   // if (wid > 86708) printf("wid = %li\n", wid);
+    //   // if (wid > 86708) printf("weight offset = %li, weight id = %li\n", weight_offset, wid);
+    //   return wid;
+    // }
+
     /*
      * For multinomial weights, given a factor and variable assignment,
      * return corresponding weight id
      */
     long get_weightid(const double *assignments, const CompactFactor& fs, long vid, long proposal) {
-      long weight_offset = 0;
+      long weight_offset_key = 0;
       for (long i = fs.n_start_i_vif; i < fs.n_start_i_vif + fs.n_variables; i++) {
         const VariableInFactor & vif = vifs[i];
         if (vif.equal_to >= 0) continue;
         if (vif.vid == vid) {
-          weight_offset = weight_offset * (variables[vif.vid].cardinality) + proposal;
+          weight_offset_key = weight_offset_key * (variables[vif.vid].cardinality) + proposal;
         } else {
-          weight_offset = weight_offset * (variables[vif.vid].cardinality) + assignments[vif.vid];
-          // printf("assignment = %f, ", assignments[vif.vid]);
+          weight_offset_key = weight_offset_key * (variables[vif.vid].cardinality) + assignments[vif.vid];
         }
-        // printf("cardinality = %d\n", variables[vif.vid].cardinality);
       }
+      long weight_offset;
+      if (this->weightmap.count(weight_offset_key) == 1) // "other"
+        weight_offset = this->weightmap[weight_offset_key];
+      else 
+        weight_offset = this->weightmap[-1];
+      // printf("key = %ld, weight offset = %ld\n", weight_offset_key, weight_offset);
       long base_offset = &fs - factors_dups; // note c++ will auto scale by sizeof(CompactFactor)
       long wid = *(factors_dups_weightids + base_offset) + weight_offset;
-      // printf("wid = %li\n", wid);
-      // printf("base offset = %li, weight id = %li\n", base_offset, wid);
-      return *(factors_dups_weightids + base_offset) + weight_offset;
+      return wid;
     }
 
     void update_weight(const Variable & variable){
@@ -206,17 +236,6 @@ namespace dd{
           // std::cout << infrs->assignments_evid[variable.id] << ' ' << infrs->assignments_free[variable.id] << endl;
 
           if(infrs->weights_isfixed[wid1] == false){
-            // if (wid1 == 41991) {
-            //   printf("vid = %li, fid = %li, wid1 = %li, weight = %f, assign_evid = %f, assign_free = %f, potential1 = %f, potential2 = %f\n",
-            //     variable.id,
-            //     fs[i].id,
-            //     wid1, 
-            //     infrs->weight_values[wid1], 
-            //     infrs->assignments_evid[variable.id],
-            //     infrs->assignments_free[variable.id],
-            //     this->template potential<false>(fs[i]),
-            //     this->template potential<true>(fs[i]));
-            // }
             infrs->weight_values[wid1] += 
               stepsize * (this->template potential<false>(fs[i]) - equal * this->template potential<true>(fs[i]));
             
@@ -225,16 +244,6 @@ namespace dd{
           }
 
           if(wid1 != wid2 && infrs->weights_isfixed[wid2] == false){
-            // if (wid2 == 41991) {
-            //   printf("fid = %li, wid2 = %li, weight = %f, assign_evid = %f, assign_free = %f, potential1 = %f, potential2 = %f\n", 
-            //     fs[i].id,
-            //     wid2, 
-            //     infrs->weight_values[wid2], 
-            //     infrs->assignments_evid[variable.id],
-            //     infrs->assignments_free[variable.id],
-            //     this->template potential<false>(fs[i]),
-            //     this->template potential<true>(fs[i]));
-            // }
             infrs->weight_values[wid2] += 
               stepsize * (equal * this->template potential<false>(fs[i]) - this->template potential<true>(fs[i]));
 

@@ -18,6 +18,7 @@ void dd::FactorGraph::load(const CmdParser & cmd){
   std::string variable_file = cmd.variable_file->getValue();
   std::string factor_file = cmd.factor_file->getValue();
   std::string edge_file = cmd.edge_file->getValue();
+  std::string weightmap_file = cmd.weightmap_file->getValue();
 
   std::string filename_edges = edge_file;
   std::string filename_factors = factor_file;
@@ -45,6 +46,10 @@ void dd::FactorGraph::load(const CmdParser & cmd){
   //n_loaded = dd::stream_load_pb<deepdive::GraphEdge, dd::FactorGraph, handle_edge>(filename_edges, *this);
   n_loaded = read_edges(edge_file, *this);
   std::cout << "LOADED EDGES: #" << n_loaded << std::endl;
+
+  if (weightmap_file != "") {
+    read_weightmap(weightmap_file, *this);
+  }
 
   this->safety_check();
 

@@ -56,6 +56,8 @@ void gibbs(dd::CmdParser & cmd_parser){
 
   std::string output_folder = cmd_parser.output_folder->getValue();
 
+  std::string weightmap_file = cmd_parser.weightmap_file->getValue();
+
   int n_learning_epoch = cmd_parser.n_learning_epoch->getValue();
   int n_samples_per_learning_epoch = cmd_parser.n_samples_per_learning_epoch->getValue();
   int n_inference_epoch = cmd_parser.n_inference_epoch->getValue();

@@ -111,27 +111,6 @@ namespace dd{
   private:
 
     void sample_sgd_single_variable(long vid){
-
-      // if (vid == 317 ||
-      //     vid == 328 ||
-      //     vid == 340 ||
-      //     vid == 353 ||
-      //     vid == 367 ||
-      //     vid == 382 ||
-      //     vid == 398 ||
-      //     vid == 415 ||
-      //     vid == 262 ||
-      //     vid == 263 ||
-      //     vid == 265 ||
-      //     vid == 268 ||
-      //     vid == 272 ||
-      //     vid == 277 ||
-      //     vid == 283 ||
-      //     vid == 290 ||
-      //     vid == 298 ||
-      //     vid == 307 ) {
-      //   printf("\nVID = %li, VALUE = %f", vid, p_fg->infrs->assignments_free[vid]);
-      // }
       
       
       Variable & variable = p_fg->variables[vid];

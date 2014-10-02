@@ -42,58 +42,58 @@ Meta read_meta(string meta_file)
 	return meta;
 }
 
-// // Read weights and load into factor graph
-// long long read_weights(string filename, dd::FactorGraph &fg)
-// {
-// 	ifstream file;
-//     file.open(filename.c_str(), ios::in | ios::binary);
-//     long long count = 0;
-//     long long id;
-//     bool isfixed;
-//     char padding;
-//     double initial_value;
-//     while (file.good()) {
-//     	// read fields
-//         file.read((char *)&id, 8);
-//         file.read((char *)&padding, 1);
-//         if (!file.read((char *)&initial_value, 8)) break;
-//         // convert endian
-//         id = bswap_64(id);
-//         isfixed = padding;
-//         long long tmp = bswap_64(*(uint64_t *)&initial_value);
-//         initial_value = *(double *)&tmp;
-//         // load into factor graph
-//         fg.weights[fg.c_nweight] = dd::Weight(id, initial_value, isfixed);
-// 		fg.c_nweight++;
-// 		count++;
-
-//         printf("WEIGHT: id=%lli isfixed=%d initial=%f\n", id, isfixed, initial_value);
-//     }
-//     file.close();
-//     return count;
-// }
-
 // Read weights and load into factor graph
 long long read_weights(string filename, dd::FactorGraph &fg)
 {
-
-    std::ifstream fin(filename.c_str());
-
-    long wid;
-    int isfixed;
-    double initvalue;
+	ifstream file;
+    file.open(filename.c_str(), ios::in | ios::binary);
     long long count = 0;
+    long long id;
+    bool isfixed;
+    char padding;
+    double initial_value;
+    while (file.good()) {
+    	// read fields
+        file.read((char *)&id, 8);
+        file.read((char *)&padding, 1);
+        if (!file.read((char *)&initial_value, 8)) break;
+        // convert endian
+        id = bswap_64(id);
+        isfixed = padding;
+        long long tmp = bswap_64(*(uint64_t *)&initial_value);
+        initial_value = *(double *)&tmp;
+        // load into factor graph
+        fg.weights[fg.c_nweight] = dd::Weight(id, initial_value, isfixed);
+		fg.c_nweight++;
+		count++;
 
-    while(fin >> wid >> isfixed >> initvalue){
-        fg.weights[fg.c_nweight] = dd::Weight(wid, initvalue, isfixed);
-        fg.c_nweight++;
-        count++;
-        // printf("WEIGHT: id=%lli isfixed=%d initial=%f\n", wid, isfixed, initvalue);
+        // printf("WEIGHT: id=%lli isfixed=%d initial=%f\n", id, isfixed, initial_value);
     }
-
-    fin.close();
+    file.close();
     return count;
 }
+
+// // Read weights and load into factor graph
+// long long read_weights(string filename, dd::FactorGraph &fg)
+// {
+
+//     std::ifstream fin(filename.c_str());
+
+//     long wid;
+//     int isfixed;
+//     double initvalue;
+//     long long count = 0;
+
+//     while(fin >> wid >> isfixed >> initvalue){
+//         fg.weights[fg.c_nweight] = dd::Weight(wid, initvalue, isfixed);
+//         fg.c_nweight++;
+//         count++;
+//         // printf("WEIGHT: id=%lli isfixed=%d initial=%f\n", wid, isfixed, initvalue);
+//     }
+
+//     fin.close();
+//     return count;
+// }
 
 
 // Read variables
@@ -131,7 +131,7 @@ long long read_variables(string filename, dd::FactorGraph &fg)
         if (type == 0){
             if (isevidence) {
                 fg.variables[fg.c_nvar] = dd::Variable(id, DTYPE_BOOLEAN, true, 0, 1, 
-                    initial_value, initial_value, edge_count, edge_count & 0x1, 2); // edge_count == -2 indicates fixed...
+                    initial_value, initial_value, edge_count, edge_count & 0x1, 2); // edge_count & 0x1 == 1 indicates fixed...
                 fg.c_nvar++;
                 fg.n_evid++;
             } else {
@@ -184,6 +184,7 @@ long long read_factors(string filename, dd::FactorGraph &fg)
         count++;
         fg.factors[fg.c_nfactor] = dd::Factor(id, weightid, type, edge_count);
         fg.c_nfactor ++;
+        // printf("FACTOR id = %ld wid = %ld\n", id, weightid);
     }
     file.close();
     return count;
@@ -215,9 +216,7 @@ long long read_edges(string filename, dd::FactorGraph &fg)
         ispositive = padding;
         equal_predicate = bswap_64(equal_predicate);
         count++;
-        // if (variable_id == 328) {
-        //     printf("EDGE: varid=%lli, factorid=%lli, position=%lli, predicate=%lli\n", variable_id, factor_id, position, equal_predicate);
-        // }
+        // printf("EDGE: varid=%lli, factorid=%lli, position=%lli, predicate=%lli\n", variable_id, factor_id, position, equal_predicate);
         // std::cout << "vid " << variable_id << std::endl;        
         // std::cout << "fid " << factor_id << std::endl;
 
@@ -239,3 +238,46 @@ long long read_edges(string filename, dd::FactorGraph &fg)
     return count;   
 }
 
+// // read weight map file
+// void read_weightmap(string filename, dd::FactorGraph &fg) {
+//     ifstream file;
+//     file.open(filename.c_str());
+//     string line;
+//     // #vars, bounds
+//     geline(file, line);
+//     // counts
+//     gelint(file, line);
+//     long key, value;
+//     while(file >> key >> line) {
+//         string cardinalityStr;
+//         string field;
+//         istringstream ss(line);
+
+//         // cardinality string
+//         getline(ss, cardinalityStr, field_delim);
+
+//         // weight id offset
+//         getline(ss, field, field_delim);
+//         long wid = atol(field.c_str());
+        
+//         fg.weightmap[cardinalityStr] = wid;
+
+//         printf("cardinalityStr = %s, wid = %li\n", cardinalityStr.c_str(), wid);
+//     }
+// }
+
+// read weight map file
+void read_weightmap(string filename, dd::FactorGraph &fg) {
+    ifstream file;
+    file.open(filename.c_str());
+    string line;
+    // #vars, bounds
+    getline(file, line);
+    // counts
+    getline(file, line);
+    long key, value;
+    while(file >> key >> value) {
+        fg.weightmap[key] = value;
+        cout << "key = " << key << " value = " << value << endl;
+    }
+}
