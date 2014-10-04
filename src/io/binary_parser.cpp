@@ -278,6 +278,6 @@ void read_weightmap(string filename, dd::FactorGraph &fg) {
     long key, value;
     while(file >> key >> value) {
         fg.weightmap[key] = value;
-        cout << "key = " << key << " value = " << value << endl;
+        // cout << "key = " << key << " value = " << value << endl;
     }
 }

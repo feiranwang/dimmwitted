@@ -149,6 +149,9 @@ namespace dd{
       memcpy(factors_dups, p_other_fg->factors_dups, sizeof(CompactFactor)*n_edge);
       memcpy(factors_dups_weightids, p_other_fg->factors_dups_weightids, sizeof(int)*n_edge);
 
+      // p_other_fg->weightmap.insert(weightmap.begin(), weightmap.end());
+      weightmap = p_other_fg->weightmap;
+
       c_nvar = p_other_fg->c_nvar;
       c_nfactor = p_other_fg->c_nfactor;
       c_nweight = p_other_fg->c_nweight;
@@ -204,10 +207,12 @@ namespace dd{
         }
       }
       long weight_offset;
-      if (this->weightmap.count(weight_offset_key) == 1) // "other"
-        weight_offset = this->weightmap[weight_offset_key];
-      else 
-        weight_offset = this->weightmap[-1];
+      std::map<long, long>::iterator it = this->weightmap.find(weight_offset_key);
+      if (it == this->weightmap.end()) { // "other"
+        weight_offset = this->weightmap.find(-1)->second;
+      } else { 
+        weight_offset = it->second;
+      }
       // printf("key = %ld, weight offset = %ld\n", weight_offset_key, weight_offset);
       long base_offset = &fs - factors_dups; // note c++ will auto scale by sizeof(CompactFactor)
       long wid = *(factors_dups_weightids + base_offset) + weight_offset;
