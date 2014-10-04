@@ -209,7 +209,7 @@ namespace dd{
           // sample without evidence unfixed, I1, with variable assigment d1 
           // gradient of wd0 = f(I0) - I(d0==d1)f(I1)
           // gradient of wd1 = I(d0==d1)f(I0) - f(I1)
-          if(fs[i].func_id != 20){
+          if(fs[i].func_id == 5){
             long wid1 = get_weightid(infrs->assignments_evid, fs[i], -1, -1);
             long wid2 = get_weightid(infrs->assignments_free, fs[i], -1, -1);
             int equal = infrs->assignments_evid[variable.id] == infrs->assignments_free[variable.id];
@@ -223,7 +223,13 @@ namespace dd{
               infrs->weight_values[wid2] += 
                 stepsize * (equal * this->template potential<false>(fs[i]) - this->template potential<true>(fs[i]));
             }
-          }else{
+          } else if (fs[i].func_id != 20) {
+            if (infrs->weights_isfixed[ws[i]] == false) {
+              infrs->weight_values[ws[i]] += 
+                  stepsize * (this->template potential<false>(fs[i]) - this->template potential<true>(fs[i]));
+            }
+          }
+          else{
 
             const int & dimension = vifs[fs[i].n_start_i_vif].dimension;
             const long & cvid = vifs[fs[i].n_start_i_vif].vid;
@@ -342,19 +348,24 @@ namespace dd{
         }
       } else if (variable.domain_type == DTYPE_MULTINOMIAL) {
         for (long i = 0; i < variable.n_factors; i++) {
-          if(fs[i].func_id != 20){
+          if (fs[i].func_id == 5) {
             if(does_change_evid == true) {
               tmp = fs[i].potential(vifs, infrs->assignments_free, variable.id, proposal);
               wid = get_weightid(infrs->assignments_free, fs[i], variable.id, proposal);
             } else {
               tmp = fs[i].potential(vifs, infrs->assignments_evid, variable.id, proposal);
               wid = get_weightid(infrs->assignments_evid, fs[i], variable.id, proposal);
-              // for (int j = 0; j < n_var; j++) {
-              //   printf("%f ", infrs->assignments_evid[j]);
-              // }
-              // printf("proposal = %d, weight id = %d\n", proposal, weight);
             }
             pot += infrs->weight_values[wid] * tmp;
+          }
+          else if(fs[i].func_id != 20){
+            if(does_change_evid == true){
+              tmp = fs[i].potential(vifs, infrs->assignments_free, variable.id, proposal);
+            }else{
+              tmp = fs[i].potential(vifs, infrs->assignments_evid, variable.id, proposal);
+            }
+            pot += infrs->weight_values[ws[i]] * tmp;
+            // printf("wid = %d\n", ws[i]);
           }else{
 
             tmp = 0.0;
