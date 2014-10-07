@@ -53,30 +53,30 @@ void dd::FactorGraph::load(const CmdParser & cmd){
 }
 
 void dd::FactorGraph::finalize_loading(){
-  std::cout << "Start Sorting Variables... nvar=" << n_var << std::endl;
-  std::sort(&variables[0], &variables[n_var], idsorter<Variable>());
-  std::cout << "Start Sorting Factors... nfac=" << n_factor << std::endl;
-  std::sort(&factors[0], &factors[n_factor], idsorter<Factor>());
-  std::cout << "Start Sorting Weights... nvar=" << n_weight << std::endl;
-  std::sort(&weights[0], &weights[n_weight], idsorter<Weight>()); 
-  this->loading_finalized = true;
-  std::cout << "Start Init Results... " << std::endl;
-  infrs->init(variables, weights);
-}
+  std::cout << "Start Sort// // ing Variables... nvar=" << n_var << std::endl;
+// //   std::sort(&variables[0], &variables[n_var], idsorter<Variable>());
+// //   std::cout << "Start Sorting Factors... nfac=" << n_factor << std::endl;
+// //   std::sort(&factors[0], &factors[n_factor], idsorter<Factor>());
+// //   std::cout << "Start Sorting Weights... nvar=" << n_weight << std::endl;
+// //   std::sort(&weights[0], &weights[n_weight], idsorter<Weight>()); 
+// //   this->loading_finalized = true;
+// //   std::cout << "Start Init Results... " << std::endl;
+// //   infrs->init(variables, weights);
+// // }
 
-void dd::FactorGraph::safety_check(){
+// // void dd::FactorGraph::safety_check(){
 
-  c_edge = 0;
-  for(long i=0;i<n_factor;i++){
-    Factor & factor = factors[i];
-    factor.n_start_i_vif = c_edge;
-    for(const VariableInFactor & vif : factor.tmp_variables){
-      vifs[c_edge] = vif;
-      c_edge ++;
-    }
-  }
+// //   c_edge = 0;
+// //   for(long i=0;i<n_factor;i++){
+// //     Factor & factor = factors[i];
+// //     factor.n_start_i_vif = c_edge;
+// //     for(const VariableInFactor & vif : factor.tmp_variables){
+// //       vifs[c_edge] = vif;
+// //       c_edge ++;
+// //     }
+// //   }
 
-  c_edge = 0;
+// //   c_edge = 0;
   long ntallies = 0;
   for(long i=0;i<n_var;i++){
     Variable & variable = variables[i];

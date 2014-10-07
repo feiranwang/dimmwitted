@@ -194,9 +194,9 @@ long long read_edges(string filename, dd::FactorGraph &fg)
     bool ispositive;
     char padding;
     long long equal_predicate;
-    // cout << "start loading edges..." << endl;
+    cout << "start loading edges..." << endl;
     while (file.good()) {
-        //cout << "reading edge file..." << endl;
+      //cout << "reading edge file..." << endl;
 	file.read((char *)&variable_id, 8);
         file.read((char *)&factor_id, 8);
         file.read((char *)&position, 8);
@@ -214,6 +214,18 @@ long long read_edges(string filename, dd::FactorGraph &fg)
         // std::cout << "vid " << variable_id << std::endl;        
         // std::cout << "fid " << factor_id << std::endl;
 
+
+	if(variable_id >= fg.n_var || variable_id < 0){
+	  //std::cout << "wrong fid = " << factor_id << std::endl;
+	  assert(false);
+	}
+
+	if(factor_id >= fg.n_factor || factor_id < 0){
+	  std::cout << "wrong fid = " << factor_id << std::endl;
+	  assert(false);
+	}
+
+
         if (fg.variables[variable_id].domain_type == DTYPE_BOOLEAN || fg.variables[variable_id].domain_type == DTYPE_REAL) {
         //     std::cout << "-" << std::endl;
             fg.factors[factor_id].tmp_variables.push_back(
@@ -228,7 +240,13 @@ long long read_edges(string filename, dd::FactorGraph &fg)
         // std::cout << "---" << std::endl;
         fg.variables[variable_id].tmp_factor_ids.push_back(factor_id);
         // std::cout << "~~~~~~~" << std::endl;
+	
+	//if(fg.factors[factor_id].weight_id == 12974744 && fg.variables[variable_id].is_evid == true){
+        //    std::cout << "~~~~~" << variable_id << " " << fg.variables[variable_id].assignment_evid << std::endl;
+        //}
+
     }
+    std::cout << "finish reading edges..." << std::endl;
     file.close();
     return count;   
 }
