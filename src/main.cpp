@@ -64,6 +64,7 @@ void gibbs(dd::CmdParser & cmd_parser){
   double stepsize2 = cmd_parser.stepsize2->getValue();
   if (stepsize == 0.01) stepsize = stepsize2;
   double decay = cmd_parser.decay->getValue();
+  double l2lambda = cmd_parser.l2lambda->getValue();
 
   std::cout << std::endl;
   std::cout << "#################MACHINE CONFIG#################" << std::endl;
@@ -114,7 +115,7 @@ void gibbs(dd::CmdParser & cmd_parser){
   int numa_aware_n_learning_epoch = (int)(n_learning_epoch/n_numa_node) + 
                             (n_learning_epoch%n_numa_node==0?0:1);
 
-  gibbs.learn(numa_aware_n_learning_epoch, n_samples_per_learning_epoch, stepsize, decay);
+  gibbs.learn(numa_aware_n_learning_epoch, n_samples_per_learning_epoch, stepsize, decay, l2lambda);
   gibbs.dump_weights();
 
   int numa_aware_n_epoch = (int)(n_inference_epoch/n_numa_node) + 
