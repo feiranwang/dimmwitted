@@ -32,6 +32,7 @@ namespace dd{
     TCLAP::ValueArg<double> * stepsize;
     TCLAP::ValueArg<double> * stepsize2;
     TCLAP::ValueArg<double> * decay;
+    TCLAP::ValueArg<double> * reg_param;
 
     // number of factor graph copies (one copy for one numa node)
     TCLAP::ValueArg<int> * n_datacopy;
@@ -62,6 +63,7 @@ namespace dd{
         stepsize = new TCLAP::ValueArg<double>("a","alpha","Stepsize",false,0.01,"double");
         stepsize2 = new TCLAP::ValueArg<double>("p","stepsize","Stepsize",false,0.01,"double");
         decay = new TCLAP::ValueArg<double>("d","diminish","Decay of stepsize per epoch",false,0.95,"double");
+        reg_param = new TCLAP::ValueArg<double>("b","reg_param","l2 regularization parameter",false,0.01,"double");
 
         n_thread = new TCLAP::ValueArg<int>("t","threads","This setting is no longer supported and will be ignored.",false,-1,"int");
         n_datacopy = new TCLAP::ValueArg<int>("c","n_datacopy","Number of data copies",false,-1,"int");
@@ -86,6 +88,7 @@ namespace dd{
         cmd->add(*n_thread);
         cmd->add(*n_datacopy);
         cmd->add(*quiet);
+        cmd->add(*reg_param);
       }else{
         std::cout << "ERROR: UNKNOWN APP NAME " << app_name << std::endl;
         std::cout << "AVAILABLE APP {gibbs}" << app_name << std::endl;

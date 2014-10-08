@@ -34,7 +34,7 @@ namespace dd{
     void dump_weights(bool is_quiet);
 
     void learn(const int & n_epoch, const int & n_sample_per_epoch, 
-      const double & stepsize, const double & decay, bool is_quiet);
+      const double & stepsize, const double & decay, const double reg_param, bool is_quiet);
 
   };
 }
