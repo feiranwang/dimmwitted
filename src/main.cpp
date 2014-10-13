@@ -3,6 +3,7 @@
 #include <iostream>
 #include "common.h"
 #include <unistd.h>
+#include <fstream>
 
 #include "io/cmd_parser.h"
 #include "io/pb_parser.h"
@@ -104,6 +105,20 @@ void gibbs(dd::CmdParser & cmd_parser){
   // std::cout << "# nedge              : " << meta.numedges() << std::endl;
   // std::cout << "################################################" << std::endl;
 
+  std::cout << "Loading regularization parameters..." << std::endl;
+  double * weight_reg = new double [meta.num_weights];
+  for(int i=0;i<meta.num_weights;i++){
+    weight_reg[i] = 0.0;
+  }
+  std::ifstream fin( (weight_file + ".regs").c_str() );
+  int wid;
+  double reg;
+  int c = 0;
+  while(fin >> wid >> reg){
+    weight_reg[wid] = reg;
+    c++;
+  }
+  std::cout << "Loaded " << c << " regularization parameters..." << std::endl;
 
   numa_run_on_node(0);
   numa_set_localalloc();
@@ -115,7 +130,7 @@ void gibbs(dd::CmdParser & cmd_parser){
   int numa_aware_n_learning_epoch = (int)(n_learning_epoch/n_numa_node) + 
                             (n_learning_epoch%n_numa_node==0?0:1);
 
-  gibbs.learn(numa_aware_n_learning_epoch, n_samples_per_learning_epoch, stepsize, decay, l2lambda);
+  gibbs.learn(numa_aware_n_learning_epoch, n_samples_per_learning_epoch, stepsize, decay, l2lambda, weight_reg);
   gibbs.dump_weights();
 
   int numa_aware_n_epoch = (int)(n_inference_epoch/n_numa_node) + 
