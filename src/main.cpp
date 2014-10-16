@@ -59,6 +59,7 @@ void gibbs(dd::CmdParser & cmd_parser){
   int n_learning_epoch = cmd_parser.n_learning_epoch->getValue();
   int n_samples_per_learning_epoch = cmd_parser.n_samples_per_learning_epoch->getValue();
   int n_inference_epoch = cmd_parser.n_inference_epoch->getValue();
+  int n_datacopy = cmd_parser.n_datacopy->getValue();
 
   double stepsize = cmd_parser.stepsize->getValue();
   double stepsize2 = cmd_parser.stepsize2->getValue();
@@ -109,7 +110,7 @@ void gibbs(dd::CmdParser & cmd_parser){
   // dd::FactorGraph fg(meta.numvariables(), meta.numfactors(), meta.numweights(), meta.numedges());
   dd::FactorGraph fg(meta.num_variables, meta.num_factors, meta.num_weights, meta.num_edges);
   fg.load(cmd_parser);
-  dd::GibbsSampling gibbs(&fg, &cmd_parser);
+  dd::GibbsSampling gibbs(&fg, &cmd_parser, n_datacopy);
 
   int numa_aware_n_learning_epoch = (int)(n_learning_epoch/n_numa_node) + 
                             (n_learning_epoch%n_numa_node==0?0:1);

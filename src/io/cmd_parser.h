@@ -33,6 +33,9 @@ namespace dd{
     TCLAP::ValueArg<double> * stepsize2;
     TCLAP::ValueArg<double> * decay;
 
+    // number of factor graph copies (one copy for one numa node)
+    TCLAP::ValueArg<int> * n_datacopy;
+
     TCLAP::CmdLine * cmd;
 
     CmdParser(std::string _app_name){
@@ -58,6 +61,7 @@ namespace dd{
         decay = new TCLAP::ValueArg<double>("d","diminish","Decay of stepsize per epoch",false,0.95,"double");
 
         n_thread = new TCLAP::ValueArg<int>("t","threads","This setting is no longer supported and will be ignored.",false,-1,"int");
+        n_datacopy = new TCLAP::ValueArg<int>("c","n_datacopy","Number of data copies",false,-1,"int");
 
         cmd->add(*fg_file);
         
@@ -75,6 +79,7 @@ namespace dd{
         cmd->add(*stepsize2);
         cmd->add(*decay);
         cmd->add(*n_thread);
+        cmd->add(*n_datacopy);
       }else{
         std::cout << "ERROR: UNKNOWN APP NAME " << app_name << std::endl;
         std::cout << "AVAILABLE APP {gibbs}" << app_name << std::endl;
