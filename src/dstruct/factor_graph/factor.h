@@ -55,7 +55,10 @@ namespace dd{
                                    const long &, const double &) const;
 
     inline double _potential_tree(const VariableInFactor * const vifs, 
-    const double * const var_values, const long &, const double &) const;
+      const double * const var_values, const long &, const double &) const;
+
+    inline double _potential_parentlabel(const VariableInFactor * const vifs, 
+      const double * const var_values, const long &, const double &) const;
 
     inline double potential(const VariableInFactor * const vifs,
       const double * const var_values,
@@ -75,7 +78,9 @@ namespace dd{
         return _potential_multinomial(vifs, var_values, vid, proposal);
       } else if (func_id == 6) {
         return _potential_tree(vifs, var_values, vid, proposal);
-      } else{
+      } else if (func_id == 7) {
+        return _potential_parentlabel(vifs, var_values, vid, proposal);
+      } else {
         std::cout << "Unsupported Factor Function ID= " << func_id << std::endl;
         assert(false);
       }
@@ -113,8 +118,42 @@ namespace dd{
  
   };
 
+  // parser: factor for enforcing parent label consistency
+  // variables: root label, left child's parent label, right child's parent label, tree pointer
+  // return 1 if this subtree is active and (left child's parent label != root label 
+  // or right child's parent label != root)
+  inline double dd::CompactFactor::_potential_parentlabel(const VariableInFactor * vifs, 
+    const double * var_values, const long & vid, const double & proposal) const {
+    int sum = 0;
+    // pointer
+    const VariableInFactor& vifn = vifs[n_start_i_vif + n_variables - 1];
+    if (vifn.vid == vid) {
+      sum += (proposal == vifn.equal_to);
+    } else {
+      sum += (var_values[vifn.vid] == vifn.equal_to);
+    }
+    // active
+    if (sum != 0) {
+      sum = 0;
+      const VariableInFactor& vif0 = vifs[n_start_i_vif];
+      // check whether the variables between equal to the first variable
+      for (long i_vif = n_start_i_vif + 1; i_vif < n_start_i_vif + n_variables - 1; i_vif++) {
+        const VariableInFactor& vif = vifs[i_vif];
+        if (vif.vid == vid) {
+          sum += 1 - (proposal == var_values[vif0.vid]);
+        } else {
+          sum += 1 - (var_values[vif.vid] == var_values[vif0.vid]);
+        }
+      }
+    }
+
+    return sum != 0 ? 1.0 : 0.0;
+  }
 
   // parser: factor for enforcing tree structure
+  // input: pointer, pointers of all potential parents
+  // return 1 if the first pointer is active but no parents are active
+  // or the first pointer is inactive and exists parents that are active
   inline double dd::CompactFactor::_potential_tree(const VariableInFactor * vifs, 
     const double * var_values, const long & vid, const double & proposal) const {
     int sum = 0;

@@ -186,8 +186,6 @@ namespace dd{
     //   }
     //   long base_offset = &fs - factors_dups; // note c++ will auto scale by sizeof(CompactFactor)
     //   long wid = *(factors_dups_weightids + base_offset) + weight_offset;
-    //   // if (wid > 86708) printf("wid = %li\n", wid);
-    //   // if (wid > 86708) printf("weight offset = %li, weight id = %li\n", weight_offset, wid);
     //   return wid;
     // }
 
