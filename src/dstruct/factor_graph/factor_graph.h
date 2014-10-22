@@ -193,7 +193,7 @@ namespace dd{
      * For multinomial weights, given a factor and variable assignment,
      * return corresponding weight id
      */
-    long get_weightid(const double *assignments, const CompactFactor& fs, long vid, long proposal) {
+    long get_weightid(const double *assignments, const CompactFactor& fs, long vid, long proposal, int func_id) {
       long weight_offset_key = 0;
       for (long i = fs.n_start_i_vif; i < fs.n_start_i_vif + fs.n_variables; i++) {
         const VariableInFactor & vif = vifs[i];
@@ -205,11 +205,15 @@ namespace dd{
         }
       }
       long weight_offset;
-      std::map<long, long>::iterator it = this->weightmap.find(weight_offset_key);
-      if (it == this->weightmap.end()) { // "other"
-        weight_offset = this->weightmap.find(-1)->second;
-      } else { 
-        weight_offset = it->second;
+      if (func_id == 5) {
+        weight_offset = weight_offset_key;
+      } else {
+        std::map<long, long>::iterator it = this->weightmap.find(weight_offset_key);
+        if (it == this->weightmap.end()) { // "other"
+          weight_offset = this->weightmap.find(-1)->second;
+        } else { 
+          weight_offset = it->second;
+        }
       }
       // printf("key = %ld, weight offset = %ld\n", weight_offset_key, weight_offset);
       long base_offset = &fs - factors_dups; // note c++ will auto scale by sizeof(CompactFactor)
@@ -221,38 +225,37 @@ namespace dd{
       const CompactFactor * const fs = factors_dups + variable.n_start_i_factors;
       const int * const ws = factors_dups_weightids + variable.n_start_i_factors;
       for(long i=0;i<variable.n_factors;i++){
-        if (fs[i].func_id != 5) {
+        if (fs[i].func_id != 5 && fs[i].func_id != 8) {
           if(infrs->weights_isfixed[ws[i]] == false){
             infrs->weight_values[ws[i]] += 
               stepsize * (this->template potential<false>(fs[i]) - this->template potential<true>(fs[i]));
           }
-        } else if (fs[i].func_id == 5) {
+        } else if (fs[i].func_id == 5 || fs[i].func_id == 8) {
           // two weights need to be updated
           // sample with evidence fixed, I0, with variable assignment d0
           // sample without evidence unfixed, I1, with variable assigment d1 
           // gradient of wd0 = f(I0) - I(d0==d1)f(I1)
           // gradient of wd1 = I(d0==d1)f(I0) - f(I1)
-          long wid1 = get_weightid(infrs->assignments_evid, fs[i], -1, -1);
-          long wid2 = get_weightid(infrs->assignments_free, fs[i], -1, -1);
+          long wid1 = get_weightid(infrs->assignments_evid, fs[i], -1, -1, fs[i].func_id);
+          long wid2 = get_weightid(infrs->assignments_free, fs[i], -1, -1, fs[i].func_id);
           int equal = infrs->assignments_evid[variable.id] == infrs->assignments_free[variable.id];
           // std::cout << wid1 << ' ' << wid2 << std::endl;
           // std::cout << infrs->assignments_evid[variable.id] << ' ' << infrs->assignments_free[variable.id] << endl;
 
+          // if (wid1 == 3 || wid2 == 3) {
+          //   printf("wid1 = %d wid2 = %d vid = %d, evid = %f, free = %f\n", wid1, wid2, variable.id, 
+          //     infrs->assignments_evid[variable.id], infrs->assignments_free[variable.id]);
+          // }
+
           if(infrs->weights_isfixed[wid1] == false){
             infrs->weight_values[wid1] += 
               stepsize * (this->template potential<false>(fs[i]) - equal * this->template potential<true>(fs[i]));
-            
-            //infrs->weight_values[wid1] *= (1.0/(1.0+0.01*stepsize));
 
           }
 
           if(wid1 != wid2 && infrs->weights_isfixed[wid2] == false){
             infrs->weight_values[wid2] += 
               stepsize * (equal * this->template potential<false>(fs[i]) - this->template potential<true>(fs[i]));
-
-            // std::cout << infrs->weight_values[wid2] << std::endl;
-
-            //infrs->weight_values[wid2] *= (1.0/(1.0+0.01*stepsize));
           }
         }
       }
@@ -315,17 +318,17 @@ namespace dd{
         } else {
           tmp = fs[i].potential(vifs, infrs->assignments_evid, variable.id, proposal);
         }
-        if (fs[i].func_id == 5) {
+        if (fs[i].func_id == 5 || fs[i].func_id == 8) {
           if(does_change_evid) {
-            wid = get_weightid(infrs->assignments_free, fs[i], variable.id, proposal);
+            wid = get_weightid(infrs->assignments_free, fs[i], variable.id, proposal, fs[i].func_id);
           } else {
-            wid = get_weightid(infrs->assignments_evid, fs[i], variable.id, proposal);
+            wid = get_weightid(infrs->assignments_evid, fs[i], variable.id, proposal, fs[i].func_id);
           }
         } else {
           wid = ws[i];
         }
         pot += infrs->weight_values[wid] * tmp;
-        // if (variable.id == 328) {
+        // if (variable.id == 0) {
         //   printf("variable id = %li, proposal = %f, factor id = %li, weight id = %li, weight = %f, potential = %f\n", 
         //     variable.id, proposal, fs[i].id, wid, infrs->weight_values[wid], tmp);
         // }

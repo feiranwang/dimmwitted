@@ -74,11 +74,11 @@ namespace dd{
         return _potential_and(vifs, var_values, vid, proposal);   
       }else if(func_id == 3){ // EQUAL
         return _potential_equal(vifs, var_values, vid, proposal);     
-      } else if (func_id == 5) {
+      } else if (func_id == 5 || func_id == 8) { // multinomial
         return _potential_multinomial(vifs, var_values, vid, proposal);
-      } else if (func_id == 6) {
+      } else if (func_id == 6) { // tree constraint
         return _potential_tree(vifs, var_values, vid, proposal);
-      } else if (func_id == 7) {
+      } else if (func_id == 7) { // parent label constraint
         return _potential_parentlabel(vifs, var_values, vid, proposal);
       } else {
         std::cout << "Unsupported Factor Function ID= " << func_id << std::endl;
@@ -124,30 +124,68 @@ namespace dd{
   // or right child's parent label != root)
   inline double dd::CompactFactor::_potential_parentlabel(const VariableInFactor * vifs, 
     const double * var_values, const long & vid, const double & proposal) const {
+    int val = 0;
+    int active = 0;
     int sum = 0;
-    // pointer
-    const VariableInFactor& vifn = vifs[n_start_i_vif + n_variables - 1];
-    if (vifn.vid == vid) {
-      sum += (proposal == vifn.equal_to);
-    } else {
-      sum += (var_values[vifn.vid] == vifn.equal_to);
-    }
-    // active
-    if (sum != 0) {
-      sum = 0;
-      const VariableInFactor& vif0 = vifs[n_start_i_vif];
-      // check whether the variables between equal to the first variable
-      for (long i_vif = n_start_i_vif + 1; i_vif < n_start_i_vif + n_variables - 1; i_vif++) {
-        const VariableInFactor& vif = vifs[i_vif];
+
+    // check active, get the value of one other variable
+    for (long i_vif = n_start_i_vif; i_vif < n_start_i_vif + n_variables; i_vif++) {
+      const VariableInFactor & vif = vifs[i_vif]; 
+      if (vif.n_position == n_variables - 1) {
         if (vif.vid == vid) {
-          sum += 1 - (proposal == var_values[vif0.vid]);
+          active = (proposal == vif.equal_to);
         } else {
-          sum += 1 - (var_values[vif.vid] == var_values[vif0.vid]);
+          active = (var_values[vif.vid] == vif.equal_to);
+        }
+      } else {
+        if (vif.vid == vid) {
+          val = proposal;
+        } else {
+          val = var_values[vif.vid];
+        }
+        break;
+      }
+    }
+
+    if (!active) return 0.0;
+
+    // check equality
+    for (long i_vif = n_start_i_vif; i_vif < n_start_i_vif + n_variables; i_vif++) {
+      const VariableInFactor & vif = vifs[i_vif]; 
+      if (vif.n_position != n_variables - 1) {
+        if (vif.vid == vid) {
+          sum += (proposal != val);
+        } else {
+          sum += (var_values[vif.vid] != val);
         }
       }
     }
 
     return sum != 0 ? 1.0 : 0.0;
+
+    // // pointer
+    // const VariableInFactor& vifn = vifs[n_start_i_vif + n_variables - 1];
+    // if (vifn.vid == vid) {
+    //   sum += (proposal == vifn.equal_to);
+    // } else {
+    //   sum += (var_values[vifn.vid] == vifn.equal_to);
+    // }
+    // // active
+    // if (sum != 0) {
+    //   sum = 0;
+    //   const VariableInFactor& vif0 = vifs[n_start_i_vif];
+    //   // check whether the variables between equal to the first variable
+    //   for (long i_vif = n_start_i_vif + 1; i_vif < n_start_i_vif + n_variables - 1; i_vif++) {
+    //     const VariableInFactor& vif = vifs[i_vif];
+    //     if (vif.vid == vid) {
+    //       sum += 1 - (proposal == var_values[vif0.vid]);
+    //     } else {
+    //       sum += 1 - (var_values[vif.vid] == var_values[vif0.vid]);
+    //     }
+    //   }
+    // }
+
+    // return sum != 0 ? 1.0 : 0.0;
   }
 
   // parser: factor for enforcing tree structure

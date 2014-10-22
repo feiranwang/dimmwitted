@@ -64,48 +64,6 @@ namespace dd{
           this->sample_sgd_single_variable(i);
       }
 
-      // for(long i = 0; i < p_fg->n_factor; i++){
-      //   p_fg->factors[i].is_sampled = false;
-      // }
-
-      // for(long i = 0; i < p_fg->n_weight; i++){
-      //   p_fg->infrs->weights_isupdated[i] = false;
-      // }
-
-      // for(long i = 0; i < p_fg->n_edge; i++){
-      //   const CompactFactor & f = p_fg->factors_dups[i];
-      //   // if (p_fg->factors[f.id].is_sampled == true)
-      //   //   continue;
-      //   // if(p_fg->factors[f.id].is_sampled == true){
-      //   //   std::cout << "skip f.id = " << f.id << "  edgeid = " << i << std::endl;
-      //   //   continue;
-      //   // }
-
-      //   long wid1 = p_fg->get_weightid(p_fg->infrs->assignments_evid, f, -1, -1);
-      //   long wid2 = p_fg->get_weightid(p_fg->infrs->assignments_free, f, -1, -1);
-
-      //   int equal = (wid1 == wid2);
-
-      //   if(p_fg->infrs->weights_isupdated[wid1] == false && p_fg->infrs->weights_isfixed[wid1] == false){
-      //     p_fg->infrs->weight_values[wid1] += 
-      //         p_fg->stepsize * (p_fg->template potential<false>(f) - equal * p_fg->template potential<true>(f));
-      //     p_fg->infrs->weights_isupdated[wid1] = true;
-      //   }
-
-      //   if(wid1 != wid2 && p_fg->infrs->weights_isupdated[wid2] == false && p_fg->infrs->weights_isfixed[wid2] == false){
-      //       p_fg->infrs->weight_values[wid2] += 
-      //         p_fg->stepsize * (equal * p_fg->template potential<false>(f) - p_fg->template potential<true>(f));
-      //       p_fg->infrs->weights_isupdated[wid2] = true;
-      //   }
-
-      //   // p_fg->factors[f.id].is_sampled = true;
-
-      //   // std::cout << "WID " << wid1 << " = " << p_fg->infrs->weight_values[wid1] << std::endl;
-      //   // std::cout << "WID " << wid2 << " = " << p_fg->infrs->weight_values[wid2] << std::endl;
-      //   // std::cout << "####" << std::endl;
-      // }
-
-
     }
 
   private:
@@ -183,7 +141,7 @@ namespace dd{
           varlen_potential_buffer[propose] = p_fg->template potential<true>(variable, propose);
           //printf("potential2 = %f\n", varlen_potential_buffer[propose]);
           sum = logadd(sum, varlen_potential_buffer[propose]);
-          // if (variable.id == 328) {
+          // if (variable.id == 0) {
           //   printf("propose = %d   potential2 = %f   sum = %f\n", propose, varlen_potential_buffer[propose], sum);
           // }
         }
@@ -194,7 +152,7 @@ namespace dd{
         for(int propose=0;propose <= variable.upper_bound; propose++){
           acc += exp(varlen_potential_buffer[propose]-sum);
           
-          // if (variable.id == 328) {
+          // if (variable.id == 0) {
           //   printf("propose = %d   potential2 = %f   sum = %f   acc = %f   rand = %f\n", propose, varlen_potential_buffer[propose], sum, acc, *this->p_rand_obj_buf);
           // }
 
