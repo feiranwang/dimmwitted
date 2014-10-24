@@ -15,9 +15,9 @@
  * for Gibbs, NN, SGD etc. However, this is the task of next pass
  * of refactoring.
  */
-void dd::GibbsSampling::prepare(){
+void dd::GibbsSampling::prepare(int n_datacopy){
 
-  n_numa_nodes = numa_max_node();
+  n_numa_nodes = n_datacopy < 0 ? numa_max_node() : n_datacopy;
   //n_numa_nodes = 0;
   n_thread_per_numa = (sysconf(_SC_NPROCESSORS_CONF))/(n_numa_nodes+1);
   //n_thread_per_numa /= 2;
