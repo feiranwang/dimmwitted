@@ -71,9 +71,9 @@ namespace dd{
         return;
       }
 
- //      if(variable.is_evid == false){
-	// return;
- //      }
+      if(variable.is_evid == false){
+        return;
+      }
 
       if(variable.domain_type == DTYPE_BOOLEAN){
 
