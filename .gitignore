@@ -2,6 +2,7 @@
 *.slo
 *.lo
 *.o
+dw
 
 # Compiled Dynamic libraries
 *.so
@@ -13,5 +14,6 @@
 *.a
 
 # others
-*/.DS_Store
 data3/
+lib/
+.DS_Store
