@@ -17,8 +17,8 @@
  */
 void dd::GibbsSampling::prepare(){
 
-  //n_numa_nodes = numa_max_node();
-  n_numa_nodes = 0;
+  n_numa_nodes = numa_max_node();
+  //n_numa_nodes = 0;
   n_thread_per_numa = (sysconf(_SC_NPROCESSORS_CONF))/(n_numa_nodes+1);
   //n_thread_per_numa /= 2;
   //if(n_thread_per_numa == 0){
