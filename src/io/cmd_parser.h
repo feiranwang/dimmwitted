@@ -22,6 +22,7 @@ namespace dd{
     TCLAP::ValueArg<std::string> * variable_file;
     TCLAP::ValueArg<std::string> * factor_file;
     TCLAP::ValueArg<std::string> * output_folder;
+    TCLAP::ValueArg<std::string> * reuse_file;
 
     TCLAP::ValueArg<int> * n_learning_epoch;
     TCLAP::ValueArg<int> * n_samples_per_learning_epoch;
@@ -49,7 +50,8 @@ namespace dd{
         variable_file = new TCLAP::ValueArg<std::string>("v","variables","variables file",true,"","string"); 
         factor_file = new TCLAP::ValueArg<std::string>("f","factors","factors file",true,"","string"); 
         output_folder = new TCLAP::ValueArg<std::string>("o","outputFile","Output Folder",true,"","string");
-        
+        reuse_file = new TCLAP::ValueArg<std::string>("r","reuseWeight","Path to Weightfile to Reuse",false,"","string");
+
         n_learning_epoch = new TCLAP::ValueArg<int>("l","n_learning_epoch","Number of Learning Epochs",true,-1,"int");
         n_samples_per_learning_epoch = new TCLAP::ValueArg<int>("s","n_samples_per_learning_epoch","Number of Samples per Leraning Epoch",true,-1,"int");
         n_inference_epoch = new TCLAP::ValueArg<int>("i","n_inference_epoch","Number of Samples for Inference",true,-1,"int");
@@ -68,6 +70,7 @@ namespace dd{
         cmd->add(*variable_file);
         cmd->add(*factor_file);
         cmd->add(*output_folder);
+        cmd->add(*reuse_file);
 
         cmd->add(*n_learning_epoch);
         cmd->add(*n_samples_per_learning_epoch);

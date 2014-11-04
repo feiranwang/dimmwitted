@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <fstream>
 #include "io/binary_parser.h"
 #include "dstruct/factor_graph/factor_graph.h"
 
@@ -18,11 +19,13 @@ void dd::FactorGraph::load(const CmdParser & cmd){
   std::string variable_file = cmd.variable_file->getValue();
   std::string factor_file = cmd.factor_file->getValue();
   std::string edge_file = cmd.edge_file->getValue();
+  std::string reuse_file = cmd.reuse_file->getValue();
 
   std::string filename_edges = edge_file;
   std::string filename_factors = factor_file;
   std::string filename_variables = variable_file;
   std::string filename_weights = weight_file;
+  std::string filename_reuse_file = reuse_file;
 
   // long long n_loaded = dd::stream_load_pb<deepdive::Variable, dd::FactorGraph, handle_variable>(filename_variables, *this);
   long long n_loaded = read_variables(filename_variables, *this);
@@ -40,6 +43,25 @@ void dd::FactorGraph::load(const CmdParser & cmd){
   assert(n_loaded == n_weight);
   std::cout << "LOADED WEIGHTS: #" << n_loaded << std::endl;
 
+
+  std::sort(&variables[0], &variables[n_var], idsorter<Variable>());
+  std::sort(&factors[0], &factors[n_factor], idsorter<Factor>());
+  std::sort(&weights[0], &weights[n_weight], idsorter<Weight>()); 
+
+  if(filename_reuse_file != ""){
+    std::cout << "START LOADING REUSABLE WEIGHT" << std::endl;
+    std::ifstream fin(filename_reuse_file);
+    int fid;
+    double value;
+    int ct = 0;
+    while(fin >> fid >> value){
+      weights[fid].weight = value;
+      weights[fid].isfixed = true;
+      ct ++;
+    }
+    std::cout << "    | " << ct << " old weights loaded!" << std::endl;
+  }
+
   this->finalize_loading();
 
   //n_loaded = dd::stream_load_pb<deepdive::GraphEdge, dd::FactorGraph, handle_edge>(filename_edges, *this);
@@ -53,9 +75,6 @@ void dd::FactorGraph::load(const CmdParser & cmd){
 }
 
 void dd::FactorGraph::finalize_loading(){
-  std::sort(&variables[0], &variables[n_var], idsorter<Variable>());
-  std::sort(&factors[0], &factors[n_factor], idsorter<Factor>());
-  std::sort(&weights[0], &weights[n_weight], idsorter<Weight>()); 
   this->loading_finalized = true;
   
   infrs->init(variables, weights);
