@@ -298,7 +298,7 @@ namespace dd{
     }
   
     template<bool does_change_evid>
-    inline void update(Variable & variable, const double & new_value);
+    inline void update(Variable & variable, const double & new_value, bool does_tally );
 
     template<bool does_change_evid>
     inline double potential(const Variable & variable, const double & proposal){
@@ -317,6 +317,10 @@ namespace dd{
               tmp = fs[i].potential(
                   vifs, infrs->assignments_evid, variable.id, proposal);
             }
+            //if(variable.id == 0){
+            //  std::cout << "weight-id " << ws[i] << " value = " << infrs->weight_values[ws[i]] << std::endl;
+            //  std::cout << "   potential tmp = " << tmp << std::endl;
+            //}
             pot += infrs->weight_values[ws[i]] * tmp;
           }else{
             tmp = 0.0;
@@ -410,17 +414,22 @@ namespace dd{
   };
 
   template<>
-  inline void FactorGraph::update<true>(Variable & variable, const double & new_value){
+  inline void FactorGraph::update<true>(Variable & variable, const double & new_value, bool does_tally ){
     infrs->assignments_free[variable.id] = new_value;
   }
 
   template<>
-  inline void FactorGraph::update<false>(Variable & variable, const double & new_value){
+  inline void FactorGraph::update<false>(Variable & variable, const double & new_value, bool does_tally ){
     infrs->assignments_evid[variable.id] = new_value;
-    infrs->agg_means[variable.id] += new_value;
-    infrs->agg_nsamples[variable.id]  ++ ;
-    if(variable.domain_type == DTYPE_MULTINOMIAL){
-      infrs->multinomial_tallies[variable.n_start_i_tally + (int)(new_value)] ++;
+
+    if(does_tally){
+      //std::cout << variable.id << " -> " << infrs->agg_means[variable.id] 
+      //          << "  " <<  infrs->agg_nsamples[variable.id] << std::endl;
+      infrs->agg_means[variable.id] += new_value;
+      infrs->agg_nsamples[variable.id]  ++ ;
+      if(variable.domain_type == DTYPE_MULTINOMIAL){
+        infrs->multinomial_tallies[variable.n_start_i_tally + (int)(new_value)] ++;
+      }
     }
   }
 

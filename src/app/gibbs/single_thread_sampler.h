@@ -79,9 +79,9 @@ namespace dd{
             potential_neg = p_fg->template potential<false>(variable, 0);
             *this->p_rand_obj_buf = erand48(this->p_rand_seed);
             if((*this->p_rand_obj_buf) * (1.0 + exp(potential_neg-potential_pos)) < 1.0){
-              p_fg->template update<false>(variable, 1.0);
+              p_fg->template update<false>(variable, 1.0, false);
             }else{
-              p_fg->template update<false>(variable, 0.0);
+              p_fg->template update<false>(variable, 0.0, false);
             }
           }
 
@@ -90,9 +90,9 @@ namespace dd{
 
           *this->p_rand_obj_buf = erand48(this->p_rand_seed);
           if((*this->p_rand_obj_buf) * (1.0 + exp(potential_neg_freeevid-potential_pos_freeevid)) < 1.0){
-            p_fg->template update<true>(variable, 1.0);
+            p_fg->template update<true>(variable, 1.0, false);
           }else{
-            p_fg->template update<true>(variable, 0.0);
+            p_fg->template update<true>(variable, 0.0, false);
           }
 
           this->p_fg->update_weight(variable);
@@ -121,7 +121,7 @@ namespace dd{
             }
           }
           assert(multi_proposal != -1.0);
-          p_fg->template update<false>(variable, multi_proposal);
+          p_fg->template update<false>(variable, multi_proposal, false);
         }
 
         sum = -100000.0;
@@ -141,7 +141,7 @@ namespace dd{
           }
         }
         assert(multi_proposal != -1.0);
-        p_fg->template update<true>(variable, multi_proposal);
+        p_fg->template update<true>(variable, multi_proposal, false);
 
         this->p_fg->update_weight(variable);
 
@@ -164,11 +164,15 @@ namespace dd{
           potential_pos = p_fg->template potential<false>(variable, 1);
           potential_neg = p_fg->template potential<false>(variable, 0);
 
+          //if(vid == 0){
+          //  std::cout << " + " << potential_pos << "  - " << potential_neg << std::endl; 
+          //}
+
           *this->p_rand_obj_buf = erand48(this->p_rand_seed);
           if((*this->p_rand_obj_buf) * (1.0 + exp(potential_neg-potential_pos)) < 1.0){
-            p_fg->template update<false>(variable, 1.0);
+            p_fg->template update<false>(variable, 1.0, true);
           }else{
-            p_fg->template update<false>(variable, 0.0);
+            p_fg->template update<false>(variable, 0.0, true);
           }
 
         }
@@ -197,7 +201,7 @@ namespace dd{
             }
           }
           assert(multi_proposal != -1.0);
-          p_fg->template update<false>(variable, multi_proposal);
+          p_fg->template update<false>(variable, multi_proposal, true);
         }
 
       }else{

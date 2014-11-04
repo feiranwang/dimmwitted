@@ -61,6 +61,19 @@ void dd::GibbsSampling::inference(const int & n_epoch){
     single_node_samplers[i].clear_variabletally();
   }
 
+  std::cout << "Clear non-evidence Variable Assignment to LowerBound..." << std::endl;
+  for(int i=0;i<=n_numa_nodes;i++){
+    FactorGraph & cfg = factorgraphs[i];
+    for(long i=0;i<factorgraphs[0].n_var;i++){
+      Variable & variable = factorgraphs[0].variables[i];
+      if(variable.is_evid != true){
+      //  variable.assignment_free = variable.lower_bound;
+        cfg.infrs->assignments_free[variable.id] = variable.lower_bound;
+        cfg.infrs->assignments_evid[variable.id] = variable.lower_bound;      
+      }
+    }
+  }
+
   for(int i_epoch=0;i_epoch<n_epoch;i_epoch++){
 
     std::cout << std::setprecision(2) << "INFERENCE EPOCH " << i_epoch * nnode <<  "~" 
