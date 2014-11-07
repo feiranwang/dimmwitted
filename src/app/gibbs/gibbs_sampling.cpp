@@ -67,6 +67,11 @@ void dd::GibbsSampling::inference(const int & n_epoch, int does_mat){
       "/QA.domain";
     std::ofstream fout(filename_qa_domain);
     fout << factorgraphs[0].n_var << std::endl;
+    for(long i=0;i<factorgraphs[0].n_var;i++){
+      Variable & variable = factorgraphs[0].variables[i];
+      fout << (variable.upper_bound - variable.lower_bound) << std::endl;
+    }
+    fout.close();
   }
 
   std::cout << "Clear non-evidence Variable Assignment to LowerBound..." << std::endl;
@@ -79,13 +84,9 @@ void dd::GibbsSampling::inference(const int & n_epoch, int does_mat){
         cfg.infrs->assignments_free[variable.id] = variable.lower_bound;
         cfg.infrs->assignments_evid[variable.id] = variable.lower_bound;      
       }
-      if(ii == 0){
-        fout << (variable.upper_bound - variable.lower_bound) << std::endl;
-      }
     }
   }
-  fout.close();
-
+  
   for(int i_epoch=0;i_epoch<n_epoch;i_epoch++){
 
     std::cout << std::setprecision(2) << "INFERENCE EPOCH " << i_epoch * nnode <<  "~" 
