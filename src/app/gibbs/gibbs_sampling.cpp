@@ -61,9 +61,14 @@ void dd::GibbsSampling::inference(const int & n_epoch){
     single_node_samplers[i].clear_variabletally();
   }
 
+  std::string filename_qa_domain = p_cmd_parser->output_folder->getValue() + 
+    "/QA.domain";
+  std::ofstream fout(filename_qa_domain);
+  fout << factorgraphs[0].n_var << std::endl;
+
   std::cout << "Clear non-evidence Variable Assignment to LowerBound..." << std::endl;
-  for(int i=0;i<=n_numa_nodes;i++){
-    FactorGraph & cfg = factorgraphs[i];
+  for(int ii=0;ii<=n_numa_nodes;ii++){
+    FactorGraph & cfg = factorgraphs[ii];
     for(long i=0;i<factorgraphs[0].n_var;i++){
       Variable & variable = factorgraphs[0].variables[i];
       if(variable.is_evid != true){
@@ -71,8 +76,12 @@ void dd::GibbsSampling::inference(const int & n_epoch){
         cfg.infrs->assignments_free[variable.id] = variable.lower_bound;
         cfg.infrs->assignments_evid[variable.id] = variable.lower_bound;      
       }
+      if(ii == 0){
+        fout << (variable.upper_bound - variable.lower_bound) << std::endl;
+      }
     }
   }
+  fout.close();
 
   for(int i_epoch=0;i_epoch<n_epoch;i_epoch++){
 
@@ -91,6 +100,16 @@ void dd::GibbsSampling::inference(const int & n_epoch){
     double elapsed = t.elapsed();
     std::cout << ""  << elapsed << " sec." ;
     std::cout << ","  << (nvar*nnode)/elapsed << " vars/sec" << std::endl;
+  
+
+    std::string filename_qa_epoch = p_cmd_parser->output_folder->getValue() + 
+      "/QA.epoch." + std::to_string(i_epoch);
+    std::ofstream fout1(filename_qa_epoch);
+    FactorGraph & cfg = factorgraphs[0];
+    for(long i=0;i<factorgraphs[0].n_var;i++){
+      fout1 << (cfg.infrs->assignments_free[i] ) << std::endl;
+    }
+    fout1.close();
   }
 
   double elapsed = t_total.elapsed();
