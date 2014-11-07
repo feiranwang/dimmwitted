@@ -27,7 +27,7 @@ namespace dd{
 
     void prepare();
 
-    void inference(const int & n_epoch);
+    void inference(const int & n_epoch, int does_mat);
 
     void dump();
 

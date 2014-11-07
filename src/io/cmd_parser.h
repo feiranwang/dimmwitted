@@ -35,6 +35,8 @@ namespace dd{
     TCLAP::ValueArg<double> * decay;
     TCLAP::ValueArg<double> * l2lambda;
 
+    TCLAP::ValueArg<int> * does_mat;
+
     TCLAP::CmdLine * cmd;
 
     CmdParser(std::string _app_name){
@@ -51,6 +53,8 @@ namespace dd{
         factor_file = new TCLAP::ValueArg<std::string>("f","factors","factors file",true,"","string"); 
         output_folder = new TCLAP::ValueArg<std::string>("o","outputFile","Output Folder",true,"","string");
         reuse_file = new TCLAP::ValueArg<std::string>("r","reuseWeight","Path to Weightfile to Reuse",false,"","string");
+
+        does_mat = new TCLAP::ValueArg<int>("q","materialize","Materialize for Query Answering",false,0,"int");
 
         n_learning_epoch = new TCLAP::ValueArg<int>("l","n_learning_epoch","Number of Learning Epochs",true,-1,"int");
         n_samples_per_learning_epoch = new TCLAP::ValueArg<int>("s","n_samples_per_learning_epoch","Number of Samples per Leraning Epoch",true,-1,"int");
@@ -71,6 +75,8 @@ namespace dd{
         cmd->add(*factor_file);
         cmd->add(*output_folder);
         cmd->add(*reuse_file);
+
+        cmd->add(*does_mat);
 
         cmd->add(*n_learning_epoch);
         cmd->add(*n_samples_per_learning_epoch);

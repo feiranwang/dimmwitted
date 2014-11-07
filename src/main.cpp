@@ -136,7 +136,7 @@ void gibbs(dd::CmdParser & cmd_parser){
   int numa_aware_n_epoch = (int)(n_inference_epoch/n_numa_node) + 
                             (n_inference_epoch%n_numa_node==0?0:1);
 
-  gibbs.inference(numa_aware_n_epoch);
+  gibbs.inference(numa_aware_n_epoch, cmd_parser.does_mat->getValue());
   gibbs.dump();
 
 }

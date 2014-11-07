@@ -43,7 +43,7 @@ void dd::GibbsSampling::prepare(){
 
 }
 
-void dd::GibbsSampling::inference(const int & n_epoch){
+void dd::GibbsSampling::inference(const int & n_epoch, int does_mat){
 
   Timer t_total;
 
@@ -61,10 +61,13 @@ void dd::GibbsSampling::inference(const int & n_epoch){
     single_node_samplers[i].clear_variabletally();
   }
 
-  std::string filename_qa_domain = p_cmd_parser->output_folder->getValue() + 
-    "/QA.domain";
-  std::ofstream fout(filename_qa_domain);
-  fout << factorgraphs[0].n_var << std::endl;
+  if(does_mat == 1){
+    std::cout << "!!!Run Inference with Materialization!!!" << std::endl; 
+    std::string filename_qa_domain = p_cmd_parser->output_folder->getValue() + 
+      "/QA.domain";
+    std::ofstream fout(filename_qa_domain);
+    fout << factorgraphs[0].n_var << std::endl;
+  }
 
   std::cout << "Clear non-evidence Variable Assignment to LowerBound..." << std::endl;
   for(int ii=0;ii<=n_numa_nodes;ii++){
@@ -101,15 +104,16 @@ void dd::GibbsSampling::inference(const int & n_epoch){
     std::cout << ""  << elapsed << " sec." ;
     std::cout << ","  << (nvar*nnode)/elapsed << " vars/sec" << std::endl;
   
-
-    std::string filename_qa_epoch = p_cmd_parser->output_folder->getValue() + 
-      "/QA.epoch." + std::to_string(i_epoch);
-    std::ofstream fout1(filename_qa_epoch);
-    FactorGraph & cfg = factorgraphs[0];
-    for(long i=0;i<factorgraphs[0].n_var;i++){
-      fout1 << (cfg.infrs->assignments_free[i] ) << std::endl;
+    if(does_mat == 1){
+      std::string filename_qa_epoch = p_cmd_parser->output_folder->getValue() + 
+        "/QA.epoch." + std::to_string(i_epoch);
+      std::ofstream fout1(filename_qa_epoch);
+      FactorGraph & cfg = factorgraphs[0];
+      for(long i=0;i<factorgraphs[0].n_var;i++){
+        fout1 << (cfg.infrs->assignments_free[i] ) << std::endl;
+      }
+      fout1.close();
     }
-    fout1.close();
   }
 
   double elapsed = t_total.elapsed();
