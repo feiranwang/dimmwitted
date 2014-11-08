@@ -117,7 +117,7 @@ void dd::GibbsSampling::inference(const int & n_epoch, int does_mat){
       FILE *fp;
       fp=fopen(filename_qa_epoch.c_str(), "wb");
       FactorGraph & cfg = factorgraphs[0];
-      const double * const pass = &cfg.infrs->assignments_free[0]; 
+      const double * const pass = &cfg.infrs->assignments_evid[0]; 
       const int nvar = factorgraphs[0].n_var;
       for(long i=0;i<nvar;i++){
         fwrite(&pass[i], sizeof(double), 1, fp);

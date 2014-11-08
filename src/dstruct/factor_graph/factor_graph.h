@@ -414,12 +414,12 @@ namespace dd{
   };
 
   template<>
-  inline void FactorGraph::update<true>(Variable & variable, const double & new_value, bool does_tally ){
+  inline void FactorGraph::update<true>(Variable & variable, const double & new_value, bool does_tally){
     infrs->assignments_free[variable.id] = new_value;
   }
 
   template<>
-  inline void FactorGraph::update<false>(Variable & variable, const double & new_value, bool does_tally ){
+  inline void FactorGraph::update<false>(Variable & variable, const double & new_value, bool does_tally){
     infrs->assignments_evid[variable.id] = new_value;
 
     if(does_tally){
