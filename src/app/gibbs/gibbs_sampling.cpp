@@ -62,16 +62,21 @@ void dd::GibbsSampling::inference(const int & n_epoch, int does_mat){
   }
 
   if(does_mat == 1){
-    std::cout << "!!!Run Inference with Materialization!!!" << std::endl; 
+    std::cout << "!!!Run Inference with Materialization (binary version)!!!" << std::endl; 
     std::string filename_qa_domain = p_cmd_parser->output_folder->getValue() + 
       "/QA.domain";
-    std::ofstream fout(filename_qa_domain);
-    fout << factorgraphs[0].n_var << std::endl;
-    for(long i=0;i<factorgraphs[0].n_var;i++){
+    FILE *fp2;
+    fp2=fopen(filename_qa_domain.c_str(), "wb");
+    FactorGraph & cfg = factorgraphs[0];
+    const int nvar = factorgraphs[0].n_var;
+    fwrite(&nvar, sizeof(int), 1, fp2);
+    double dddd;
+    for(long i=0;i<nvar;i++){
       Variable & variable = factorgraphs[0].variables[i];
-      fout << (variable.upper_bound - variable.lower_bound) << std::endl;
+      dddd = variable.upper_bound - variable.lower_bound;
+      fwrite(&dddd, sizeof(double), 1, fp2);
     }
-    fout.close();
+    fclose(fp2);
   }
 
   std::cout << "Clear non-evidence Variable Assignment to LowerBound..." << std::endl;
@@ -108,12 +113,25 @@ void dd::GibbsSampling::inference(const int & n_epoch, int does_mat){
     if(does_mat == 1){
       std::string filename_qa_epoch = p_cmd_parser->output_folder->getValue() + 
         "/QA.epoch." + std::to_string(i_epoch);
+      
+      FILE *fp;
+      fp=fopen(filename_qa_epoch.c_str(), "wb");
+      FactorGraph & cfg = factorgraphs[0];
+      const double * const pass = &cfg.infrs->assignments_free[0]; 
+      const int nvar = factorgraphs[0].n_var;
+      for(long i=0;i<nvar;i++){
+        fwrite(&pass[i], sizeof(double), 1, fp);
+      }
+      fclose(fp);
+
+      /*
       std::ofstream fout1(filename_qa_epoch);
       FactorGraph & cfg = factorgraphs[0];
       for(long i=0;i<factorgraphs[0].n_var;i++){
         fout1 << (cfg.infrs->assignments_free[i] ) << std::endl;
       }
       fout1.close();
+      */
     }
   }
 
