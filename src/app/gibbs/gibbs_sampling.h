@@ -20,21 +20,21 @@ namespace dd{
 
     std::vector<FactorGraph> factorgraphs;
 
-    GibbsSampling(FactorGraph * const _p_fg, CmdParser * const _p_cmd_parser, int n_datacopy) 
+    GibbsSampling(FactorGraph * const _p_fg, CmdParser * const _p_cmd_parser, int n_datacopy, bool is_quiet) 
       : p_fg(_p_fg), p_cmd_parser(_p_cmd_parser){
-      prepare(n_datacopy);
+      prepare(n_datacopy, is_quiet);
     }
 
-    void prepare(int n_datacopy);
+    void prepare(int n_datacopy, bool is_quiet);
 
-    void inference(const int & n_epoch);
+    void inference(const int & n_epoch, bool is_quiet);
 
-    void dump();
+    void dump(bool is_quiet);
 
-    void dump_weights();
+    void dump_weights(bool is_quiet);
 
     void learn(const int & n_epoch, const int & n_sample_per_epoch, 
-      const double & stepsize, const double & decay);
+      const double & stepsize, const double & decay, bool is_quiet);
 
   };
 }

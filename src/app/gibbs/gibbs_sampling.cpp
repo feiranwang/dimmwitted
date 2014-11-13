@@ -15,7 +15,7 @@
  * for Gibbs, NN, SGD etc. However, this is the task of next pass
  * of refactoring.
  */
-void dd::GibbsSampling::prepare(int n_datacopy){
+void dd::GibbsSampling::prepare(int n_datacopy, bool is_quiet){
 
   n_numa_nodes = n_datacopy < 0 ? numa_max_node() : n_datacopy;
   //n_numa_nodes = 0;
@@ -32,7 +32,9 @@ void dd::GibbsSampling::prepare(int n_datacopy){
     numa_run_on_node(i);
     numa_set_localalloc();
 
-    std::cout << "CREATE FG ON NODE ..." <<  i << std::endl;
+    if (!is_quiet) {
+      std::cout << "CREATE FG ON NODE ..." <<  i << std::endl;
+    }
     dd::FactorGraph fg(p_fg->n_var, p_fg->n_factor, p_fg->n_weight, p_fg->n_edge);
     
     fg.copy_from(p_fg);
@@ -43,7 +45,7 @@ void dd::GibbsSampling::prepare(int n_datacopy){
 
 }
 
-void dd::GibbsSampling::inference(const int & n_epoch){
+void dd::GibbsSampling::inference(const int & n_epoch, const bool is_quiet){
 
   Timer t_total;
 
@@ -63,8 +65,10 @@ void dd::GibbsSampling::inference(const int & n_epoch){
 
   for(int i_epoch=0;i_epoch<n_epoch;i_epoch++){
 
-    std::cout << std::setprecision(2) << "INFERENCE EPOCH " << i_epoch * nnode <<  "~" 
-      << ((i_epoch+1) * nnode) << "...." << std::flush;
+    if (!is_quiet) {
+      std::cout << std::setprecision(2) << "INFERENCE EPOCH " << i_epoch * nnode <<  "~" 
+        << ((i_epoch+1) * nnode) << "...." << std::flush;
+    }
 
     t.restart();
 
@@ -76,8 +80,10 @@ void dd::GibbsSampling::inference(const int & n_epoch){
       single_node_samplers[i].wait();
     }
     double elapsed = t.elapsed();
-    std::cout << ""  << elapsed << " sec." ;
-    std::cout << ","  << (nvar*nnode)/elapsed << " vars/sec" << std::endl;
+    if (!is_quiet) {
+      std::cout << ""  << elapsed << " sec." ;
+      std::cout << ","  << (nvar*nnode)/elapsed << " vars/sec" << std::endl;
+    }
   }
 
   double elapsed = t_total.elapsed();
@@ -86,7 +92,7 @@ void dd::GibbsSampling::inference(const int & n_epoch){
 }
 
 void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoch, 
-                              const double & stepsize, const double & decay){
+                              const double & stepsize, const double & decay, const bool is_quiet){
 
   Timer t_total;
 
@@ -108,8 +114,10 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
 
   for(int i_epoch=0;i_epoch<n_epoch;i_epoch++){
 
-    std::cout << std::setprecision(2) << "LEARNING EPOCH " << i_epoch * nnode <<  "~" 
-      << ((i_epoch+1) * nnode) << "...." << std::flush;
+    if (!is_quiet) {
+      std::cout << std::setprecision(2) << "LEARNING EPOCH " << i_epoch * nnode <<  "~" 
+        << ((i_epoch+1) * nnode) << "...." << std::flush;
+    }
 
     t.restart();
     
@@ -163,9 +171,12 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
     lmax = lmax/current_stepsize;
     
     double elapsed = t.elapsed();
-    std::cout << "" << elapsed << " sec.";
-    std::cout << ","  << (nvar*nnode)/elapsed << " vars/sec." << ",stepsize=" << current_stepsize << ",lmax=" << lmax << ",l2=" << sqrt(l2)/current_stepsize << std::endl;
-    //std::cout << "     " << this->compact_factors[0].fg_mutable->weights[0] << std::endl;
+    
+    if (!is_quiet) {
+      std::cout << "" << elapsed << " sec.";
+      std::cout << ","  << (nvar*nnode)/elapsed << " vars/sec." << ",stepsize=" << current_stepsize << ",lmax=" << lmax << ",l2=" << sqrt(l2)/current_stepsize << std::endl;
+      //std::cout << "     " << this->compact_factors[0].fg_mutable->weights[0] << std::endl;
+    }
 
     current_stepsize = current_stepsize * decay;
 
@@ -176,19 +187,21 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
 
 }
 
-void dd::GibbsSampling::dump_weights(){
+void dd::GibbsSampling::dump_weights(bool is_quiet){
 
-  std::cout << "LEARNING SNIPPETS (QUERY WEIGHTS):" << std::endl;
   FactorGraph const & cfg = this->factorgraphs[0];
-  int ct = 0;
-  for(size_t i=0;i<cfg.infrs->nweights;i++){
-    ct ++;
-    std::cout << "   " << i << " " << cfg.infrs->weight_values[i] << std::endl;
-    if(ct % 10 == 0){
-      break;
+  if (!is_quiet) {
+    std::cout << "LEARNING SNIPPETS (QUERY WEIGHTS):" << std::endl;
+    int ct = 0;
+    for(size_t i=0;i<cfg.infrs->nweights;i++){
+      ct ++;
+      std::cout << "   " << i << " " << cfg.infrs->weight_values[i] << std::endl;
+      if(ct % 10 == 0){
+        break;
+      }
     }
+    std::cout << "   ..." << std::endl; 
   }
-  std::cout << "   ..." << std::endl; 
 
   std::string filename_protocol = p_cmd_parser->output_folder->getValue() 
     + "/inference_result.out.weights";
@@ -223,7 +236,7 @@ void dd::GibbsSampling::dump_weights(){
 }
 
 
-void dd::GibbsSampling::dump(){
+void dd::GibbsSampling::dump(bool is_quiet){
 
   double * agg_means = new double[factorgraphs[0].n_var];
   double * agg_nsamples = new double[factorgraphs[0].n_var];
@@ -250,33 +263,35 @@ void dd::GibbsSampling::dump(){
     }
   }
 
-  std::cout << "INFERENCE SNIPPETS (QUERY VARIABLES):" << std::endl;
-  int ct = 0;
-  for(long i=0;i<factorgraphs[0].n_var;i++){
-    const Variable & variable = factorgraphs[0].variables[i];
-    if(variable.is_evid == false){
-      ct ++;
-      std::cout << "   " << variable.id << " EXP=" 
-                << agg_means[variable.id]/agg_nsamples[variable.id] << "  NSAMPLE=" 
-                << agg_nsamples[variable.id] << std::endl;
+  if (!is_quiet) {
+    std::cout << "INFERENCE SNIPPETS (QUERY VARIABLES):" << std::endl;
+    int ct = 0;
+    for(long i=0;i<factorgraphs[0].n_var;i++){
+      const Variable & variable = factorgraphs[0].variables[i];
+      if(variable.is_evid == false){
+        ct ++;
+        std::cout << "   " << variable.id << " EXP=" 
+                  << agg_means[variable.id]/agg_nsamples[variable.id] << "  NSAMPLE=" 
+                  << agg_nsamples[variable.id] << std::endl;
 
-      if(variable.domain_type != DTYPE_BOOLEAN){
-        if(variable.domain_type == DTYPE_MULTINOMIAL){
-          for(int j=0;j<=variable.upper_bound;j++){
-            std::cout << "        @ " << j << " -> " << 1.0*multinomial_tallies[variable.n_start_i_tally + j]/agg_nsamples[variable.id] << std::endl;
+        if(variable.domain_type != DTYPE_BOOLEAN){
+          if(variable.domain_type == DTYPE_MULTINOMIAL){
+            for(int j=0;j<=variable.upper_bound;j++){
+              std::cout << "        @ " << j << " -> " << 1.0*multinomial_tallies[variable.n_start_i_tally + j]/agg_nsamples[variable.id] << std::endl;
+            }
+          }else{
+            std::cout << "ERROR: Only support boolean variables for now!" << std::endl;
+            assert(false);
           }
-        }else{
-          std::cout << "ERROR: Only support boolean variables for now!" << std::endl;
-          assert(false);
+        }
+
+        if(ct % 10 == 0){
+          break;
         }
       }
-
-      if(ct % 10 == 0){
-        break;
-      }
     }
+    std::cout << "   ..." << std::endl; 
   }
-  std::cout << "   ..." << std::endl; 
 
   std::string filename_protocol = p_cmd_parser->output_folder->getValue() + 
     "/inference_result.out";
@@ -333,6 +348,8 @@ void dd::GibbsSampling::dump(){
   delete _OstreamOutputStream;
   mFs.close();
   fout_text.close();
+
+  if (is_quiet) return;
 
   std::cout << "INFERENCE CALIBRATION (QUERY BINS):" << std::endl;
   std::vector<int> abc;

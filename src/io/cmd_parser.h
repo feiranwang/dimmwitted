@@ -36,6 +36,9 @@ namespace dd{
     // number of factor graph copies (one copy for one numa node)
     TCLAP::ValueArg<int> * n_datacopy;
 
+    // compress output
+    TCLAP::SwitchArg * quiet; 
+
     TCLAP::CmdLine * cmd;
 
     CmdParser(std::string _app_name){
@@ -63,6 +66,8 @@ namespace dd{
         n_thread = new TCLAP::ValueArg<int>("t","threads","This setting is no longer supported and will be ignored.",false,-1,"int");
         n_datacopy = new TCLAP::ValueArg<int>("c","n_datacopy","Number of data copies",false,-1,"int");
 
+        quiet = new TCLAP::SwitchArg("q", "quiet", "quiet output", false);
+
         cmd->add(*fg_file);
         
         cmd->add(*edge_file);
@@ -80,6 +85,7 @@ namespace dd{
         cmd->add(*decay);
         cmd->add(*n_thread);
         cmd->add(*n_datacopy);
+        cmd->add(*quiet);
       }else{
         std::cout << "ERROR: UNKNOWN APP NAME " << app_name << std::endl;
         std::cout << "AVAILABLE APP {gibbs}" << app_name << std::endl;

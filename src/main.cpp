@@ -60,6 +60,7 @@ void gibbs(dd::CmdParser & cmd_parser){
   int n_samples_per_learning_epoch = cmd_parser.n_samples_per_learning_epoch->getValue();
   int n_inference_epoch = cmd_parser.n_inference_epoch->getValue();
   int n_datacopy = cmd_parser.n_datacopy->getValue();
+  bool is_quiet = cmd_parser.quiet->getValue();
 
   double stepsize = cmd_parser.stepsize->getValue();
   double stepsize2 = cmd_parser.stepsize2->getValue();
@@ -110,19 +111,19 @@ void gibbs(dd::CmdParser & cmd_parser){
   // dd::FactorGraph fg(meta.numvariables(), meta.numfactors(), meta.numweights(), meta.numedges());
   dd::FactorGraph fg(meta.num_variables, meta.num_factors, meta.num_weights, meta.num_edges);
   fg.load(cmd_parser);
-  dd::GibbsSampling gibbs(&fg, &cmd_parser, n_datacopy);
+  dd::GibbsSampling gibbs(&fg, &cmd_parser, n_datacopy, is_quiet);
 
   int numa_aware_n_learning_epoch = (int)(n_learning_epoch/n_numa_node) + 
                             (n_learning_epoch%n_numa_node==0?0:1);
 
-  gibbs.learn(numa_aware_n_learning_epoch, n_samples_per_learning_epoch, stepsize, decay);
-  gibbs.dump_weights();
+  gibbs.learn(numa_aware_n_learning_epoch, n_samples_per_learning_epoch, stepsize, decay, is_quiet);
+  gibbs.dump_weights(is_quiet);
 
   int numa_aware_n_epoch = (int)(n_inference_epoch/n_numa_node) + 
                             (n_inference_epoch%n_numa_node==0?0:1);
 
-  gibbs.inference(numa_aware_n_epoch);
-  gibbs.dump();
+  gibbs.inference(numa_aware_n_epoch, is_quiet);
+  gibbs.dump(is_quiet);
 
 }
 
