@@ -118,7 +118,7 @@ void gibbs(dd::CmdParser & cmd_parser){
   int numa_aware_n_learning_epoch = (int)(n_learning_epoch/n_numa_node) + 
                             (n_learning_epoch%n_numa_node==0?0:1);
 
-  gibbs.learn(numa_aware_n_learning_epoch, n_samples_per_learning_epoch, stepsize, decay, is_quiet, reg_param);
+  gibbs.learn(numa_aware_n_learning_epoch, n_samples_per_learning_epoch, stepsize, decay, reg_param, is_quiet);
   gibbs.dump_weights(is_quiet);
   int numa_aware_n_epoch = (int)(n_inference_epoch/n_numa_node) + 
                             (n_inference_epoch%n_numa_node==0?0:1);
