@@ -86,6 +86,7 @@ void gibbs(dd::CmdParser & cmd_parser){
   std::cout << "# n_inference_epoch  : " << n_inference_epoch << std::endl;
   std::cout << "# stepsize           : " << stepsize << std::endl;
   std::cout << "# decay              : " << decay << std::endl;
+  std::cout << "# regularization     : " << reg_param << std::endl;
   std::cout << "################################################" << std::endl;
   std::cout << "# IGNORE -s (n_samples/l. epoch). ALWAYS -s 1. #" << std::endl;
   std::cout << "# IGNORE -t (threads). ALWAYS USE ALL THREADS. #" << std::endl;
