@@ -81,11 +81,13 @@ long dd::FactorGraph::get_multinomial_weight_id(const VariableValue *assignments
   // for each variable in the factor
   for (long i = fs.n_start_i_vif; i < fs.n_start_i_vif + fs.n_variables; i++) {
     const VariableInFactor & vif = vifs[i];
+    if (vif.is_observation) continue;
     if (vif.vid == vid) {
       weight_offset = weight_offset * (variables[vif.vid].upper_bound+1) + proposal;
     } else {
       weight_offset = weight_offset * (variables[vif.vid].upper_bound+1) + assignments[vif.vid];
     }
+    // std::cerr << "weight_offset = " << weight_offset << std::endl;
   }
   long base_offset = &fs - compact_factors; // note c++ will auto scale by sizeof(CompactFactor)
   return *(compact_factors_weightids + base_offset) + weight_offset;
@@ -93,6 +95,8 @@ long dd::FactorGraph::get_multinomial_weight_id(const VariableValue *assignments
 
 
 void dd::FactorGraph::update_weight(const Variable & variable){
+
+  // std::cerr << "***************" << std::endl;
   // corresponding factors and weights in a continous region
   CompactFactor * const fs = compact_factors + variable.n_start_i_factors;
   const int * const ws = compact_factors_weightids + variable.n_start_i_factors;
@@ -110,7 +114,7 @@ void dd::FactorGraph::update_weight(const Variable & variable){
         infrs->weight_values[ws[i]] += 
           stepsize * (this->template potential<false>(fs[i]) - this->template potential<true>(fs[i]));
       }
-    } else if (variable.domain_type == DTYPE_MULTINOMIAL) {
+    } else if (variable.domain_type == DTYPE_MULTINOMIAL || variable.domain_type == DTYPE_CENSORED_MULTINOMIAL) {
       // two weights need to be updated
       // sample with evidence fixed, I0, with corresponding weight w1
       // sample without evidence unfixed, I1, with corresponding weight w2 
@@ -118,6 +122,7 @@ void dd::FactorGraph::update_weight(const Variable & variable){
       // gradient of wd1 = I(w1==w2)f(I0) - f(I1)
       long wid1 = get_multinomial_weight_id(infrs->assignments_evid, fs[i], -1, -1);
       long wid2 = get_multinomial_weight_id(infrs->assignments_free, fs[i], -1, -1);
+      // std::cerr << "wid1 = " << wid1 << "wid2 = " << wid2 << std::endl;
       int equal = (wid1 == wid2);
 
       if(infrs->weights_isfixed[wid1] == false){
@@ -198,6 +203,8 @@ void dd::FactorGraph::load(const CmdParser & cmd, const bool is_quiet, int inc){
 
   // load edges
   n_loaded = read_edges(filename_edges, *this);
+  this->handle_observation();
+
   if(cmd.delta_folder->getValue() != ""){
     std::cout << "Loading delta..." << std::endl;
     n_loaded += read_edges(cmd.delta_folder->getValue() + "/graph.edges", *this);
@@ -299,6 +306,16 @@ void dd::FactorGraph::sort_by_id() {
   infrs->init(variables, weights);
 }
 
+// fill the is_observation field of VariableInFactor
+// NOTE this assumes that variables are ordered by id, i.e., must be executed after sort_by_id
+void dd::FactorGraph::handle_observation() {
+  for (long i = 0; i < n_factor; i++) {
+    for (VariableInFactor & vif : factors[i].tmp_variables) {
+      vif.is_observation = variables[vif.vid].is_observation;
+    }
+  }
+}
+
 bool dd::compare_position(const VariableInFactor& x, const VariableInFactor& y) {
   return x.n_position < y.n_position;
 }
@@ -326,7 +343,7 @@ void dd::FactorGraph::organize_graph_by_edge() {
     variable.n_factors = variable.tmp_factor_ids.size();  // no edge count any more
     
     variable.n_start_i_factors = c_edge;
-    if(variable.domain_type == DTYPE_MULTINOMIAL){
+    if(variable.domain_type == DTYPE_MULTINOMIAL || variable.domain_type == DTYPE_CENSORED_MULTINOMIAL){
       variable.n_start_i_tally = ntallies;
       ntallies += variable.upper_bound - variable.lower_bound + 1;
     }

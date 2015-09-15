@@ -19,7 +19,7 @@
 #define bswap_16(x) \
      ((unsigned short int) ((((x) >> 8) & 0xff) | (((x) & 0xff) << 8)))
 
-// Read meta data file, return Meta struct 
+// Read meta data file, return Meta struct
 Meta read_meta(string meta_file)
 {
 	ifstream file;
@@ -80,8 +80,7 @@ long long read_variables(string filename, dd::FactorGraph &fg)
     file.open(filename.c_str(), ios::in | ios::binary);
     long long count = 0;
     long long id;
-    bool isevidence;
-    char padding1;
+    char isevidence;
     double initial_value;
     short type;
     long long edge_count;
@@ -89,7 +88,7 @@ long long read_variables(string filename, dd::FactorGraph &fg)
     while (file.good()) {
         // read fields
         file.read((char *)&id, 8);
-        file.read((char *)&padding1, 1);
+        file.read((char *)&isevidence, 1);
         file.read((char *)&initial_value, 8);
         file.read((char *)&type, 2);
         file.read((char *)&edge_count, 8);
@@ -97,7 +96,6 @@ long long read_variables(string filename, dd::FactorGraph &fg)
 
         // convert endian
         id = bswap_64(id);
-        isevidence = padding1;
         type = bswap_16(type);
         long long tmp = bswap_64(*(uint64_t *)&initial_value);
         initial_value = *(double *)&tmp;
@@ -108,46 +106,36 @@ long long read_variables(string filename, dd::FactorGraph &fg)
 
         count++;
 
-        // add to factor graph
-        if (type == 0){ // boolean
-            if (isevidence) {
-                fg.variables[fg.c_nvar] = dd::Variable(id, DTYPE_BOOLEAN, true, 0, 1, 
-                    initial_value, initial_value, edge_count);
-                fg.c_nvar++;
-                fg.n_evid++;
-            } else {
-                fg.variables[fg.c_nvar] = dd::Variable(id, DTYPE_BOOLEAN, false, 0, 1, 
-                    0, 0, edge_count);
-                fg.c_nvar++;
-                fg.n_query++;
-            }
-        } else if (type == 1) { // multinomial
-            if (isevidence) {
-                fg.variables[fg.c_nvar] = dd::Variable(id, DTYPE_MULTINOMIAL, true, 0, 
-                    cardinality-1, initial_value, initial_value, edge_count);
-                fg.c_nvar ++;
-                fg.n_evid ++;
-            } else {
-                fg.variables[fg.c_nvar] = dd::Variable(id, DTYPE_MULTINOMIAL, false, 0, 
-                    cardinality-1, 0, 0, edge_count);
-                fg.c_nvar ++;
-                fg.n_query ++;
-            }
-        } else if (type == 3){
-            if (isevidence) {
-                fg.variables[fg.c_nvar] = dd::Variable(id, DTYPE_REAL, true, 0, cardinality, 
-                    initial_value, initial_value, edge_count);
-                fg.c_nvar++;
-                fg.n_evid++;
-            }else{
-                fg.variables[fg.c_nvar] = dd::Variable(id, DTYPE_REAL, true, 0, cardinality, 
-                    initial_value, initial_value, edge_count);
-                fg.c_nvar++;
-                fg.n_evid++;
-            }
-        }else {
-            cout << "[ERROR] Only Boolean and Multinomial variables are supported now!" << endl;
+        int type_const, upper_bound;
+        if (type == 0) {
+            type_const  = DTYPE_BOOLEAN;
+            upper_bound = 1;
+        } else if (type == 1) {
+            type_const  = DTYPE_MULTINOMIAL;
+            upper_bound = cardinality - 1;
+        } else if (type == 2) {
+            type_const  = DTYPE_REAL;
+            upper_bound = 0;
+        } else if (type == 3) {
+            type_const  = DTYPE_CENSORED_MULTINOMIAL;
+            upper_bound = cardinality - 1;
+        }
+        else {
+            cerr << "[ERROR] Only Boolean and Multinomial variables are supported now!" << endl;
             exit(1);
+        }
+        bool is_observation = isevidence == 2;
+        bool is_evidence    = isevidence >= 1;
+        bool is_censored    = isevidence == 3;
+        double init_value   = is_evidence ? initial_value : 0;
+
+        fg.variables[fg.c_nvar] = dd::Variable(id, type_const, is_evidence, 0, upper_bound,
+            init_value, init_value, edge_count, is_observation, is_censored);
+        fg.c_nvar++;
+        if (is_evidence) {
+            fg.n_evid++;
+        } else {
+            fg.n_query++;
         }
 
     }
@@ -202,17 +190,14 @@ long long read_edges(string filename, dd::FactorGraph &fg)
         file.read((char *)&position, 8);
         file.read((char *)&padding, 1);
         if (!file.read((char *)&equal_predicate, 8)) break;
-        
+
         variable_id = bswap_64(variable_id);
         factor_id = bswap_64(factor_id);
         position = bswap_64(position);
         ispositive = padding;
         equal_predicate = bswap_64(equal_predicate);
-        
-        count++;
-        // printf("varid=%lli, factorid=%lli, position=%lli, predicate=%lli\n", variable_id, factor_id, position, equal_predicate);
 
-        //std::cout << variable_id << std::endl;
+        count++;
 
         // wrong id
     	if(variable_id >= fg.n_var || variable_id < 0){
@@ -225,17 +210,12 @@ long long read_edges(string filename, dd::FactorGraph &fg)
         }
 
         // add variables to factors
-        if (fg.variables[variable_id].domain_type == DTYPE_BOOLEAN) {
-            fg.factors[factor_id].tmp_variables.push_back(
-                dd::VariableInFactor(variable_id, fg.variables[variable_id].upper_bound, variable_id, position, ispositive));
-        } else {
-            fg.factors[factor_id].tmp_variables.push_back(
-                dd::VariableInFactor(variable_id, position, ispositive, equal_predicate));
-        }
+        fg.factors[factor_id].tmp_variables.push_back(
+            dd::VariableInFactor(variable_id, position, ispositive, equal_predicate));
         fg.variables[variable_id].tmp_factor_ids.push_back(factor_id);
 
     }
     file.close();
-    return count;   
+    return count;
 }
 

@@ -7,10 +7,11 @@
 #define DTYPE_BOOLEAN     0x00
 #define DTYPE_REAL        0x01
 #define DTYPE_MULTINOMIAL 0x04
+#define DTYPE_CENSORED_MULTINOMIAL 0x02
 
 namespace dd{
 
-  typedef int VariableValue;
+  typedef double VariableValue;
   typedef long VariableIndex;
   typedef long FactorIndex;
 
@@ -23,6 +24,8 @@ namespace dd{
     int domain_type;                // variable domain type, can be DTYPE_BOOLEAN or 
                                     // DTYPE_MULTINOMIAL
     bool is_evid;                   // whether the variable is evidence
+    bool is_observation;            // observed variable
+    bool is_censored;               // censored variable
     VariableValue lower_bound;      // lower bound
     VariableValue upper_bound;      // upper bound
     
@@ -55,7 +58,8 @@ namespace dd{
     Variable(const long & _id, const int & _domain_type, 
              const bool & _is_evid, const VariableValue & _lower_bound,
              const VariableValue & _upper_bound, const VariableValue & _init_value, 
-             const VariableValue & _current_value, const int & _n_factors);
+             const VariableValue & _current_value, const int & _n_factors,
+             bool is_observation, bool is_censored);
   };
 
   /**
@@ -67,9 +71,8 @@ namespace dd{
     int n_position;         // position of the variable inside factor
     bool is_positive;       // whether the variable is positive or negated
     // the variable's predicate value. A variable is "satisfied" if its value equals equal_to
-    VariableValue equal_to; 
-
-    int dimension;
+    VariableValue equal_to;
+    bool is_observation;
 
     /**
      * Returns whether the variable's predicate is satisfied using the given value
@@ -77,15 +80,6 @@ namespace dd{
     bool satisfiedUsing(int value) const;
 
     VariableInFactor();
-
-    VariableInFactor(int dummy,
-                      const int & _dimension, 
-                      const long & _vid, const int & _n_position, 
-                     const bool & _is_positive);
-
-
-    VariableInFactor(const long & _vid, const int & _n_position, 
-                     const bool & _is_positive);
 
     VariableInFactor(const long & _vid, const int & _n_position, 
                      const bool & _is_positive, const VariableValue & _equal_to);

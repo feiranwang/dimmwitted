@@ -20,7 +20,7 @@ void dd::InferenceResult::init(Variable * variables, Weight * const weights){
     assignments_evid[variable.id] = variable.assignment_evid;
     agg_means[variable.id] = 0.0;
     agg_nsamples[variable.id] = 0.0;
-    if(variable.domain_type == DTYPE_MULTINOMIAL){
+    if(variable.domain_type == DTYPE_MULTINOMIAL || variable.domain_type == DTYPE_CENSORED_MULTINOMIAL){
       ntallies += variable.upper_bound - variable.lower_bound + 1;
     }
   }

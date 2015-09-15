@@ -43,9 +43,10 @@ namespace dd{
     
     Variable & variable = p_fg->variables[vid];
 
-    if (!learn_non_evidence && !variable.is_evid) return;
+    if (!learn_non_evidence && (!variable.is_evid || variable.is_observation)) return;
 
     if(variable.domain_type == DTYPE_BOOLEAN){ // boolean
+
 
         // sample the variable with evidence unchanged
         if(variable.is_evid == false){
@@ -79,27 +80,33 @@ namespace dd{
 
         this->p_fg->update_weight(variable);
         
-    }else if(variable.domain_type == DTYPE_MULTINOMIAL){ // multinomial
+    }else if(variable.domain_type == DTYPE_MULTINOMIAL || variable.domain_type == DTYPE_CENSORED_MULTINOMIAL) { // multinomial
+
+      // std::cerr << "learning: sampling " << variable.id << std::endl;
 
       // varlen_potential_buffer contains potential for each proposals
       while(variable.upper_bound >= varlen_potential_buffer.size()){
         varlen_potential_buffer.push_back(0.0);
       }
 
-      if(variable.is_evid == false){
+      if (variable.is_evid == false ||
+        (variable.domain_type == DTYPE_CENSORED_MULTINOMIAL && variable.is_censored)) {
         sum = -100000.0;
         acc = 0.0;
         multi_proposal = -1;
-        
+
+        int lower_bound = variable.is_censored ? variable.assignment_evid : variable.lower_bound;
+        // std::cerr << "lower bound = " << lower_bound << std::endl;
+
         // calculate potential for each proposal
-        for(int propose=variable.lower_bound;propose <= variable.upper_bound; propose++){
+        for(int propose=lower_bound;propose <= variable.upper_bound; propose++){
           varlen_potential_buffer[propose] = p_fg->template potential<false>(variable, propose);
           sum = logadd(sum, varlen_potential_buffer[propose]);
         }
 
         // flip a coin
         *this->p_rand_obj_buf = erand48(this->p_rand_seed);
-        for(int propose=variable.lower_bound;propose <= variable.upper_bound; propose++){
+        for(int propose=lower_bound;propose <= variable.upper_bound; propose++){
           acc += exp(varlen_potential_buffer[propose]-sum);
           if(*this->p_rand_obj_buf <= acc){
             multi_proposal = propose;
@@ -108,6 +115,7 @@ namespace dd{
         }
         assert(multi_proposal != -1);
         p_fg->update_evid(variable, multi_proposal);
+        // std::cerr << "evid proposal = " << multi_proposal << std::endl;
       }
 
       sum = -100000.0;
@@ -126,12 +134,20 @@ namespace dd{
           break;
         }
       }
+      if (multi_proposal == -1) {
+        sum = -100000.0;
+        for(int propose=variable.lower_bound;propose <= variable.upper_bound; propose++){
+          varlen_potential_buffer[propose] = p_fg->template potential<true>(variable, propose);
+          sum = logadd(sum, varlen_potential_buffer[propose]);
+        }
+      }
       assert(multi_proposal != -1);
       p_fg->template update<true>(variable, multi_proposal);
+      // std::cerr << "free proposal = " << multi_proposal << std::endl;
 
       this->p_fg->update_weight(variable);
 
-    }else{
+    } else{
       //std::cout << "~~~~~~~~~" << std::endl;
       std::cerr << "[ERROR] Only Boolean and Multinomial variables are supported now!" << std::endl;
       assert(false);
@@ -145,6 +161,7 @@ namespace dd{
     // this function uses the same sampling technique as in sample_sgd_single_variable
 
     Variable & variable = this->p_fg->variables[vid];
+    if (variable.is_observation) return;
 
     if(is_inc){
       if(variable.domain_type == DTYPE_BOOLEAN || variable.domain_type == DTYPE_MULTINOMIAL) {
@@ -200,7 +217,7 @@ namespace dd{
 
         }
 
-      }else if(variable.domain_type == DTYPE_MULTINOMIAL){
+      }else if(variable.domain_type == DTYPE_MULTINOMIAL || variable.domain_type == DTYPE_CENSORED_MULTINOMIAL){
 
         while(variable.upper_bound >= varlen_potential_buffer.size()){
           varlen_potential_buffer.push_back(0.0);
@@ -220,6 +237,7 @@ namespace dd{
             acc += exp(varlen_potential_buffer[propose]-sum);
             if(*this->p_rand_obj_buf <= acc){
               multi_proposal = propose;
+              // std::cerr << "acc = " << acc << " propose = " << propose << " pot = " << varlen_potential_buffer[propose] << std::endl;
               break;
             }
           }

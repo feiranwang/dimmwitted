@@ -45,11 +45,11 @@ namespace dd{
 
     float * old_weight_values;
 
-    // For each edge, we store the factor, weight id, factor id, and the variable, 
+    // For each edge, we store the factor, weight id, factor id, and the variable,
     // in the same index of seperate arrays. The edges are ordered so that the
-    // edges for a variable is in a continuous region (sequentially). 
+    // edges for a variable is in a continuous region (sequentially).
     // This allows us to access factors given variables, and access variables
-    // given factors faster. 
+    // given factors faster.
     CompactFactor * const compact_factors;
     int * const compact_factors_weightids;
     long * const factor_ids;
@@ -79,17 +79,17 @@ namespace dd{
     void copy_from(const FactorGraph * const p_other_fg);
 
     /*
-     * Given a factor and variable assignment, returns corresponding multinomial 
+     * Given a factor and variable assignment, returns corresponding multinomial
      * factor weight id, using proposal value for the variable with id vid.
-     * For multinomial weights, for each possible assignment, there is a corresponding 
-     * indicator function and weight. 
+     * For multinomial weights, for each possible assignment, there is a corresponding
+     * indicator function and weight.
      */
     long get_multinomial_weight_id(const VariableValue *assignments, const CompactFactor& fs, long vid, long proposal);
 
     /**
-     * Given a variable, updates the weights associated with the factors that 
-     * connect to the variable. 
-     * Used in learning phase, after sampling one variable, 
+     * Given a variable, updates the weights associated with the factors that
+     * connect to the variable.
+     * Used in learning phase, after sampling one variable,
      * update corresponding weights (stochastic gradient descent).
      */
     void update_weight(const Variable & variable);
@@ -98,7 +98,7 @@ namespace dd{
      * Returns potential of the given factor
      *
      * does_change_evid = true, use the free assignment. Otherwise, use the
-     * evid assignement. 
+     * evid assignement.
      */
     template<bool does_change_evid>
     inline double potential(const CompactFactor & factor){
@@ -108,24 +108,24 @@ namespace dd{
         return factor.potential(vifs, infrs->assignments_evid, -1, -1);
       }
     }
-    
+
     template<bool does_change_evid>
     inline void update(Variable & variable, const double & new_value);
 
     inline void update_evid(Variable & variable, const double & new_value);
 
     /**
-     * Returns log-linear weighted potential of the all factors for the given 
+     * Returns log-linear weighted potential of the all factors for the given
      * variable using the propsal value.
      *
      * does_change_evid = true, use the free assignment. Otherwise, use the
-     * evid assignement. 
+     * evid assignement.
      */
     template<bool does_change_evid>
     inline double potential(const Variable & variable, const double & proposal){
 
       // potential
-      double pot = 0.0;  
+      double pot = 0.0;
       double tmp;
       // weight id
       long wid = 0;
@@ -134,11 +134,11 @@ namespace dd{
       // region of the array
       CompactFactor * const fs = &compact_factors[variable.n_start_i_factors];
       // the weights, corresponding to the factor with the same index
-      const int * const ws = &compact_factors_weightids[variable.n_start_i_factors];   
-      
+      const int * const ws = &compact_factors_weightids[variable.n_start_i_factors];
+
       // boolean type
-      if (variable.domain_type == DTYPE_BOOLEAN) {   
-        // for all factors that the variable connects to, calculate the 
+      if (variable.domain_type == DTYPE_BOOLEAN) {
+        // for all factors that the variable connects to, calculate the
         // weighted potential
         for(long i=0;i<variable.n_factors;i++){
           if(ws[i] == -1){
@@ -154,7 +154,7 @@ namespace dd{
           }
           pot += infrs->weight_values[ws[i]] * tmp;
         }
-      } else if (variable.domain_type == DTYPE_MULTINOMIAL) { // multinomial
+      } else if (variable.domain_type == DTYPE_MULTINOMIAL || variable.domain_type == DTYPE_CENSORED_MULTINOMIAL) { // multinomial
         for (long i = 0; i < variable.n_factors; i++) {
           //if(ws[i] == -1){
           //  continue;
@@ -203,6 +203,9 @@ namespace dd{
      */
     bool is_usable();
 
+    // fill the is_observation field for VariableInFactor
+    void handle_observation();
+
   };
 
   /**
@@ -228,8 +231,8 @@ namespace dd{
     infrs->assignments_evid[variable.id] = new_value;
     infrs->agg_means[variable.id] += new_value;
     infrs->agg_nsamples[variable.id]  ++ ;
-    if(variable.domain_type == DTYPE_MULTINOMIAL){
-      infrs->multinomial_tallies[variable.n_start_i_tally + (int)(new_value) - variable.lower_bound] ++;
+    if(variable.domain_type == DTYPE_MULTINOMIAL || variable.domain_type == DTYPE_CENSORED_MULTINOMIAL){
+      infrs->multinomial_tallies[variable.n_start_i_tally + (int)(new_value) - (int)variable.lower_bound] ++;
     }
   }
 

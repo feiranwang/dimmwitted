@@ -22,7 +22,7 @@ dd::GibbsSampling::GibbsSampling(FactorGraph * const _p_fg,
 
     // max possible threads per NUMA node
     n_thread_per_numa = (sysconf(_SC_NPROCESSORS_CONF))/(n_numa_nodes+1);
-    //n_thread_per_numa = 1;
+    // n_thread_per_numa = 1;
 
     this->factorgraphs.push_back(*p_fg);
 
@@ -336,14 +336,14 @@ void dd::GibbsSampling::aggregate_results_and_dump(const bool is_quiet, int inc)
     int ct = 0;
     for(long i=0;i<factorgraphs[0].n_var;i++){
       const Variable & variable = factorgraphs[0].variables[i];
-      if(variable.is_evid == false || sample_evidence){
+      if ((variable.is_evid == false || sample_evidence) && !variable.is_observation) {
         ct ++;
         std::cout << "   " << variable.id << " EXP=" 
                   << agg_means[variable.id]/agg_nsamples[variable.id] << "  NSAMPLE=" 
                   << agg_nsamples[variable.id] << std::endl;
 
         if(variable.domain_type != DTYPE_BOOLEAN){
-          if(variable.domain_type == DTYPE_MULTINOMIAL){
+          if(variable.domain_type == DTYPE_MULTINOMIAL || variable.domain_type == DTYPE_CENSORED_MULTINOMIAL){
             for(int j=0;j<=variable.upper_bound;j++){
               std::cout << "        @ " << j << " -> " << 1.0*multinomial_tallies[variable.n_start_i_tally + j]/agg_nsamples[variable.id] << std::endl;
             }
@@ -376,12 +376,12 @@ void dd::GibbsSampling::aggregate_results_and_dump(const bool is_quiet, int inc)
   std::ofstream fout_text(filename_text.c_str());
   for(long i=0;i<factorgraphs[0].n_var;i++){
     const Variable & variable = factorgraphs[0].variables[i];
-    if(variable.is_evid == true && !sample_evidence){
+    if((variable.is_evid == true && !sample_evidence) || variable.is_observation){
       continue;
     }
     
     if(variable.domain_type != DTYPE_BOOLEAN){
-      if(variable.domain_type == DTYPE_MULTINOMIAL){
+      if(variable.domain_type == DTYPE_MULTINOMIAL || variable.domain_type == DTYPE_CENSORED_MULTINOMIAL){
         for(int j=0;j<=variable.upper_bound;j++){
           
           fout_text << variable.id << " " << j << " " << (1.0*multinomial_tallies[variable.n_start_i_tally + j]/agg_nsamples[variable.id]) << std::endl;
