@@ -6,12 +6,15 @@
 #include <fstream>
 #include <memory>
 #include "timer.h"
+#include <zmq.hpp>
+#include "message.h"
 
 dd::GibbsSampling::GibbsSampling(FactorGraph * const _p_fg, 
   CmdParser * const _p_cmd_parser, int n_datacopy, bool sample_evidence,
-  int burn_in, bool learn_non_evidence) 
+  int burn_in, bool learn_non_evidence, bool fusion_mode) 
   : p_fg(_p_fg), p_cmd_parser(_p_cmd_parser), sample_evidence(sample_evidence),
-    burn_in(burn_in), learn_non_evidence(learn_non_evidence) {
+    burn_in(burn_in), learn_non_evidence(learn_non_evidence),
+    fusion_mode(fusion_mode) {
     // the highest node number available
     n_numa_nodes = numa_max_node(); 
 
@@ -22,7 +25,12 @@ dd::GibbsSampling::GibbsSampling(FactorGraph * const _p_fg,
 
     // max possible threads per NUMA node
     n_thread_per_numa = (sysconf(_SC_NPROCESSORS_CONF))/(n_numa_nodes+1);
-    //n_thread_per_numa = 1;
+
+    // use 1 numa node and 1 thread for fusion
+    if (fusion_mode) {
+      n_thread_per_numa = 1;
+      n_numa_nodes = 0;
+    }
 
     this->factorgraphs.push_back(*p_fg);
 
@@ -145,6 +153,41 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
 
   std::unique_ptr<double[]> ori_weights(new double[nweight]);
   memcpy(ori_weights.get(), this->factorgraphs[0].infrs->weight_values, sizeof(double)*nweight);
+
+  // TODO fuse with fg
+  // TEST communicate with Caffe
+  printf("Start fusion learning...\n");
+
+  zmq::context_t context(1);
+  zmq::socket_t socket (context, ZMQ_REP);
+  socket.bind ("tcp://*:5555");
+  zmq::message_t request;
+
+  for (int i_epoch = 0; i_epoch < n_epoch; i_epoch++) {
+    printf("waiting for message...%d\n", i_epoch);
+    socket.recv(&request);
+    // printf("Received...\n");
+
+    // FusionMessage * msg = reinterpret_cast<FusionMessage*>(buf);
+    FusionMessage * msg = (FusionMessage*)request.data();
+
+    if (msg->msg_type == REQUEST_GRAD) {
+      single_node_samplers[0].learn_fusion(msg);
+      memcpy ((void *)request.data(), msg, msg->size());
+      socket.send(request);
+
+    } else if (msg->msg_type == REQUEST_ACCURACY) {
+      i_epoch--;
+      // save messages, which will be ued later in inference
+      single_node_samplers[0].save_fusion_message(msg);
+      memcpy ((void *)request.data(), msg, msg->size());
+      socket.send(request);
+    }
+
+    // printf("Responded...\n");
+  }
+
+  return;
 
   // learning epochs
   for(int i_epoch=0;i_epoch<n_epoch;i_epoch++){

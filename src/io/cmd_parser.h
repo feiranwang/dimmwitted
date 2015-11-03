@@ -46,6 +46,7 @@ namespace dd{
     TCLAP::SwitchArg * quiet; 
     TCLAP::SwitchArg * sample_evidence;
     TCLAP::SwitchArg * learn_non_evidence;
+    TCLAP::SwitchArg * fusion_mode;
 
     TCLAP::ValueArg<std::string> * regularization;
 

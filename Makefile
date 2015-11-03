@@ -6,7 +6,7 @@
 CXXFLAGS = -std=c++0x -Wall -fno-strict-aliasing
 LDFLAGS =
 LDLIBS =
-CXXFLAGS += -I./lib/tclap/include/ -I./src
+CXXFLAGS += -I./lib/tclap/include/ -I./src -I./lib/zeromq-4.1.3/include/
 
 # platform dependent compiler flags
 UNAME := $(shell uname)
@@ -19,9 +19,9 @@ endif
 CXXFLAGS += -Ofast
 # using NUMA for Linux
 CXXFLAGS += -I./lib/numactl-2.0.9/
-LDFLAGS += -L./lib/numactl-2.0.9/
+LDFLAGS += -L./lib/numactl-2.0.9/ -L./lib/zeromq-4.1.3/lib
 LDFLAGS += -Wl,-Bstatic -Wl,-Bdynamic
-LDLIBS += -lnuma -lrt -lpthread
+LDLIBS += -lnuma -lrt -lpthread -lzmq
 endif
 
 ifeq ($(UNAME), Darwin)

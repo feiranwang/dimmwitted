@@ -39,6 +39,8 @@ namespace dd{
 
         burn_in = new TCLAP::ValueArg<int>("", "burn_in", "Burn-in period", false, 0, "int");
 
+        fusion_mode = new TCLAP::SwitchArg("", "fusion", "fusion mode", false);
+
         cmd->add(*original_folder);
         cmd->add(*delta_folder);
 
@@ -67,6 +69,8 @@ namespace dd{
         cmd->add(*sample_evidence);
         cmd->add(*learn_non_evidence);
         cmd->add(*regularization);
+
+        cmd->add(fusion_mode);
       }else{
         std::cout << "ERROR: UNKNOWN APP NAME " << app_name << std::endl;
         std::cout << "AVAILABLE APP {gibbs/mat/inc}" << app_name << std::endl;

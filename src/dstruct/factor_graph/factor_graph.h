@@ -171,6 +171,8 @@ namespace dd{
           pot += infrs->weight_values[wid] * tmp;
         }
       } // end if for variable type
+      // if (!does_change_evid) printf("sample pot = %f\n", infrs->cnn_ips[variable.n_start_i_tally]);
+      pot += infrs->cnn_ips[variable.n_start_i_tally + (int)(proposal) - variable.lower_bound];
       return pot;
     }
 

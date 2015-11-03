@@ -342,10 +342,10 @@ void dd::FactorGraph::organize_graph_by_edge() {
     variable.n_factors = variable.tmp_factor_ids.size();  // no edge count any more
     
     variable.n_start_i_factors = c_edge;
-    if(variable.domain_type == DTYPE_MULTINOMIAL){
-      variable.n_start_i_tally = ntallies;
-      ntallies += variable.upper_bound - variable.lower_bound + 1;
-    }
+    // if(variable.domain_type == DTYPE_MULTINOMIAL){
+    variable.n_start_i_tally = ntallies;
+    ntallies += variable.upper_bound - variable.lower_bound + 1;
+    // }
     for(const long & fid : variable.tmp_factor_ids){
       factor_ids[c_edge] = fid;
       compact_factors[c_edge].id = factors[fid].id;
