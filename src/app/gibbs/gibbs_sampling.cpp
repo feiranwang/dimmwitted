@@ -154,40 +154,50 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
   std::unique_ptr<double[]> ori_weights(new double[nweight]);
   memcpy(ori_weights.get(), this->factorgraphs[0].infrs->weight_values, sizeof(double)*nweight);
 
-  // TODO fuse with fg
-  // TEST communicate with Caffe
-  printf("Start fusion learning...\n");
+  // // TODO fuse with fg
+  // // TEST communicate with Caffe
+  // printf("Start fusion learning...\n");
 
+  // zmq::context_t context(1);
+  // zmq::socket_t socket (context, ZMQ_REP);
+  // socket.bind ("tcp://*:5555");
+  // zmq::message_t request;
+
+  // for (int i_epoch = 0; i_epoch < n_epoch; i_epoch++) {
+  //   // printf("waiting for message...%d\n", i_epoch);
+  //   socket.recv(&request);
+  //   // printf("Received...\n");
+
+  //   // FusionMessage * msg = reinterpret_cast<FusionMessage*>(buf);
+  //   FusionMessage * msg = (FusionMessage*)request.data();
+
+  //   if (msg->msg_type == REQUEST_GRAD) {
+  //     single_node_samplers[0].learn_fusion(msg);
+  //     memcpy ((void *)request.data(), msg, msg->size());
+  //     socket.send(request);
+
+  //   } else if (msg->msg_type == REQUEST_ACCURACY) {
+  //     i_epoch--;
+  //     // save messages, which will be ued later in inference
+  //     single_node_samplers[0].save_fusion_message(msg);
+  //     memcpy ((void *)request.data(), msg, msg->size());
+  //     socket.send(request);
+  //   }
+
+  //   // printf("Responded...\n");
+  // }
+
+  // return;
+
+  int batch_size = 0;
+  int batch_count = 0;
   zmq::context_t context(1);
   zmq::socket_t socket (context, ZMQ_REP);
-  socket.bind ("tcp://*:5555");
   zmq::message_t request;
 
-  for (int i_epoch = 0; i_epoch < n_epoch; i_epoch++) {
-    printf("waiting for message...%d\n", i_epoch);
-    socket.recv(&request);
-    // printf("Received...\n");
-
-    // FusionMessage * msg = reinterpret_cast<FusionMessage*>(buf);
-    FusionMessage * msg = (FusionMessage*)request.data();
-
-    if (msg->msg_type == REQUEST_GRAD) {
-      single_node_samplers[0].learn_fusion(msg);
-      memcpy ((void *)request.data(), msg, msg->size());
-      socket.send(request);
-
-    } else if (msg->msg_type == REQUEST_ACCURACY) {
-      i_epoch--;
-      // save messages, which will be ued later in inference
-      single_node_samplers[0].save_fusion_message(msg);
-      memcpy ((void *)request.data(), msg, msg->size());
-      socket.send(request);
-    }
-
-    // printf("Responded...\n");
+  if (fusion_mode) {
+    socket.bind ("tcp://*:5555");
   }
-
-  return;
 
   // learning epochs
   for(int i_epoch=0;i_epoch<n_epoch;i_epoch++){
@@ -213,6 +223,30 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
     for(int i=0;i<nnode;i++){
       single_node_samplers[i].wait_sgd();
     }
+
+    // fusion
+    // NOTE assume batch size is smaller than the number of variables
+    while (fusion_mode && batch_count < this->factorgraphs[0].n_cnn_evid) {
+      // printf("batch count = %d\n", batch_count);
+      socket.recv(&request);
+      FusionMessage * msg = (FusionMessage*)request.data();
+      batch_size = msg->batch;
+
+      if (msg->msg_type == REQUEST_GRAD) {
+        single_node_samplers[0].learn_fusion(msg);
+        memcpy ((void *)request.data(), msg, msg->size());
+        socket.send(request);
+        batch_count += batch_size;
+      } else if (msg->msg_type == REQUEST_ACCURACY) {
+        // i_epoch--;
+        // save messages, which will be ued later in inference
+        single_node_samplers[0].save_fusion_message(msg);
+        memcpy ((void *)request.data(), msg, msg->size());
+        socket.send(request);
+      }
+    }
+    batch_count = batch_count % this->factorgraphs[0].n_cnn_evid;
+
 
     FactorGraph & cfg = this->factorgraphs[0];
 

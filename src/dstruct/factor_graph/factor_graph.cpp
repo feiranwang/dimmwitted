@@ -24,7 +24,7 @@ bool dd::FactorGraph::is_usable(){
 
 dd::FactorGraph::FactorGraph(long _n_var, long _n_factor, long _n_weight, long _n_edge) : 
   n_var(_n_var), n_factor(_n_factor), n_weight(_n_weight), n_edge(_n_edge),
-  c_nvar(0), c_nfactor(0), c_nweight(0), n_evid(0), n_query(0),
+  c_nvar(0), c_nfactor(0), c_nweight(0), n_evid(0), n_query(0), //n_cnn_evid(0),
   variables(new Variable[_n_var]),
   factors(new Factor[_n_factor]),
   weights(new Weight[_n_weight]),
@@ -59,6 +59,7 @@ void dd::FactorGraph::copy_from(const FactorGraph * const p_other_fg){
   c_nfactor = p_other_fg->c_nfactor;
   c_nweight = p_other_fg->c_nweight;
   c_edge = p_other_fg->c_edge;
+  // n_cnn_evid = p_other_fg->n_cnn_evid;
   sorted = p_other_fg->sorted;
   safety_check_passed = p_other_fg->safety_check_passed;
 
@@ -159,6 +160,8 @@ public:
 //   6. read edges
 void dd::FactorGraph::load(const CmdParser & cmd, const bool is_quiet, int inc){
 
+  printf("loading\n");
+
   // get factor graph file names from command line arguments
   std::string filename_edges;
   std::string filename_factors;
@@ -173,10 +176,12 @@ void dd::FactorGraph::load(const CmdParser & cmd, const bool is_quiet, int inc){
     filename_weights    = cmd.weight_file->getValue();
     filename_variables  = cmd.variable_file->getValue();
     filename_factors    = cmd.factor_file->getValue();
+    filename_edges      = cmd.edge_file->getValue();
   }
 
   // load variables
   long long n_loaded = read_variables(filename_variables, *this);
+  printf("loading\n");
 
   if(cmd.delta_folder->getValue() != ""){
     std::cout << "Loading delta..." << std::endl;
@@ -208,10 +213,7 @@ void dd::FactorGraph::load(const CmdParser & cmd, const bool is_quiet, int inc){
   infrs->init(variables, weights);
 
   // load factors
-  if (inc)
-    n_loaded = read_factors_inc(filename_factors, *this);
-  else
-    n_loaded = read_factors(filename_factors, *this);
+  n_loaded = read_factors_inc(filename_factors, *this);
   if(cmd.delta_folder->getValue() != ""){
     std::cout << "Loading delta..." << cmd.delta_folder->getValue() + "/graph.factors" << std::endl;
     n_loaded += read_factors_inc(cmd.delta_folder->getValue() + "/graph.factors", *this);
@@ -222,21 +224,27 @@ void dd::FactorGraph::load(const CmdParser & cmd, const bool is_quiet, int inc){
     std::cout << "LOADED FACTORS: #" << n_loaded << std::endl;
   }
 
-  if (inc) {
-    // sort edges
-    // NOTE This is very important, as read_edges assume variables,
-    // factors and weights are ordered so that their id is the index 
-    // where they are stored in the array
-    std::sort(&factors[0], &factors[n_factor], idsorter<Factor>());
-    // load edges
-    n_loaded = read_edges_inc(filename_edges, *this);
-    if(cmd.delta_folder->getValue() != ""){
-      std::cout << "Loading delta..." << std::endl;
-      n_loaded += read_edges_inc(cmd.delta_folder->getValue() + "/graph.edges", *this);
-    }
+  // sort edges
+  // NOTE This is very important, as read_edges assume variables,
+  // factors and weights are ordered so that their id is the index 
+  // where they are stored in the array
+  std::sort(&factors[0], &factors[n_factor], idsorter<Factor>());
+  // load edges
+  n_loaded = read_edges_inc(filename_edges, *this);
+  if(cmd.delta_folder->getValue() != ""){
+    std::cout << "Loading delta..." << std::endl;
+    n_loaded += read_edges_inc(cmd.delta_folder->getValue() + "/graph.edges", *this);
+  }
 
-    if (!is_quiet) {
-      std::cout << "LOADED EDGES: #" << n_loaded << std::endl;
+  if (!is_quiet) {
+    std::cout << "LOADED EDGES: #" << n_loaded << std::endl;
+  }
+
+  // count number of evidence variables in cnn
+  int n_cnn_evid = 0;
+  for (int i = 0;i < n_var; i++) {
+    if (variables[i].is_evid && variables[i].in_cnn) {
+      n_cnn_evid++;
     }
   }
 
@@ -297,6 +305,8 @@ void dd::FactorGraph::load(const CmdParser & cmd, const bool is_quiet, int inc){
   // construct edge-based store
   this->organize_graph_by_edge();
   this->safety_check();
+
+  printf("*******************\n");
 
   assert(this->is_usable() == true);
 

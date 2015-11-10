@@ -47,6 +47,8 @@ namespace dd{
 
     int next_sample;
 
+    bool in_cnn; // whether the vairiable is in cnn
+
     Variable();
 
     /**
@@ -57,7 +59,7 @@ namespace dd{
              const bool & _is_evid, const VariableValue & _lower_bound,
              const VariableValue & _upper_bound, const VariableValue & _init_value, 
              const VariableValue & _current_value, const int & _n_factors,
-             bool is_observation);
+             bool is_observation, bool in_cnn);
   };
 
   /**

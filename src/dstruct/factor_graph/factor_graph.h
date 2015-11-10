@@ -35,6 +35,9 @@ namespace dd{
     long n_evid;
     long n_query;
 
+    // number of cnn evidence variable
+    // long n_cnn_evid;
+
     // learning weight update stepsize (learning rate)
     double stepsize;
 

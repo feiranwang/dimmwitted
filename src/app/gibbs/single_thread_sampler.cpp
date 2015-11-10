@@ -43,6 +43,7 @@ namespace dd{
     
     Variable & variable = p_fg->variables[vid];
     if (variable.is_observation) return;
+    if (variable.in_cnn) return;
 
     if (!learn_non_evidence && !variable.is_evid) return;
 
@@ -273,9 +274,13 @@ namespace dd{
         // if ((*this->p_rand_obj_buf) * (1.0 + exp(potential_neg_freeevid-potential_pos_freeevid + data[i * dim] - data[i * dim + 1])) < 1.0) {
         if ((*this->p_rand_obj_buf) * (1.0 + exp(potential_neg_freeevid-potential_pos_freeevid)) < 1.0) {
           sample_free = 1;
+          p_fg->template update<true>(variable, 1.0);
         } else {
           sample_free = 0;
+          p_fg->template update<true>(variable, 0.0);
         }
+
+        this->p_fg->update_weight(variable);
 
         // calculate loss
         double prob = exp(data[i * dim + variable.assignment_evid]) / (exp(data[i * dim]) + exp(data[i * dim + 1]));
@@ -316,6 +321,9 @@ namespace dd{
           }
         }
         assert(multi_proposal != -1);
+        p_fg->template update<true>(variable, multi_proposal);
+
+        this->p_fg->update_weight(variable);
 
 
         // printf("vid = %d evid = %d sample = %d sum = %f \n", vid, variable.assignment_evid, multi_proposal, sum);

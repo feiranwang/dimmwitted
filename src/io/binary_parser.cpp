@@ -119,10 +119,12 @@ long long read_variables(string filename, dd::FactorGraph &fg)
         }
         bool is_evidence    = isevidence >= 1;
         bool is_observation = isevidence == 2;
+        // bool in_cnn         = isevidence >> 4;
+        bool in_cnn = true;
         double init_value   = is_evidence ? initial_value : 0;
 
         fg.variables[fg.c_nvar] = dd::Variable(id, type_const, is_evidence, 0, upper_bound,
-            init_value, init_value, edge_count, is_observation);
+            init_value, init_value, edge_count, is_observation, in_cnn);
         fg.c_nvar++;
         if (is_evidence) {
             fg.n_evid++;
@@ -227,6 +229,7 @@ long long read_factors_inc(string filename, dd::FactorGraph &fg)
 // It is binary format without delimiter.
 long long read_edges_inc(string filename, dd::FactorGraph &fg)
 {
+    printf("%s\n", filename.c_str());
     ifstream file;
     file.open(filename.c_str(), ios::in | ios::binary);
     long long count = 0;

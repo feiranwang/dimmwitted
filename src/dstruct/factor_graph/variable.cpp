@@ -8,7 +8,7 @@ namespace dd{
              const bool & _is_evid, const VariableValue & _lower_bound,
              const VariableValue & _upper_bound, const VariableValue & _init_value, 
              const VariableValue & _current_value, const int & _n_factors,
-             bool is_observation){
+             bool is_observation, bool in_cnn){
 
       this->id = _id;
       this->domain_type = _domain_type;
@@ -21,6 +21,7 @@ namespace dd{
       this->n_factors = _n_factors;
       this->isactive = false;
       this->component_id = -1;
+      this->in_cnn = in_cnn;
     }
 
     bool VariableInFactor::satisfiedUsing(int value) const{
