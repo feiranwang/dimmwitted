@@ -203,6 +203,9 @@ namespace dd{
      */
     bool is_usable();
 
+    // fill the is_observation field for VariableInFactor
+    void handle_observation();
+
   };
 
   /**
@@ -229,7 +232,7 @@ namespace dd{
     infrs->agg_means[variable.id] += new_value;
     infrs->agg_nsamples[variable.id]  ++ ;
     if(variable.domain_type == DTYPE_MULTINOMIAL){
-      infrs->multinomial_tallies[variable.n_start_i_tally + (int)(new_value) - variable.lower_bound] ++;
+      infrs->multinomial_tallies[variable.n_start_i_tally + (int)(new_value) - (int)variable.lower_bound] ++;
     }
   }
 
