@@ -43,6 +43,7 @@ namespace dd{
 
     TCLAP::ValueArg<int> * n_datacopy;
     TCLAP::ValueArg<double> * reg_param;
+    TCLAP::ValueArg<double> * elastic_net_alpha;
     TCLAP::ValueArg<int> * burn_in;
     TCLAP::SwitchArg * quiet; 
     TCLAP::SwitchArg * sample_evidence;

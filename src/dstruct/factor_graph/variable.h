@@ -8,6 +8,7 @@
 #define DTYPE_REAL        0x01
 #define DTYPE_MULTINOMIAL 0x04
 #define DTYPE_CENSORED_MULTINOMIAL 0x02
+#define DTYPE_SURVIVAL 0x03
 
 namespace dd{
 

@@ -7,7 +7,7 @@ namespace dd{
 
       app_name = _app_name;
 
-      if(app_name == "mat" || app_name == "gibbs" || app_name == "inc"){
+      if(app_name == "mat" || app_name == "gibbs" || app_name == "inc" || app_name == "cox"){
         cmd = new TCLAP::CmdLine("DimmWitted GIBBS", ' ', "0.01");
 
         original_folder = new TCLAP::ValueArg<std::string>("r","ori_folder","Folder of original factor graph",false,"","string");
@@ -32,6 +32,7 @@ namespace dd{
         n_thread = new TCLAP::ValueArg<int>("t","threads","This setting is no longer supported and will be ignored.",false,-1,"int");
         n_datacopy = new TCLAP::ValueArg<int>("c","n_datacopy","Number of factor graph copies",false,0,"int");
         reg_param = new TCLAP::ValueArg<double>("b","reg_param","l2 regularization parameter",false,0.01,"double");
+        elastic_net_alpha = new TCLAP::ValueArg<double>("","elastic_net_alpha","Elastic net alpha: 0.5 * (1-alpha) * l2 + (alpha) * l1",false,0.1,"double");
         quiet = new TCLAP::SwitchArg("q", "quiet", "quiet output", false);
         sample_evidence = new TCLAP::SwitchArg("", "sample_evidence", "also sample evidence variables in inference", false);
         learn_non_evidence = new TCLAP::SwitchArg("", "learn_non_evidence", "sample non-evidence variables in learning", false);
@@ -65,6 +66,7 @@ namespace dd{
 
         cmd->add(*n_datacopy);
         cmd->add(*reg_param);
+        cmd->add(*elastic_net_alpha);
         cmd->add(*quiet);
 
         cmd->add(*burn_in);

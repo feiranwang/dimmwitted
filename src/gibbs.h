@@ -30,7 +30,7 @@ void mat(dd::CmdParser & cmd_parser);
  */
 void inc(dd::CmdParser & cmd_parser);
 
-
+void cox(dd::CmdParser & cmd_parser);
 
 
 

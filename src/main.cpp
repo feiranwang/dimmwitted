@@ -13,6 +13,8 @@ int main(int argv, char** argc){
     mat(cmd_parser);
   } else if (cmd_parser.app_name == "inc") {
     inc(cmd_parser);
+  } else if (cmd_parser.app_name == "cox") {
+    cox(cmd_parser);
   }
 
 

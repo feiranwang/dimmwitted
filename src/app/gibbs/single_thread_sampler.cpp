@@ -177,7 +177,7 @@ namespace dd{
 
         // printf("sample inf %f\n", p_fg->infrs->cnn_ips[variable.n_start_i_tally]);
 
-        if(variable.is_evid == false){
+        if(variable.is_evid == false || sample_evidence) {
           double proposal = draw_sample(vid, false);
           p_fg->template update<false>(variable, proposal);
         }
@@ -333,7 +333,9 @@ namespace dd{
     // TODO support other types of variables as well
     assert(variable.domain_type == DTYPE_MULTINOMIAL || variable.domain_type == DTYPE_CENSORED_MULTINOMIAL);
 
-    if (variable.is_evid && !is_free && variable.is_censored) return variable.assignment_evid;
+    // when sampling conditioned on evidence, and the sampled variable is evidence
+    // and the variable is not censored, just return the evidence value
+    if (variable.is_evid && !is_free && !variable.is_censored) return variable.assignment_evid;
 
     while(variable.upper_bound >= (int)varlen_potential_buffer.size()){
       varlen_potential_buffer.push_back(0.0);

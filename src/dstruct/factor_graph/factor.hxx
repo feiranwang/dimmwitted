@@ -263,7 +263,6 @@ namespace dd{
 	  bool satisfied = false;
 	  for(long i_vif=n_start_i_vif; i_vif<n_start_i_vif+n_variables; i_vif++){
 	    const VariableInFactor & vif = vifs[i_vif];
-	    // std::cerr << "ob: " << vif.is_observation << std::endl;
 	    if (vif.is_observation) {
 	    	ans = var_values[vif.vid];
 	    } else {

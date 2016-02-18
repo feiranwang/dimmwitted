@@ -1,5 +1,6 @@
 
 #include "gibbs.h"
+#include "app/cox/cox.h"
 #include <cmath>
 
 /*
@@ -8,7 +9,7 @@
 dd::CmdParser parse_input(int argc, char** argv){
 
   std::vector<std::string> new_args;
-  if (argc < 2 || (strcmp(argv[1], "gibbs") != 0 && strcmp(argv[1], "mat") != 0 && strcmp(argv[1], "inc") != 0)) {
+  if (argc < 2 || (strcmp(argv[1], "gibbs") != 0 && strcmp(argv[1], "mat") != 0 && strcmp(argv[1], "inc") != 0 && strcmp(argv[1], "cox") != 0)) {
     new_args.push_back(std::string(argv[0]) + " " + "gibbs");
     new_args.push_back("-h");
   } else {
@@ -307,4 +308,79 @@ void gibbs(dd::CmdParser & cmd_parser){
   // inference
   gibbs.inference(numa_aware_n_epoch, is_quiet, false, false);
   gibbs.aggregate_results_and_dump(is_quiet, 0);
+}
+
+void cox(dd::CmdParser & cmd_parser){
+
+  // get command line arguments
+  std::string fg_file = cmd_parser.fg_file->getValue();
+
+  std::string weight_file = cmd_parser.weight_file->getValue();
+  std::string variable_file = cmd_parser.variable_file->getValue();
+  std::string factor_file = cmd_parser.factor_file->getValue();
+  std::string edge_file = cmd_parser.edge_file->getValue();
+
+  std::string output_folder = cmd_parser.output_folder->getValue();
+
+  // check arguments
+  if (fg_file == "" || weight_file == "" || variable_file == "" || factor_file == "" ||
+      edge_file == "" || output_folder == "") {
+    std::cout << "factor graph files not specified" << std::endl;
+    exit(1);
+  }
+
+  int n_learning_epoch = cmd_parser.n_learning_epoch->getValue();
+  int n_inference_epoch = cmd_parser.n_inference_epoch->getValue();
+
+  double stepsize = cmd_parser.stepsize->getValue();
+  double decay = cmd_parser.decay->getValue();
+
+  double reg_param = cmd_parser.reg_param->getValue();
+  double alpha = cmd_parser.elastic_net_alpha->getValue();
+  bool is_quiet = cmd_parser.quiet->getValue();
+  bool sample_evidence = cmd_parser.sample_evidence->getValue();
+  bool fusion_mode = cmd_parser.fusion_mode->getValue();
+
+  Meta meta = read_meta(fg_file);
+
+  if (is_quiet) {
+    std::cout << "Running in quiet mode..." << std::endl;
+  } else {
+    std::cout << std::endl;
+    std::cout << "#################GIBBS SAMPLING#################" << std::endl;
+    std::cout << "# fg_file            : " << fg_file << std::endl;
+    std::cout << "# edge_file          : " << edge_file << std::endl;
+    std::cout << "# weight_file        : " << weight_file << std::endl;
+    std::cout << "# variable_file      : " << variable_file << std::endl;
+    std::cout << "# factor_file        : " << factor_file << std::endl;
+    std::cout << "# output_folder      : " << output_folder << std::endl;
+    std::cout << "# n_learning_epoch   : " << n_learning_epoch << std::endl;
+    std::cout << "# stepsize           : " << stepsize << std::endl;
+    std::cout << "# decay              : " << decay << std::endl;
+    std::cout << "# fusion_mode        : " << fusion_mode << std::endl;
+    std::cout << "################################################" << std::endl;
+    std::cout << "# nvar               : " << meta.num_variables << std::endl;
+    std::cout << "# nfac               : " << meta.num_factors << std::endl;
+    std::cout << "# nweight            : " << meta.num_weights << std::endl;
+    std::cout << "# nedge              : " << meta.num_edges << std::endl;
+    std::cout << "################################################" << std::endl;
+  }
+
+  // run on NUMA node 0
+  numa_run_on_node(0);
+  numa_set_localalloc();
+
+  // load factor graph
+  dd::FactorGraph fg(meta.num_variables, meta.num_factors, meta.num_weights, meta.num_edges);
+  fg.load(cmd_parser, is_quiet, false);
+  dd::Cox cox_model(fg, n_learning_epoch, cmd_parser.output_folder->getValue(),
+    stepsize, decay, reg_param, alpha, fusion_mode);
+  // std::cout << "*****" << std::endl;
+  // std::cout << std::endl;
+  // std::cout << cox_model.compute_loss() << std::endl;
+  cox_model.check();
+  // cox_model.train();
+  // cox_model.dump_weights();
+  // cox_model.test();
+
 }

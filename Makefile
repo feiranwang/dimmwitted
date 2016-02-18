@@ -48,6 +48,7 @@ SOURCES += src/app/gibbs/gibbs_sampling.cpp
 SOURCES += src/app/gibbs/single_thread_sampler.cpp
 SOURCES += src/app/gibbs/single_node_sampler.cpp
 SOURCES += src/timer.cpp
+SOURCES += src/app/cox/cox.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 PROGRAM = dw
 

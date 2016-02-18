@@ -117,8 +117,11 @@ long long read_variables(string filename, dd::FactorGraph &fg)
             type_const  = DTYPE_REAL;
             upper_bound = 0;
         } else if (type == 3) {
-            type_const = DTYPE_CENSORED_MULTINOMIAL;
+            type_const  = DTYPE_CENSORED_MULTINOMIAL;
             upper_bound = cardinality - 1;
+        } else if (type == 4) {
+            type_const  = DTYPE_SURVIVAL;
+            upper_bound = 0;
         } else {
             cerr << "[ERROR] Only Boolean and Multinomial variables are supported now!" << endl;
             exit(1);
@@ -214,6 +217,9 @@ long long read_edges(string filename, dd::FactorGraph &fg)
         if (fg.variables[variable_id].domain_type == DTYPE_BOOLEAN) {
             fg.factors[factor_id].tmp_variables.push_back(
                 dd::VariableInFactor(variable_id, fg.variables[variable_id].upper_bound, variable_id, position, ispositive));
+        } else if (fg.variables[variable_id].domain_type == DTYPE_SURVIVAL) {
+            fg.factors[factor_id].tmp_variables.push_back(
+                dd::VariableInFactor(variable_id, position, ispositive, 0));
         } else {
             fg.factors[factor_id].tmp_variables.push_back(
                 dd::VariableInFactor(variable_id, position, ispositive, equal_predicate));
