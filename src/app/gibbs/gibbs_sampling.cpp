@@ -216,7 +216,6 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
 
           sockets[i].recv(&requests[i]);
           FusionMessage * msg = (FusionMessage*)requests[i].data();
-          assert(this->factorgraphs[0].cnn_batch_sizes[i] = msg->batch);
 
           // for (int j = 0; j < msg->batch; j++) {
           //   printf("vid = %d label = %d\n", msg->imgids[j], msg->labels[j]);

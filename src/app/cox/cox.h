@@ -3,6 +3,7 @@
 #include "io/cmd_parser.h"
 #include "common.h"
 #include "dstruct/factor_graph/factor_graph.h"
+#include "message.h"
 
 #ifndef _COX_H_
 #define _COX_H_
@@ -28,8 +29,9 @@ namespace dd {
     std::vector<std::vector<double>> x_test;
     std::vector<Variable> y_train;
     std::vector<Variable> y_test;
-    // map from variable id -> training matrix index
-    std::map<long, int> idmap;
+    // map from variable id -> matrix index
+    std::map<long, int> idmap_train;
+    std::map<long, int> idmap_test;
 
     // solver related settings
     int n_epochs;
@@ -79,6 +81,8 @@ namespace dd {
 
     void dump_scores_helper(std::ofstream &fout, std::vector<std::vector<double>> x, std::vector<Variable> y,
       std::vector<double> cnn_scores);
+
+    void save_fusion_message(FusionMessage *msg, bool train);
 
   };
 }

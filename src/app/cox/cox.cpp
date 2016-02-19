@@ -1,10 +1,10 @@
 
-#include "app/cox/cox.h"
-#include "timer.h"
 #include <cmath>
 #include <fstream>
 #include <cstdlib>
 #include <zmq.hpp>
+#include "app/cox/cox.h"
+#include "timer.h"
 
 dd::Cox::Cox(FactorGraph &fg, int n_epochs, std::string folder,
              double lr, double lr_decay, double lambda, double alpha,
@@ -60,11 +60,12 @@ dd::Cox::Cox(FactorGraph &fg, int n_epochs, std::string folder,
     if (variable.is_evid) {
       y_train.push_back(variable);
       x_train.push_back(features);
-      idmap[variable.id] = n_train;
+      idmap_train[variable.id] = n_train;
       n_train++;
     } else {
       y_test.push_back(variable);
       x_test.push_back(features);
+      idmap_test[variable.id] = n_test;
       n_test++;
     }
   }
@@ -98,6 +99,7 @@ dd::Cox::Cox(FactorGraph &fg, int n_epochs, std::string folder,
     for (int i = 0; i < n_test; i++) {
       cnn_scores_test.push_back(0);
     }
+    this->n_epochs = (cnn_train_iterations / cnn_test_interval + 1) * cnn_test_iterations + cnn_train_iterations;
   }
 
 }
@@ -223,18 +225,14 @@ std::vector<double> dd::Cox::gradients_to_beta() {
 
 void dd::Cox::train() {
 
-  // // fusion
-  // zmq::context_t context(1);
-  // zmq::socket_t socket(context, ZMQ_REP);
-  // zmq::message_t request;
-  // int batch_counts, iteration_counts, max_iterations;
+  // fusion
+  zmq::context_t context(1);
+  zmq::socket_t socket(context, ZMQ_REP);
+  zmq::message_t request;
 
-  // if (fusion_mode) {
-  //   socket.bind(("tcp://*:" + cnn_port).c_str());
-
-  //   // number of iterations Caffe needs to run
-  //   int max_iterations = (cnn_train_iterations / cnn_test_intervals + 1) * cnn_test_iterations + cnn_train_iterations;
-  // }
+  if (fusion_mode) {
+    socket.bind(("tcp://*:" + cnn_port).c_str());
+  }
 
 
   Timer t_total;
@@ -245,8 +243,39 @@ void dd::Cox::train() {
     Timer t;
     t.restart();
 
+    // receive fusion message, and save cnn scores
+    if (fusion_mode) {
+
+      socket.recv(&request);
+      FusionMessage *msg = (FusionMessage *)request.data();
+
+      // for (int j = 0; j < msg->batch; j++) {
+      //   printf("vid = %d label = %d\n", msg->imgids[j], msg->labels[j]);
+      // }
+
+      if (msg->msg_type == REQUEST_GRAD) {
+        save_fusion_message(msg, true);
+      } else if (msg->msg_type == REQUEST_ACCURACY) {
+        save_fusion_message(msg, false);
+        socket.send(request);
+        continue;
+      }
+    }
+
     double loss = compute_loss();
     std::vector<double> gradients = gradients_to_beta();
+
+    // reply fusion message, backprop cnn gradients during training, and original data during testing
+    if (fusion_mode) {
+      FusionMessage *msg = (FusionMessage *)request.data();
+      if (msg->msg_type == REQUEST_GRAD) {
+        std::vector<double> gradients_scores = gradients_to_scores();
+        for (int i = 0; i < n_train; i++) {
+          msg->content[i] = gradients_scores[i];
+        }
+        socket.send(request);
+      }
+    }
 
     // momentum-GD
     for (int i = 0; i < n_features; i++) {
@@ -298,6 +327,24 @@ void dd::Cox::dump_scores_helper(std::ofstream &fout, std::vector<std::vector<do
   std::vector<double> scores = compute_scores(x, cnn_scores);
   for (size_t i = 0; i < scores.size(); i++) {
     fout << y[i].id << " 0 " << scores[i] << std::endl;
+  }
+}
+
+void dd::Cox::save_fusion_message(FusionMessage *msg, bool train) {
+  if (train) {
+    assert(msg->nelem == n_train);
+    assert(msg->batch == n_train);
+    for (int i = 0; i < n_train; i++) {
+      long vid = msg->imgids[i];
+      cnn_scores_train[idmap_train[vid]] = msg->content[i];
+    }
+  } else {
+    assert(msg->nelem == n_test);
+    assert(msg->batch == n_test);
+    for (int i = 0; i < n_test; i++) {
+      long vid = msg->imgids[i];
+      cnn_scores_test[idmap_train[vid]] = msg->content[i];
+    }
   }
 }
 

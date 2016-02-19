@@ -338,7 +338,6 @@ void cox(dd::CmdParser & cmd_parser){
   double reg_param = cmd_parser.reg_param->getValue();
   double alpha = cmd_parser.elastic_net_alpha->getValue();
   bool is_quiet = cmd_parser.quiet->getValue();
-  bool sample_evidence = cmd_parser.sample_evidence->getValue();
   bool fusion_mode = cmd_parser.fusion_mode->getValue();
 
   Meta meta = read_meta(fg_file);
@@ -378,9 +377,8 @@ void cox(dd::CmdParser & cmd_parser){
   // std::cout << "*****" << std::endl;
   // std::cout << std::endl;
   // std::cout << cox_model.compute_loss() << std::endl;
-  cox_model.check();
-  // cox_model.train();
-  // cox_model.dump_weights();
-  // cox_model.test();
+  cox_model.train();
+  cox_model.dump_weights();
+  cox_model.test();
 
 }
