@@ -330,10 +330,10 @@ void cox(dd::CmdParser & cmd_parser){
   }
 
   int n_learning_epoch = cmd_parser.n_learning_epoch->getValue();
-  int n_inference_epoch = cmd_parser.n_inference_epoch->getValue();
 
   double stepsize = cmd_parser.stepsize->getValue();
   double decay = cmd_parser.decay->getValue();
+  int batch_size = cmd_parser.batch_size->getValue();
 
   double reg_param = cmd_parser.reg_param->getValue();
   double alpha = cmd_parser.elastic_net_alpha->getValue();
@@ -373,7 +373,7 @@ void cox(dd::CmdParser & cmd_parser){
   dd::FactorGraph fg(meta.num_variables, meta.num_factors, meta.num_weights, meta.num_edges);
   fg.load(cmd_parser, is_quiet, false);
   dd::Cox cox_model(fg, n_learning_epoch, cmd_parser.output_folder->getValue(),
-    stepsize, decay, reg_param, alpha, fusion_mode);
+    stepsize, decay, reg_param, alpha, batch_size, fusion_mode);
   // std::cout << "*****" << std::endl;
   // std::cout << std::endl;
   // std::cout << cox_model.compute_loss() << std::endl;

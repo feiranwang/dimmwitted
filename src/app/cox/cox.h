@@ -40,6 +40,8 @@ namespace dd {
     double momentum;
     double lambda;
     double alpha;
+    int batch_size;
+    int n_iterations;
 
     // output
     std::string folder;
@@ -56,7 +58,7 @@ namespace dd {
 
     // Constructs a new cox model from factor graph
     Cox(FactorGraph &fg, int n_epochs, std::string folder, double lr, double lr_decay,
-        double lambda, double alpha,
+        double lambda, double alpha, int batch_size,
         bool fusion_mode);
 
     // scores
@@ -66,11 +68,13 @@ namespace dd {
     std::vector<double> compute_theta(std::vector<double> scores);
 
     // loss
-    double compute_loss();
+    double compute_loss(std::vector<std::vector<double>> x, std::vector<Variable> y,
+      std::vector<double> cnn_scores);
 
     // gradients
-    std::vector<double> gradients_to_scores();
-    std::vector<double> gradients_to_beta();
+    std::vector<double> gradients_to_scores(std::vector<double> scores, std::vector<Variable> y);
+    std::vector<double> gradients_to_beta(std::vector<std::vector<double>> x,
+      std::vector<Variable> y, std::vector<double> cnn_scores);
 
     // train
     void train();
@@ -79,8 +83,8 @@ namespace dd {
 
     void test();
 
-    void dump_scores_helper(std::ofstream &fout, std::vector<std::vector<double>> x, std::vector<Variable> y,
-      std::vector<double> cnn_scores);
+    void dump_scores_helper(std::ofstream &fout, std::vector<std::vector<double>> x,
+      std::vector<Variable> y, std::vector<double> cnn_scores);
 
     void save_fusion_message(FusionMessage *msg, bool train);
 

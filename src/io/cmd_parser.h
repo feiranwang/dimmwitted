@@ -40,6 +40,7 @@ namespace dd{
     TCLAP::ValueArg<double> * stepsize;
     TCLAP::ValueArg<double> * stepsize2;
     TCLAP::ValueArg<double> * decay;
+    TCLAP::ValueArg<int> * batch_size;
 
     TCLAP::ValueArg<int> * n_datacopy;
     TCLAP::ValueArg<double> * reg_param;

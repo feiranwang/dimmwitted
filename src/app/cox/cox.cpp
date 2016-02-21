@@ -7,16 +7,17 @@
 #include "timer.h"
 
 dd::Cox::Cox(FactorGraph &fg, int n_epochs, std::string folder,
-             double lr, double lr_decay, double lambda, double alpha,
+             double lr, double lr_decay, double lambda, double alpha, int batch_size,
              bool fusion_mode) :
   n_epochs(n_epochs),
   lr(lr),
   lr_decay(lr_decay),
   lambda(lambda),
   alpha(alpha),
+  batch_size(batch_size),
   folder(folder),
   fusion_mode(fusion_mode) {
-  // TODO fusion weight
+
   n_features = fg.n_weight;
 
   // count below
@@ -31,8 +32,7 @@ dd::Cox::Cox(FactorGraph &fg, int n_epochs, std::string folder,
   }
   for (int i = 0; i < n_features; i++) {
     // initialize from fixed weight or uniform [-1, 1]
-    // double weight = fg.weights[i].isfixed ? fg.weights[i].weight : 2 * ((double)rand() / RAND_MAX) - 1;
-    double weight = 0;
+    double weight = fg.weights[i].isfixed ? fg.weights[i].weight : 2 * ((double)rand() / RAND_MAX) - 1;
     beta[fg.weights[i].id] = weight;
   }
 
@@ -83,6 +83,8 @@ dd::Cox::Cox(FactorGraph &fg, int n_epochs, std::string folder,
 
   // solver settings
   momentum = 0.9;
+  int iterations_per_epoch = n_train / batch_size > 1 ? n_train / batch_size : 1;
+  n_iterations = n_epochs * iterations_per_epoch;
 
   // fusion, handle only 1 cnn
   if (fusion_mode) {
@@ -99,12 +101,14 @@ dd::Cox::Cox(FactorGraph &fg, int n_epochs, std::string folder,
     for (int i = 0; i < n_test; i++) {
       cnn_scores_test.push_back(0);
     }
-    this->n_epochs = (cnn_train_iterations / cnn_test_interval + 1) * cnn_test_iterations + cnn_train_iterations;
+    n_iterations = (cnn_train_iterations / cnn_test_interval + 1) * cnn_test_iterations + cnn_train_iterations;
+    this->batch_size = cnn_batch_size;
   }
 
 }
 
-std::vector<double> dd::Cox::compute_scores(std::vector<std::vector<double>> x, std::vector<double> cnn_scores) {
+std::vector<double> dd::Cox::compute_scores(std::vector<std::vector<double>> x,
+  std::vector<double> cnn_scores) {
   int m = x.size();
   std::vector<double> scores(m, 0);
   for (int i = 0; i < m; i++) {
@@ -123,31 +127,34 @@ std::vector<double> dd::Cox::compute_scores(std::vector<std::vector<double>> x, 
 }
 
 std::vector<double> dd::Cox::compute_theta(std::vector<double> scores) {
-  std::vector<double> theta(n_train, 0);
-  for (int i = 0; i < n_train; i++) {
+  int m = scores.size();
+  std::vector<double> theta(m, 0);
+  for (int i = 0; i < m; i++) {
     theta[i] = exp(scores[i]);
   }
   return theta;
 }
 
-double dd::Cox::compute_loss() {
-  std::vector<double> scores = compute_scores(x_train, cnn_scores_train);
+double dd::Cox::compute_loss(std::vector<std::vector<double>> x,
+  std::vector<Variable> y, std::vector<double> cnn_scores) {
+  int m = x.size();
+  std::vector<double> scores = compute_scores(x, cnn_scores);
   std::vector<double> theta = compute_theta(scores);
   double loss = 0;
-  for (int i = 0; i < n_train; i++) {
+  for (int i = 0; i < m; i++) {
     // only sum over events
-    if (y_train[i].is_censored) continue;
+    if (y[i].is_censored) continue;
 
     // second term of loss
     double sum_theta = 0;
-    for (int j = 0; j < n_train; j++) {
-      if (y_train[j].assignment_evid >= y_train[i].assignment_evid) {
+    for (int j = 0; j < m; j++) {
+      if (y[j].assignment_evid >= y[i].assignment_evid) {
         sum_theta += theta[j];
       }
     }
     loss += - scores[i] + log(sum_theta);
   }
-  loss = loss / n_train;
+  loss = loss / m;
 
   double norm_2 = 0, norm_1 = 0;
   for (int j = 0; j < n_features; j++) {
@@ -158,61 +165,65 @@ double dd::Cox::compute_loss() {
   return loss;
 }
 
-std::vector<double> dd::Cox::gradients_to_scores() {
-  std::vector<double> gradients(n_train, 0);
-  std::vector<double> scores = compute_scores(x_train, cnn_scores_train);
+std::vector<double> dd::Cox::gradients_to_scores(std::vector<double> scores,
+  std::vector<Variable> y) {
+  int m = scores.size();
+  std::vector<double> gradients(m, 0);
   std::vector<double> theta = compute_theta(scores);
 
-  for (int i = 0; i < n_train; i++) {
-    if (y_train[i].is_censored) continue;
+  for (int i = 0; i < m; i++) {
+    if (y[i].is_censored) continue;
     double sum_theta = 0;
-    for (int j = 0; j < n_train; j++) {
-      if (y_train[j].assignment_evid >= y_train[i].assignment_evid) {
+    for (int j = 0; j < m; j++) {
+      if (y[j].assignment_evid >= y[i].assignment_evid) {
         sum_theta += theta[j];
       }
     }
 
-    for (int j = 0; j < n_train; j++) {
-      gradients[j] += -(j == i) + (y_train[j].assignment_evid >= y_train[i].assignment_evid) * theta[j] / sum_theta;
+    for (int j = 0; j < m; j++) {
+      gradients[j] += -(j == i) + (y[j].assignment_evid >= y[i].assignment_evid) * theta[j] / sum_theta;
     }
 
   }
-  for (int i = 0; i < n_train; i++) {
-    gradients[i] /= n_train;
+  for (int i = 0; i < m; i++) {
+    gradients[i] /= m;
   }
   return gradients;
 }
 
-std::vector<double> dd::Cox::gradients_to_beta() {
+std::vector<double> dd::Cox::gradients_to_beta(std::vector<std::vector<double>> x,
+  std::vector<Variable> y, std::vector<double> cnn_scores) {
+
+  int m = x.size();
   std::vector<double> gradients(n_features, 0);
-  std::vector<double> scores = compute_scores(x_train, cnn_scores_train);
+  std::vector<double> scores = compute_scores(x, cnn_scores);
   std::vector<double> theta = compute_theta(scores);
 
-  for (int i = 0; i < n_train; i++) {
-    if (y_train[i].is_censored) continue;
+  for (int i = 0; i < m; i++) {
+    if (y[i].is_censored) continue;
     double sum_theta = 0;
-    for (int j = 0; j < n_train; j++) {
-      if (y_train[j].assignment_evid >= y_train[i].assignment_evid) {
+    for (int j = 0; j < m; j++) {
+      if (y[j].assignment_evid >= y[i].assignment_evid) {
         sum_theta += theta[j];
       }
     }
 
     std::vector<double> sum_theta_x(n_features, 0);
-    for (int j = 0; j < n_train; j++) {
-      if (y_train[j].assignment_evid >= y_train[i].assignment_evid) {
+    for (int j = 0; j < m; j++) {
+      if (y[j].assignment_evid >= y[i].assignment_evid) {
         for (int k = 0; k < n_features; k++) {
-          sum_theta_x[k] += theta[j] * x_train[j][k];
+          sum_theta_x[k] += theta[j] * x[j][k];
         }
       }
     }
 
     for (int j = 0; j < n_features; j++) {
-      gradients[j] += -x_train[i][j] + sum_theta_x[j] / sum_theta;
+      gradients[j] += -x[i][j] + sum_theta_x[j] / sum_theta;
     }
   }
 
   for (int j = 0; j < n_features; j++) {
-    gradients[j] /= n_train;
+    gradients[j] /= m;
   }
 
   // regularization terms
@@ -224,6 +235,8 @@ std::vector<double> dd::Cox::gradients_to_beta() {
 }
 
 void dd::Cox::train() {
+
+  int iterations_per_epoch = n_train / batch_size > 1 ? n_train / batch_size : 1;
 
   // fusion
   zmq::context_t context(1);
@@ -239,9 +252,13 @@ void dd::Cox::train() {
 
   std::vector<double> cache(n_features, 0);
 
-  for (int epoch = 0; epoch < n_epochs; epoch++) {
+  for (int iter = 0; iter < n_iterations; iter++) {
     Timer t;
     t.restart();
+
+    std::vector<std::vector<double>> x_batch;
+    std::vector<Variable> y_batch;
+    std::vector<double> cnn_scores_batch;
 
     // receive fusion message, and save cnn scores
     if (fusion_mode) {
@@ -260,16 +277,35 @@ void dd::Cox::train() {
         socket.send(request);
         continue;
       }
+
+      // use cnn's batch
+      assert(batch_size == msg->batch);
+      for (int i = 0; i < batch_size; i++) {
+        int index = idmap_train[msg->imgids[i]];
+        x_batch.push_back(x_train[index]);
+        y_batch.push_back(y_train[index]);
+        cnn_scores_batch.push_back(cnn_scores_train[index]);
+      }
+
+    } else { // generate batch (could be slow)
+      for (int i = 0; i < batch_size; i++) {
+        int index = (iter * batch_size + i) % n_train;
+        // TODO
+        // index = rand() % n_train;
+        x_batch.push_back(x_train[index]);
+        y_batch.push_back(y_train[index]);
+      }
     }
 
-    double loss = compute_loss();
-    std::vector<double> gradients = gradients_to_beta();
+    double loss = compute_loss(x_batch, y_batch, cnn_scores_batch);
+    std::vector<double> gradients = gradients_to_beta(x_batch, y_batch, cnn_scores_batch);
 
     // reply fusion message, backprop cnn gradients during training, and original data during testing
     if (fusion_mode) {
       FusionMessage *msg = (FusionMessage *)request.data();
       if (msg->msg_type == REQUEST_GRAD) {
-        std::vector<double> gradients_scores = gradients_to_scores();
+        std::vector<double> scores = compute_scores(x_batch, cnn_scores_batch);
+        std::vector<double> gradients_scores = gradients_to_scores(scores, y_batch);
         for (int i = 0; i < n_train; i++) {
           msg->content[i] = gradients_scores[i];
         }
@@ -284,15 +320,18 @@ void dd::Cox::train() {
     for (int i = 0; i < n_features; i++) {
       beta[i] += cache[i];
     }
-    std::cout << "Epoch " << epoch << ", loss = " << loss << std::endl;
     // for (int i = 0; i < n_features; i++) {
     //   std::cout << gradients[i] << ", ";
     // }
     // std::cout << std::endl;
-    std::cout << "    time = " << t.elapsed() << " sec." << std::endl;
 
-    // lr decay
-    lr *= lr_decay;
+    // epoch end
+    if ((iter + 1) % iterations_per_epoch == 0) {
+      lr *= lr_decay;
+    }
+
+    std::cout << "Iteration " << iter << ", loss = " << loss << std::endl;
+    std::cout << "    time = " << t.elapsed() << " sec." << std::endl;
   }
   // for (int i = 0; i < n_features; i++) {
   //   std::cout << beta[i] << ", ";
@@ -332,18 +371,14 @@ void dd::Cox::dump_scores_helper(std::ofstream &fout, std::vector<std::vector<do
 
 void dd::Cox::save_fusion_message(FusionMessage *msg, bool train) {
   if (train) {
-    assert(msg->nelem == n_train);
-    assert(msg->batch == n_train);
     for (int i = 0; i < n_train; i++) {
-      long vid = msg->imgids[i];
-      cnn_scores_train[idmap_train[vid]] = msg->content[i];
+      int index = idmap_train[msg->imgids[i]];
+      cnn_scores_train[index] = msg->content[i];
     }
   } else {
-    assert(msg->nelem == n_test);
-    assert(msg->batch == n_test);
     for (int i = 0; i < n_test; i++) {
-      long vid = msg->imgids[i];
-      cnn_scores_test[idmap_train[vid]] = msg->content[i];
+      int index = idmap_test[msg->imgids[i]];
+      cnn_scores_test[index] = msg->content[i];
     }
   }
 }
