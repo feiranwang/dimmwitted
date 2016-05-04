@@ -3,6 +3,9 @@
 
 #include <stdlib.h>
 #include "dstruct/factor_graph/factor_graph.h"
+
+#include <map>
+
 using namespace std;
 
 // meta data
@@ -44,4 +47,7 @@ long long read_factors(string filename, dd::FactorGraph &);
  */
 long long read_edges(string filename, dd::FactorGraph &);
 
+long long read_probs(string filename, dd::FactorGraph &);
+
 #endif
+

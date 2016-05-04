@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include "binary_parser.h"
 
+#include <map>
 
 // 64-bit big endian to little endian
 # define bswap_64(x) \
@@ -221,3 +222,15 @@ long long read_edges(string filename, dd::FactorGraph &fg)
     return count;   
 }
 
+long long read_probs(string filename, dd::FactorGraph &fg)
+{
+    ifstream file;
+    file.open(filename.c_str(), ios::in);
+    long long id;
+    double prob;
+    while (file >> id >> prob) {
+        fg.variables[id].prob = prob;
+    }
+    file.close();
+    return 0;
+}

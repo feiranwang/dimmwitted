@@ -141,6 +141,7 @@ void dd::FactorGraph::load(const CmdParser & cmd, const bool is_quiet, int inc){
   std::string filename_factors;
   std::string filename_variables;
   std::string filename_weights;
+  std::string filename_probs;
   if (inc) {
     filename_weights    = cmd.original_folder->getValue() + "/graph.weights";
     filename_variables  = cmd.original_folder->getValue() + "/graph.variables";
@@ -151,6 +152,7 @@ void dd::FactorGraph::load(const CmdParser & cmd, const bool is_quiet, int inc){
     filename_variables  = cmd.variable_file->getValue();
     filename_factors    = cmd.factor_file->getValue();
     filename_edges      = cmd.edge_file->getValue();
+    filename_probs      = cmd.prob_file->getValue();
   }
 
   // load variables
@@ -196,7 +198,9 @@ void dd::FactorGraph::load(const CmdParser & cmd, const bool is_quiet, int inc){
   // factors and weights are ordered so that their id is the index 
   // where they are stored in the array
   this->sort_by_id();
-
+  
+  n_loaded = read_probs(filename_probs, *this);
+  
   // load edges
   n_loaded = read_edges(filename_edges, *this);
   if(cmd.delta_folder->getValue() != ""){

@@ -15,6 +15,12 @@ namespace dd{
     sampler.sample_sgd(i_worker,n_worker);
   }
 
+  void gibbs_single_thread_prob_task(FactorGraph * const _p_fg, int i_worker, int n_worker,
+    bool learn_non_evidence) {
+    SingleThreadSampler sampler = SingleThreadSampler(_p_fg, false, 0, learn_non_evidence);
+    sampler.sample_prob(i_worker,n_worker);
+  }
+
   SingleNodeSampler::SingleNodeSampler(FactorGraph * _p_fg, int _nthread, int _nodeid) :
     p_fg (_p_fg), nthread(_nthread), nodeid(_nodeid) {}
 
@@ -73,6 +79,22 @@ namespace dd{
     }
   }
 
+  void SingleNodeSampler::sample_prob(){
+    numa_run_on_node(this->nodeid);
+
+    this->threads.clear();
+
+    for(int i=0;i<this->nthread;i++){
+      this->threads.push_back(std::thread(gibbs_single_thread_prob_task, p_fg, i,
+        nthread, learn_non_evidence));
+    }
+  }
+
+  void SingleNodeSampler::wait_prob(){
+    for(int i=0;i<this->nthread;i++){
+      this->threads[i].join();
+    }
+  }
 }
 
 

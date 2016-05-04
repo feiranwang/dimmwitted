@@ -74,10 +74,13 @@ namespace dd{
      */
     void sample_sgd(const int & i_sharding, const int & n_sharding);
 
+    void sample_prob(const int & i_sharding, const int & n_sharding);
     /**
      * Performs SGD by sampling a single variable with id vid
      */
     void sample_sgd_single_variable(long vid);
+
+    void sample_prob_single_variable(long vid);
 
     /**
      * Samples a single variable with id vid

@@ -21,8 +21,8 @@ dd::GibbsSampling::GibbsSampling(FactorGraph * const _p_fg,
     }
 
     // max possible threads per NUMA node
-    n_thread_per_numa = (sysconf(_SC_NPROCESSORS_CONF))/(n_numa_nodes+1);
-    //n_thread_per_numa = 1;
+    // n_thread_per_numa = (sysconf(_SC_NPROCESSORS_CONF))/(n_numa_nodes+1);
+    n_thread_per_numa = 1;
 
     this->factorgraphs.push_back(*p_fg);
 
@@ -83,6 +83,16 @@ void dd::GibbsSampling::inference(const int & n_epoch, const bool is_quiet, cons
 
     // restart timer
     t.restart();
+
+    // performs assign evidence with prob
+    for(int i=0;i<nnode;i++){
+      single_node_samplers[i].sample_prob();
+    }
+
+    // wait for samplers to finish
+    for(int i=0;i<nnode;i++){
+      single_node_samplers[i].wait();
+    }
 
     // sample
     for(int i=0;i<nnode;i++){
@@ -161,11 +171,22 @@ void dd::GibbsSampling::learn(const int & n_epoch, const int & n_sample_per_epoc
       single_node_samplers[i].p_fg->stepsize = current_stepsize;
     }
 
-    // performs stochastic gradient descent with sampling
+    // performs assign evidence with prob
     for(int i=0;i<nnode;i++){
-      single_node_samplers[i].sample_sgd();
+      single_node_samplers[i].sample_prob();
     }
 
+    for(int i=0;i<nnode;i++){
+      single_node_samplers[i].wait_prob();
+    }
+
+    // std::cout << "start prob..." << std::endl;
+    // performs stochastic gradient descent with sampling
+    for(int i=0;i<nnode;i++){
+      // std::cout << i << std::endl;
+      single_node_samplers[i].sample_sgd();
+    }
+    // std::cout << "end prob..." << std::endl;
     // wait the samplers to finish
     for(int i=0;i<nnode;i++){
       single_node_samplers[i].wait_sgd();

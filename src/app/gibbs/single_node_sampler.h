@@ -65,6 +65,8 @@ namespace dd{
      */
     void wait_sgd();
 
+    void sample_prob();
+    void wait_prob();
   };
 }
 

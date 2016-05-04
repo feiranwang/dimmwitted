@@ -34,6 +34,45 @@ namespace dd{
     }
   }
 
+  void SingleThreadSampler::sample_prob(const int & i_sharding, const int & n_sharding){
+    long nvar = p_fg->n_var;
+    long start = ((long)(nvar/n_sharding)+1) * i_sharding;
+    long end = ((long)(nvar/n_sharding)+1) * (i_sharding+1);
+    end = end > nvar ? nvar : end;
+    for(long i=start; i<end; i++){
+      this->sample_prob_single_variable(i);
+    }
+  }
+
+  void SingleThreadSampler::sample_prob_single_variable(long vid){
+
+    // stochastic gradient ascent 
+    // gradient of weight = E[f|D] - E[f], where D is evidence variables, 
+    // f is the factor function, E[] is expectation. Expectation is calculated
+    // using a sample of the variable.
+    
+    Variable & variable = p_fg->variables[vid];
+    if (variable.is_observation) return;
+
+    if (!variable.is_evid) return;
+    // printf("~~~~~%d\n",vid);
+    // printf("%lf\n", variable.prob);
+    if(variable.domain_type == DTYPE_BOOLEAN){ // boolean
+
+        // sample the variable with evidence unchanged
+        if(variable.is_evid == true){
+          *this->p_rand_obj_buf = erand48(this->p_rand_seed);
+          // std::cout << variable.id << "\t" << (*this->p_rand_obj_buf) << "\t" << variable.prob << std::endl;
+          if((*this->p_rand_obj_buf) <= variable.prob){
+            p_fg->update_evid(variable, 1.0);
+          }else{
+            p_fg->update_evid(variable, 0.0);
+          }
+        }        
+    }
+    // printf("~~~~~\n");
+  }
+
   void SingleThreadSampler::sample_sgd_single_variable(long vid){
 
     // stochastic gradient ascent 

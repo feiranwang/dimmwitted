@@ -27,6 +27,8 @@ namespace dd{
     VariableValue lower_bound;      // lower bound
     VariableValue upper_bound;      // upper bound
     
+    double prob;
+
     VariableValue assignment_evid;  // assignment, while keeping evidence variables unchanged
     VariableValue assignment_free;  // assignment, free to change any variable
 

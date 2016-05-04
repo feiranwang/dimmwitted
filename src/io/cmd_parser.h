@@ -29,7 +29,8 @@ namespace dd{
     TCLAP::ValueArg<std::string> * variable_file;
     TCLAP::ValueArg<std::string> * factor_file;
     TCLAP::ValueArg<std::string> * output_folder;
-
+    TCLAP::ValueArg<std::string> * prob_file;
+    
     TCLAP::ValueArg<int> * n_learning_epoch;
     TCLAP::ValueArg<int> * n_samples_per_learning_epoch;
     TCLAP::ValueArg<int> * n_inference_epoch;
